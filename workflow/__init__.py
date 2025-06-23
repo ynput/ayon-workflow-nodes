@@ -44,10 +44,33 @@ def get_plugins():
             "version": __version__,
             "inputs": [
                 {
-                    "name": "input",
+                    "name": "input_str",
                     "description": "whatever",
                     "type": str,
                 }
+            ],
+            "outputs": [],
+        },
+        {
+            "name": "Concatenate String",
+            "description": "Concatenate 2 strings",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "input_A",
+                    "description": "whatever",
+                    "type": str,
+                },
+                {
+                    "name": "input_B",
+                    "description": "whatever",
+                    "type": str,
+                },
+                {
+                    "name": "input_C",
+                    "description": "whatever",
+                    "type": str,
+                },
             ],
             "outputs": [],
         },
@@ -65,5 +88,8 @@ def get_plugin_function(name):
 
     elif name == "Print":
         return plugin1.print_stuff
+
+    elif name == "Concatenate String":
+        return plugin1.concatenate_as_string
 
     return None
