@@ -47,6 +47,11 @@ def get_plugins():
                     "name": "input_str",
                     "description": "whatever",
                     "type": str,
+                },
+                {
+                    "name": "template",
+                    "description": "whatever",
+                    "type": str,
                 }
             ],
             "outputs": [],
@@ -74,6 +79,47 @@ def get_plugins():
             ],
             "outputs": [],
         },
+        {
+            "name": "Write to File",
+            "description": "Concatenate 2 strings",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "content",
+                    "description": "whatever",
+                    "type": object,
+                },
+                {
+                    "name": "filepath",
+                    "description": "whatever",
+                    "type": str,
+                },
+                {
+                    "name": "directory",
+                    "description": "whatever",
+                    "type": str,
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "filepath",
+                    "type": object,
+                }
+            ],
+        },
+        {
+            "name": "Fail",
+            "description": "Raise an exception",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "message",
+                    "description": "whatever",
+                    "type": object,
+                },
+            ],
+            "outputs": [],
+        }
     ]
 
 
@@ -91,5 +137,20 @@ def get_plugin_function(name):
 
     elif name == "Concatenate String":
         return plugin1.concatenate_as_string
+
+    elif name == "Write to File":
+        return plugin1.write_to_file
+
+    elif name == "Fail":
+        return plugin1.raise_exception
+
+    return None
+
+
+def get_plugin_revert_function(name):
+    from . import plugin1
+
+    if name == "Write to File":
+        return plugin1.revert_write_to_file
 
     return None
