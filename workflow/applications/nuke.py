@@ -70,11 +70,17 @@ def _get_render_python_script_path(
     ):
     if python_script_path:
         if not os.path.exists(python_script_path):
-            raise ValueError(f"Unreachable python script {python_script_path}.")
+            raise ValueError(
+                f"Unreachable python script {python_script_path}."
+            )
         return python_script_path
 
     # TODO implement a temporary centralized temporary directory.
-    with tempfile.NamedTemporaryFile(suffix=".py", mode="w", delete=False) as fhandler:
+    with tempfile.NamedTemporaryFile(
+        suffix=".py",
+        mode="w",
+        delete=False
+    ) as fhandler:
         fhandler.write(
             _default_py_render_logic(
                 read_node_name=read_node_name,
@@ -114,7 +120,7 @@ def run_nuke_render(
     if input_media:
         app_args.append(input_media.format())
 
-    # TODO: make output_media optional and 
+    # TODO: make output_media optional and
     # identify media from resulting stdout instead.
     # assert the output_media exists
     app_args.append(output_media.format())

@@ -2,7 +2,7 @@
 """
 import os
 from typing import Optional, Tuple
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from ayon_applications import ApplicationManager, Application
 
@@ -74,11 +74,15 @@ def get_application(
     try:
         app_group = app_manager.app_groups[application_group_name]
     except KeyError:
-        raise ValueError(f"Unknown application group name {application_group_name}.")
+        raise ValueError(
+            f"Unknown application group name {application_group_name}."
+        )
 
     # If not provided, default to latest version available.
     if application_variant is None:
-        app = app_manager.find_latest_available_variant_for_group(app_group.name)
+        app = app_manager.find_latest_available_variant_for_group(
+            app_group.name
+        )
 
     else:
         # Retrieve explicit version.

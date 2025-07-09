@@ -152,7 +152,7 @@ def get_plugins():
                 },
                 {
                     "name": "frame_range",
-                    "description": "An optional FrameRange to limit the render.",
+                    "description": "Restrictive frame range.",
                     "type": object,
                 },
                 {
@@ -167,7 +167,7 @@ def get_plugins():
                 },
                 {
                     "name": "nuke_application_variant",
-                    "description": "An application variant to use (default to latest).",
+                    "description": "An application variant to use.",
                     "type": str,
                 }
             ],
