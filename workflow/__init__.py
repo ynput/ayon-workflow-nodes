@@ -119,12 +119,71 @@ def get_plugins():
                 },
             ],
             "outputs": [],
-        }
+        },
+        {
+            "name": "NukeRender",
+            "description": "Perform a render through Nuke.",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "folder",
+                    "description": "The folder associated to the Render.",
+                    "type": object,
+                },
+                {
+                    "name": "nuke_script_path",
+                    "description": "The path to the Nuke script.",
+                    "type": str,
+                },
+                {
+                    "name": "input_media",
+                    "description": "The input media",
+                    "type": object,
+                },
+                {
+                    "name": "output_media",
+                    "description": "The output media",
+                    "type": object,
+                },
+                {
+                    "name": "python_script_path",
+                    "description": "The path to a python script.",
+                    "type": str,
+                },
+                {
+                    "name": "frame_range",
+                    "description": "An optional FrameRange to limit the render.",
+                    "type": object,
+                },
+                {
+                    "name": "read_node_name",
+                    "description": "Explicit a Read node to use.",
+                    "type": str,
+                },
+                {
+                    "name": "write_node_name",
+                    "description": "Explicit a Write node to use.",
+                    "type": str,
+                },
+                {
+                    "name": "nuke_application_variant",
+                    "description": "An application variant to use (default to latest).",
+                    "type": str,
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "filepath",
+                    "type": object,
+                }
+            ],
+        },
     ]
 
 
 def get_plugin_function(name):
     from . import plugin1
+    from .applications import nuke
 
     if name == "Random Number":
         return plugin1.do_stuff
@@ -143,6 +202,9 @@ def get_plugin_function(name):
 
     elif name == "Fail":
         return plugin1.raise_exception
+
+    elif name == "NukeRender":
+        return nuke.run_nuke_render
 
     return None
 
