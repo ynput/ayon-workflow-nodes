@@ -135,9 +135,7 @@ def run_nuke_render(
         project_name=folder.project_name,
         app_args=app_args,
     )
-
     process = app_launcher.launch()
-    print(" ".join(app_args))
 
     # TODO: check this, how can we interceipt errors.
     if bool(process.returncode):
