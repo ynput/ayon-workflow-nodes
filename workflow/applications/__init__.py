@@ -1,2 +1,2 @@
-""" plugin.workflow.applications
+""" plugins.workflow.applications
 """
