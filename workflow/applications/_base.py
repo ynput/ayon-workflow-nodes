@@ -84,6 +84,7 @@ def run_application(
     )
     process = app_launcher.launch()
 
+    process.wait()
     # TODO: check this, how can we interceipt errors.
     if bool(process.returncode):
         raise RuntimeError("Execution failed.")

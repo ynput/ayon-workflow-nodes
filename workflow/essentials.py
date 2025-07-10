@@ -35,9 +35,7 @@ def _check_parent_directory(
         parent_directory: Optional[str],
     ) -> str:
     if parent_directory and not os.path.exists(parent_directory):
-        raise ValueError(
-            f"Provided parent directory does not exists: {parent_directory}"
-        )
+        os.makedirs(parent_directory)
 
     elif not parent_directory:
         parent_directory = tempfile.mkdtemp()
@@ -48,13 +46,13 @@ def _check_parent_directory(
 def prepare_image_sequence(
     head: str,
     tail: str,
-    parent_dir: Optional[str] = None,
+    directory: Optional[str] = None,
     padding: Optional[int] = 4,
     frame_range: Optional[FrameRange] = None,
 ) -> ImageSequence:
-    parent_dir = _check_parent_directory(parent_dir)
+    directory = _check_parent_directory(directory)
     return ImageSequence(
-        directory=parent_dir,
+        directory=directory,
         head=head,
         tail=tail,
         padding=padding,
@@ -71,6 +69,6 @@ def prepare_video(
 
     directory = _check_parent_directory(directory)
     return Video(
-        directory=os.path.join(directory, basename),
+        path=os.path.join(directory, basename),
         frame_range=frame_range,
     )

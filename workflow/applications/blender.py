@@ -110,7 +110,7 @@ def run_blender_render(
                 "--output_path",
                 os.path.join(
                     output_media.directory,
-                    f"{output_media.head}."
+                    f"{output_media.head}"
                 )
             ]
         )

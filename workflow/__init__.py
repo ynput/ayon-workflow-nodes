@@ -221,7 +221,7 @@ def get_plugins():
                     "type": FrameRange,
                 },
                 {
-                    "name": "nuke_application_variant",
+                    "name": "blender_application_variant",
                     "description": "An application variant to use.",
                     "type": str,
                 }
@@ -258,3 +258,16 @@ def get_plugin_function(name):
 
 def get_plugin_revert_function(name):
     return None
+
+
+__all__ = [
+    "Media",
+    "ImageSequence",
+    "Video",
+    "Folder",
+    "FrameRange",
+
+    "get_plugins",
+    "get_plugin_function",
+    "get_plugin_revert_function",
+]
