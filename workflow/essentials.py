@@ -34,8 +34,8 @@ def get_ayon_folder(
 def _check_parent_directory(
         parent_directory: Optional[str],
     ) -> str:
-    if parent_directory and not os.path.exists(parent_directory):
-        os.makedirs(parent_directory)
+    if parent_directory:
+        os.makedirs(parent_directory, exist_ok=True)
 
     elif not parent_directory:
         parent_directory = tempfile.mkdtemp()

@@ -75,6 +75,7 @@ def get_plugins():
                     "name": "path",
                     "description": "The path to the video.",
                     "type": str,
+                    "default": "movie.mov",
                 },
                 {
                     "name": "frame_range",
@@ -103,11 +104,13 @@ def get_plugins():
                     "name": "head",
                     "description": "The head of the sequence e.g. `img.`.",
                     "type": str,
+                    "default": "img_seq.",
                 },
                 {
                     "name": "tail",
                     "description": "The tail of the sequence e.g. `.jpg`.",
                     "type": str,
+                    "default": ".exr",
                 },
                 {
                     "name": "frame_range",
@@ -118,6 +121,7 @@ def get_plugins():
                     "name": "padding",
                     "description": "An optional frame range padding.",
                     "type": int,
+                    "default": 4,
                 },
             ],
             "outputs": [
