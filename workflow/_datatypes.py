@@ -61,10 +61,21 @@ Media = Union[ImageSequence, Video]
 
 @dataclass
 class Folder:
-    """ A folder container.
+    """ A folder (with optional task) container.
     """
     project_name: str
     folder_type: Optional[str] = None
     folder_name: Optional[str] = None
     parent: Optional["Folder"] = None
+    task_name: Optional[str] = None
 
+    def folder_path(self) -> str:
+        if self.parent:
+            ancestor = self.parent.folder_path()
+        else:
+            ancestor = ""
+
+        if self.folder_name:
+            return f"{ancestor}/{self.folder_name}"
+
+        raise ValueError(f"Not a complete folder: {self}")

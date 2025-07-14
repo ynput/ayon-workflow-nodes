@@ -20,14 +20,16 @@ def pass_through(input_data: Any) -> Any:
 
 def get_ayon_folder(
     project_name: str,
-    folder_id: Optional[str] = str,
-    folder_name: Optional[str] = str,
-    folder_type: Optional[str] = str,
+    folder_id: Optional[str] = None,
+    folder_name: Optional[str] = None,
+    folder_type: Optional[str] = None,
+    task_name: Optional[str] = None,
 ) -> Folder:
     # TODO gather from server (id or type/name)
     # also validate it exists, raise otherwise.
     return Folder(
-        project_name=project_name
+        project_name=project_name,
+        task_name=task_name,
     )
 
 
