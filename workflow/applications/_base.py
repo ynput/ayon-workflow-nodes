@@ -77,12 +77,12 @@ def run_application(
         application_group_name,
         application_variant=app_application_variant
     )
-    app_launcher = app_manager.create_launch_context(
+    launch_context = app_manager.create_launch_context(
         app.full_name,
         project_name=folder.project_name,
         app_args=app_args or [],
     )
-    process = app_launcher.launch()
+    process = launch_context.launch()
 
     process.wait()
     # TODO: check this, how can we interceipt errors.
