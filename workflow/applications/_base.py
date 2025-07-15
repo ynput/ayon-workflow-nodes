@@ -48,7 +48,7 @@ class ImageSequence:
     def format(self) -> str:
         seq = os.path.join(
             self.directory,
-            f"{self.head}%0{self.padding}d{self.tail}"
+            f"{self.head}%{self.padding:0>2}d{self.tail}"
         )
         if self.frame_range:
             return f"{seq} {self.frame_range.format()}"
