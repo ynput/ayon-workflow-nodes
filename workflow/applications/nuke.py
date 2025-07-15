@@ -6,10 +6,16 @@ from typing import Optional, Union
 import os
 import tempfile
 
-from . import _base
+from ._base import (
+    get_application,
+    Folder,
+    FrameRange,
+    ImageSequence,
+    Video,
+)
 
 
-Media = Union[_base.ImageSequence, _base.Video]
+Media = Union[ImageSequence, Video]
 
 
 def _default_py_render_logic(
@@ -92,12 +98,12 @@ def _get_render_python_script_path(
 
 
 def run_nuke_render(
-        folder: _base.Folder,
+        folder: Folder,
         nuke_script_path: str,
         input_media: Media,
         output_media: Media,
         python_script_path: Optional[str] = None,
-        frame_range: Optional[_base.FrameRange] = None,
+        frame_range: Optional[FrameRange] = None,
         read_node_name: Optional[str] = None,
         write_node_name: Optional[str] = None,
         nuke_application_variant: Optional[str] = None,
@@ -126,16 +132,16 @@ def run_nuke_render(
     app_args.append(output_media.format())
 
     # Start Nuke application.
-    app_manager, app = _base.get_application(
+    app_manager, app = get_application(
         "nuke",
         application_variant=nuke_application_variant
     )
-    app_launcher = app_manager.create_launch_context(
+    launch_context = app_manager.create_launch_context(
         app.full_name,
         project_name=folder.project_name,
         app_args=app_args,
     )
-    process = app_launcher.launch()
+    process = launch_context.launch()
 
     # TODO: check this, how can we interceipt errors.
     if bool(process.returncode):
