@@ -8,7 +8,7 @@ import tempfile
 from ayon_workflow.plugins.workflow._datatypes import (
     ImageSequence,
     Video,
-    Folder,
+    FolderItem,
     FrameRange,
 )
 
@@ -24,10 +24,10 @@ def get_ayon_folder(
     folder_name: Optional[str] = None,
     folder_type: Optional[str] = None,
     task_name: Optional[str] = None,
-) -> Folder:
+) -> FolderItem:
     # TODO gather from server (id or type/name)
     # also validate it exists, raise otherwise.
-    return Folder(
+    return FolderItem(
         project_name=project_name,
         task_name=task_name,
     )

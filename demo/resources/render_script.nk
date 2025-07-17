@@ -1,0 +1,195 @@
+#! C:/Program Files/Nuke15.1v3/nuke-15.1.3.dll -nx
+#write_info Write1 file:"/path/to/output.mov" format:"960 540 1" chans:":rgba.red:rgba.green:rgba.blue:rgba.alpha:" framerange:"0 5000" fps:"0" colorspace:"default (Gamma2.2)" datatype:"unknown" transfer:"unknown" views:"main" colorManagement:"Nuke"
+version 15.1 v3
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="0" y="0" w="3437" h="1360" screen="0">
+        <splitter orientation="1">
+            <split size="40"/>
+            <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                <page id="Toolbar.1"/>
+            </dock>
+            <split size="1343" stretch="1"/>
+            <splitter orientation="2">
+                <split size="0"/>
+                <dock id=""/>
+                <split size="1318"/>
+                <dock id="" activePageId="DAG.1" focus="true">
+                    <page id="DAG.1"/>
+                    <page id="Curve Editor.1"/>
+                    <page id="DopeSheet.1"/>
+                </dock>
+            </splitter>
+            <split size="578"/>
+            <dock id="" activePageId="Properties.1">
+                <page id="Properties.1"/>
+                <page id="uk.co.thefoundry.backgroundrenderview.1"/>
+                <page id="Scenegraph.1"/>
+            </dock>
+            <split size="1464"/>
+            <dock id="" activePageId="Viewer.1">
+                <page id="Viewer.1"/>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name C:/Users/robin/OneDrive/Bureau/dev_ayon/dev/ayon-workflow/demo/resources/render_script.nk
+ frame 2
+ first_frame 0
+ last_frame 5000
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement Nuke
+ OCIO_config aces_1.2
+ workingSpaceLUT linear
+ monitorLut sRGB
+ monitorOutLUT rec709
+ int8Lut sRGB
+ int16Lut sRGB
+ logLut Cineon
+ floatLut linear
+}
+Read {
+ inputs 0
+ file_type jpeg
+ file /path/to/nowhere/blender_render####.jpg
+ format "960 540 0 0 960 540 1 "
+ first 46
+ last 47
+ origfirst 46
+ origlast 47
+ origset true
+ version 1
+ name Read1
+ xpos 72
+ ypos -343
+}
+set N5ef45c00 [stack 0]
+Rectangle {
+ area {-26 33 998 520.5}
+ name Rectangle1
+ xpos 236
+ ypos -101
+}
+push $N5ef45c00
+Grade {
+ multiply 0
+ name Grade2
+ xpos -191
+ ypos -129
+}
+Transform {
+ center {480 270}
+ name Transform1
+ xpos -191
+ ypos -105
+}
+push $N5ef45c00
+Grade {
+ add {0.1 0 0 0}
+ name Grade1
+ xpos 72
+ ypos -174
+}
+Merge2 {
+ inputs 2+1
+ invert_mask true
+ mix 0.75
+ name Merge1
+ xpos 72
+ ypos -46
+}
+Text2 {
+ font_size_toolbar 12
+ font_width_toolbar 100
+ font_height_toolbar 100
+ message processed
+ old_message {{112 114 111 99 101 115 115 101 100}
+   }
+ box {4.5 493.5 524.5 534.5}
+ transforms {{0 2}
+   }
+ font_size_values {{0 12 1 12 2 12 3 12 4 12 5 12 6 12 7 12 8 12 0 0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0}
+   }
+ cursor_position 9
+ font_size 12
+ center {1024 778}
+ cursor_initialised true
+ autofit_bbox false
+ initial_cursor_position {{53 506.5}
+   }
+ group_animations {{0} imported: 0 selected: items: "root transform/"}
+ animation_layers {{1 11 1024 778 0 0 1 1 0 0 0 0}
+   }
+ name Text1
+ xpos 72
+ ypos -22
+}
+Text2 {
+ font_size_toolbar 12
+ font_width_toolbar 100
+ font_height_toolbar 100
+ message "\[frame]"
+ old_message {{48}
+   }
+ old_expression_markers {{0 0}
+   }
+ box {897 2.25 954 26.75}
+ transforms {{0 2}
+   }
+ font_size_values {{0 12}
+   }
+ cursor_position 6
+ font_size 12
+ center {1024 778}
+ cursor_initialised true
+ autofit_bbox false
+ initial_cursor_position {{53 506.5}
+   }
+ group_animations {{0} imported: 0 selected: items: "root transform/"}
+ animation_layers {{1 11 1024 778 0 0 1 1 0 0 0 0}
+   }
+ name Text2
+ xpos 72
+ ypos 2
+}
+Write {
+ channels rgba
+ file /path/to/output.mov
+ file_type mov
+ mov64_format "mov (QuickTime / MOV)"
+ mov64_codec h264
+ mov_h264_codec_profile "High 4:2:0 8-bit"
+ mov64_pixel_format {{0} "yuv420p\tYCbCr 4:2:0 8-bit"}
+ mov64_quality Custom
+ mov64_fast_start true
+ mov64_write_timecode true
+ mov64_gop_size 12
+ mov64_b_frames 0
+ mov64_bitrate 28000
+ mov64_bitrate_tolerance 0
+ mov64_quality_min 1
+ mov64_quality_max 3
+ checkHashOnRead false
+ version 1
+ ocioColorspace scene_linear
+ display ACES
+ view sRGB
+ name Write1
+ xpos 72
+ ypos 107
+}
+Viewer {
+ frame_range 2-5000
+ frame_range_lock true
+ input_number 1
+ monitorOutNDISenderName "Nuke - render_script - Viewer1"
+ monitorOutOutputTransform rec709
+ name Viewer1
+ xpos 72
+ ypos 368
+}

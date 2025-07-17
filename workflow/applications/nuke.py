@@ -3,10 +3,9 @@
 
 from typing import Optional
 
-
 from ayon_workflow.plugins.workflow._datatypes import (
     Media,
-    Folder,
+    FolderItem,
     FrameRange,
 )
 
@@ -65,7 +64,7 @@ write_node['file'].fromUserText(sys.argv[3])
 
 
 def run_nuke_render(
-        folder: Folder,
+        folder_item: FolderItem,
         nuke_script_path: str,
         input_media: Media,
         output_media: Media,
@@ -101,7 +100,7 @@ def run_nuke_render(
     # Start application.
     _ = _base.run_application(
         "nuke",
-        folder,
+        folder_item,
         app_args=app_args,
         app_application_variant=nuke_application_variant,
     )

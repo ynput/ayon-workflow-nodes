@@ -2,7 +2,7 @@
 """
 import os
 
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 from dataclasses import dataclass
 
@@ -55,18 +55,32 @@ class ImageSequence:
 
         return seq
 
+    def __iter__(self) -> List[str]:
+        if not self.frame_range:
+            return
+
+        for frame in range(
+            self.frame_range.first_frame,
+            self.frame_range.last_frame + 1,
+        ):
+            frame_str = str(frame).zfill(self.padding)
+            yield os.path.join(
+                self.directory,
+                f"{self.head}{frame_str}{self.tail}"
+            )
+
 
 Media = Union[ImageSequence, Video]
 
 
 @dataclass
-class Folder:
-    """ A folder (with optional task) container.
+class FolderItem:
+    """ An AYON folder item container.
     """
     project_name: str
     folder_type: Optional[str] = None
     folder_name: Optional[str] = None
-    parent: Optional["Folder"] = None
+    parent: Optional["FolderItem"] = None
     task_name: Optional[str] = None
 
     def folder_path(self) -> str:
