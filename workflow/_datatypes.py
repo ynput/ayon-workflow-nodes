@@ -60,11 +60,10 @@ Media = Union[ImageSequence, Video]
 
 
 @dataclass
-class Folder:
-    """ A folder container.
+class FolderItem:
+    """ An AYON folder item container.
     """
     project_name: str
     folder_type: Optional[str] = None
     folder_name: Optional[str] = None
-    parent: Optional["Folder"] = None
-
+    parent: Optional["FolderItem"] = None

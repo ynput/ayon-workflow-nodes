@@ -6,7 +6,7 @@ from ayon_workflow.plugins.workflow._datatypes import (
     Media,
     ImageSequence,
     Video,
-    Folder,
+    FolderItem,
     FrameRange,
 )
 
@@ -34,8 +34,8 @@ def get_plugins():
             ],
         },
         {
-            "name": "Folder",
-            "description": "Gather a valid AYON folder.",
+            "name": "FolderItem",
+            "description": "Gather a valid AYON folder item.",
             "version": __version__,
             "inputs": [
                 {
@@ -61,8 +61,8 @@ def get_plugins():
             ],
             "outputs": [
                 {
-                    "name": "folder",
-                    "type": Folder,
+                    "name": "folder_item",
+                    "type": FolderItem,
                 }
             ],
         },
@@ -137,9 +137,9 @@ def get_plugins():
             "version": __version__,
             "inputs": [
                 {
-                    "name": "folder",
-                    "description": "The folder associated to the Render.",
-                    "type": Folder,
+                    "name": "folder_item",
+                    "description": "The folder item associated to the Render.",
+                    "type": FolderItem,
                 },
                 {
                     "name": "nuke_script_path",
@@ -195,9 +195,9 @@ def get_plugins():
             "version": __version__,
             "inputs": [
                 {
-                    "name": "folder",
-                    "description": "The folder associated to the Render.",
-                    "type": Folder,
+                    "name": "folder_item",
+                    "description": "The folder item associated to the Render.",
+                    "type": FolderItem,
                 },
                 {
                     "name": "blender_script_path",
@@ -248,7 +248,7 @@ def get_plugin_function(name):
         # Others
         "NoOp": essentials.pass_through,
 
-        "Folder": essentials.get_ayon_folder,
+        "FolderItem": essentials.get_ayon_folder,
         "Video": essentials.prepare_video,
         "ImageSequence": essentials.prepare_image_sequence,
 
@@ -268,7 +268,7 @@ __all__ = [
     "Media",
     "ImageSequence",
     "Video",
-    "Folder",
+    "FolderItem",
     "FrameRange",
 
     "get_plugins",

@@ -1,13 +1,14 @@
 """ plugin.workflow.applications.render
 """
 import os
-from typing import Optional, Tuple, List
-import tempfile
 import subprocess
+import tempfile
+
+from typing import Optional, Tuple, List
 
 from ayon_applications import ApplicationManager, Application
 
-from ayon_workflow.plugins.workflow._datatypes import Folder
+from ayon_workflow.plugins.workflow._datatypes import FolderItem
 
 
 def get_application(
@@ -68,7 +69,7 @@ def get_render_python_script_path(
 
 def run_application(
         application_group_name: str,
-        folder: Folder,
+        folder_item: FolderItem,
         app_args: Optional[List[str]] = None,
         app_application_variant: Optional[str] = None,
     ) -> subprocess.Popen:
@@ -79,7 +80,7 @@ def run_application(
     )
     launch_context = app_manager.create_launch_context(
         app.full_name,
-        project_name=folder.project_name,
+        project_name=folder_item.project_name,
         app_args=app_args or [],
     )
     process = launch_context.launch()

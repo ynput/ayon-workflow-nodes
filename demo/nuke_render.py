@@ -6,7 +6,6 @@ Requirement:
 """
 import os
 import pprint
-import tempfile
 
 from ayon_workflow import graph_editor
 from ayon_workflow import graph_execution
@@ -28,7 +27,7 @@ def _build_graph(project_name: str) -> graph_editor.Graph:
 
     # Retrieve project
     project_node = graph.create_node(
-        "Folder",
+        "FolderItem",
         label="AYON project"
     )
     project_node["project_name"] = project_name
@@ -85,14 +84,14 @@ def _build_graph(project_name: str) -> graph_editor.Graph:
 
     # Connections
     project_node.connect(
-        "folder",
+        "folder_item",
         nuke_node,
-        "folder"
+        "folder_item"
     )
     project_node.connect(
-        "folder",
+        "folder_item",
         blender_node,
-        "folder"
+        "folder_item"
     )
     render_node.connect(
         "image_sequence",
