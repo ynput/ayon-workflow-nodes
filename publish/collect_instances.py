@@ -75,10 +75,15 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                 _, ext = os.path.splitext(path)
                 ext = ext.strip(".")
 
+                if isinstance(paths, list):
+                    files = [os.path.basename(pth) for pth in paths]
+                else:
+                    files = os.path.basename(paths)
+
                 repre = {
                     'name': ext,
                     'ext': ext,
-                    'files': [os.path.basename(pth) for pth in paths],
+                    'files': files,
                     "stagingDir": os.path.dirname(path),
                     "tags": ["webreview"],
                 }

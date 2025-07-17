@@ -52,34 +52,34 @@ def publish(
         for instance in pyblish_context
     ]
 
+def run_demo(project_name: str):
+    seq_folder = FolderItem(
+        folder_name="sq_test",
+        project_name=project_name,
+    )
+    shot_folder = FolderItem(
+        folder_name="sh_test",
+        parent=seq_folder,
+        project_name=project_name,
+        task_name="compositing",
+    )
 
-seq_folder = FolderItem(
-    folder_name="sq_test",
-    project_name="SN4exploration",
-)
-shot_folder = FolderItem(
-    folder_name="sh_test",
-    parent=seq_folder,
-    project_name="SN4exploration",
-    task_name="compositing",
-)
+    publish(
+        os.path.join(AYON_DIRECTORY, "resources", "render_script.nk"),
+        shot_folder,
+        "workfile_test",
+        product_type="workfile"
+    )
 
-publish(
-    os.path.join(AYON_DIRECTORY, "resources", "render_script.nk"),
-    shot_folder,
-    "workfile_test",
-    product_type="workfile"
-)
-
-img_seq = ImageSequence(
-    directory=os.path.join(AYON_DIRECTORY, "resources"),
-    head="img.",
-    tail=".jpg",
-    frame_range=FrameRange(first_frame=10, last_frame=11)
-)
-publish(
-    img_seq,
-    shot_folder,
-    "render_test",
-    product_type="render"
-)
+    img_seq = ImageSequence(
+        directory=os.path.join(AYON_DIRECTORY, "resources"),
+        head="img.",
+        tail=".jpg",
+        frame_range=FrameRange(first_frame=10, last_frame=11)
+    )
+    publish(
+        img_seq,
+        shot_folder,
+        "render_test",
+        product_type="render"
+    )
