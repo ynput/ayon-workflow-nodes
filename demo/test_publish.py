@@ -7,7 +7,12 @@ import pyblish.util
 from ayon_core.pipeline import install_ayon_plugins
 from ayon_core.pipeline.publish import publish_plugins_discover
 
-from ayon_workflow.plugins.workflow import FolderItem, Video, ImageSequence, FrameRange
+from ayon_workflow.plugins.workflow import (
+    FolderItem,
+    Video,
+    ImageSequence,
+    FrameRange
+)
 
 
 AYON_DIRECTORY = os.path.dirname(__file__)
