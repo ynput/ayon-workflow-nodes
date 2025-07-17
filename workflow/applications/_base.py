@@ -57,8 +57,8 @@ class ImageSequence:
 
 
 @dataclass
-class Folder:
-    """ A folder container.
+class FolderItem:
+    """ An AYON folder item container.
     """
     project_name: str
     folder_type: Optional[str] = None

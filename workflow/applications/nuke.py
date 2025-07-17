@@ -8,7 +8,7 @@ import tempfile
 
 from ._base import (
     get_application,
-    Folder,
+    FolderItem,
     FrameRange,
     ImageSequence,
     Video,
@@ -98,7 +98,7 @@ def _get_render_python_script_path(
 
 
 def run_nuke_render(
-        folder: Folder,
+        folder_item: FolderItem,
         nuke_script_path: str,
         input_media: Media,
         output_media: Media,
@@ -138,7 +138,7 @@ def run_nuke_render(
     )
     launch_context = app_manager.create_launch_context(
         app.full_name,
-        project_name=folder.project_name,
+        project_name=folder_item.project_name,
         app_args=app_args,
     )
     process = launch_context.launch()

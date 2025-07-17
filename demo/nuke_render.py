@@ -20,7 +20,7 @@ RESOURCE_DIR = os.path.abspath(
 def run_nuke_render(project_name: str):
     nuke_script_path = os.path.join(RESOURCE_DIR, "render_script.nk")
 
-    current_project = _base.Folder(project_name=project_name)
+    current_project = _base.FolderItem(project_name=project_name)
     input_media = _base.ImageSequence(
         directory=RESOURCE_DIR,
         head="img.",

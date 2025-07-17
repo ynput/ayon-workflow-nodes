@@ -126,7 +126,7 @@ def get_plugins():
             "version": __version__,
             "inputs": [
                 {
-                    "name": "folder",
+                    "name": "folder_item",
                     "description": "The folder associated to the Render.",
                     "type": object,
                 },
