@@ -2,8 +2,8 @@
 This should be as simple as possible to avoid import errors.
 """
 from typing import Any
-from ayon_workflow.plugins.workflow._datatypes import (
-    Media,
+from ayon_workflow.datatypes import (
+    MediaType,
     ImageSequence,
     Video,
     FolderItem,
@@ -149,12 +149,12 @@ def get_plugins():
                 {
                     "name": "input_media",
                     "description": "The input media",
-                    "type": Media,
+                    "type": MediaType,
                 },
                 {
                     "name": "output_media",
                     "description": "The output media",
-                    "type": Media,
+                    "type": MediaType,
                 },
                 {
                     "name": "python_script_path",
@@ -185,7 +185,7 @@ def get_plugins():
             "outputs": [
                 {
                     "name": "rendered_media",
-                    "type": Media,
+                    "type": MediaType,
                 }
             ],
         },
@@ -212,7 +212,7 @@ def get_plugins():
                 {
                     "name": "output_media",
                     "description": "The output media",
-                    "type": Media,
+                    "type": MediaType,
                 },
                 {
                     "name": "python_script_path",
@@ -233,7 +233,7 @@ def get_plugins():
             "outputs": [
                 {
                     "name": "rendered_media",
-                    "type": Media,
+                    "type": MediaType,
                 }
             ],
         },
@@ -265,12 +265,6 @@ def get_plugin_revert_function(name):
 
 
 __all__ = [
-    "Media",
-    "ImageSequence",
-    "Video",
-    "FolderItem",
-    "FrameRange",
-
     "get_plugins",
     "get_plugin_function",
     "get_plugin_revert_function",

@@ -5,7 +5,7 @@ import os
 from typing import Optional, Any
 import tempfile
 
-from ayon_workflow.plugins.workflow._datatypes import (
+from ayon_workflow.datatypes import (
     ImageSequence,
     Video,
     FolderItem,
