@@ -8,7 +8,7 @@ from typing import Optional, Tuple, List
 
 from ayon_applications import ApplicationManager, Application
 
-from ayon_workflow.plugins.workflow._datatypes import FolderItem
+from ayon_workflow.datatypes import FolderItem
 
 
 def get_application(

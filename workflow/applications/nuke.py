@@ -3,8 +3,8 @@
 
 from typing import Optional
 
-from ayon_workflow.plugins.workflow._datatypes import (
-    Media,
+from ayon_workflow.datatypes import (
+    MediaType,
     FolderItem,
     FrameRange,
 )
@@ -66,14 +66,14 @@ write_node['file'].fromUserText(sys.argv[3])
 def run_nuke_render(
         folder_item: FolderItem,
         nuke_script_path: str,
-        input_media: Media,
-        output_media: Media,
+        input_media: MediaType,
+        output_media: MediaType,
         python_script_path: Optional[str] = None,
         frame_range: Optional[FrameRange] = None,
         read_node_name: Optional[str] = None,
         write_node_name: Optional[str] = None,
         nuke_application_variant: Optional[str] = None,
-    ) -> Media:
+    ) -> MediaType:
     # Construct render command line args.
     app_args = ["-X",  f"{write_node_name}"] if write_node_name else ["-x"]
     if frame_range:

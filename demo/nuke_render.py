@@ -13,7 +13,7 @@ from ayon_workflow.plugins.workflow import FrameRange
 from ayon_workflow.plugin_system import register_plugins
 
 
-AYON_WORKFLOW_DIR = os.path.dirname(__file__)
+AYON_WORKFLOW_DIR = os.path.dirname(os.path.abspath(__file__))
 FRAME_RANGE = FrameRange(
     first_frame=1,
     last_frame=5,

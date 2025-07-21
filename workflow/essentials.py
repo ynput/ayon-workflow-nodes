@@ -5,14 +5,12 @@ import os
 from typing import Optional, Any
 import tempfile
 
-from ayon_workflow.plugins.workflow._datatypes import (
+from ayon_workflow.datatypes import (
     ImageSequence,
     Video,
     FolderItem,
     FrameRange,
 )
-
-
 
 def pass_through(input_data: Any) -> Any:
     return input_data

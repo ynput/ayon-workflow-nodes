@@ -4,7 +4,7 @@
 from typing import Optional
 import os
 
-from ayon_workflow.plugins.workflow._datatypes import (
+from ayon_workflow.datatypes import (
     ImageSequence,
     FolderItem,
     FrameRange,
