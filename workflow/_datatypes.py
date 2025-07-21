@@ -56,7 +56,7 @@ class ImageSequence:
         return seq
 
 
-Media = Union[ImageSequence, Video]
+MediaType = Union[ImageSequence, Video]
 
 
 @dataclass

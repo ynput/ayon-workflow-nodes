@@ -12,8 +12,6 @@ from ayon_workflow.plugins.workflow._datatypes import (
     FrameRange,
 )
 
-
-
 def pass_through(input_data: Any) -> Any:
     return input_data
 
