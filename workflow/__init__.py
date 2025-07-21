@@ -1,12 +1,14 @@
 """
 This should be as simple as possible to avoid import errors.
 """
-from typing import Any
+from typing import Any, Union
 from ayon_workflow.datatypes import (
     MediaType,
     ImageSequence,
     Video,
+    ContextItem,
     FolderItem,
+    TaskItem,
     FrameRange,
 )
 
@@ -34,8 +36,8 @@ def get_plugins():
             ],
         },
         {
-            "name": "FolderItem",
-            "description": "Gather a valid AYON folder item.",
+            "name": "Context",
+            "description": "Gather a valid AYON context item.",
             "version": __version__,
             "inputs": [
                 {
@@ -49,20 +51,26 @@ def get_plugins():
                     "type": str,
                 },
                 {
-                    "name": "folder_name",
-                    "description": "An optional folder name.",
+                    "name": "folder_path",
+                    "description": "An optional folder path.",
                     "type": str,
                 },
                 {
-                    "name": "folder_type",
-                    "description": "An optional folder type.",
+                    "name": "task_name",
+                    "description": "An optional task name.",
                     "type": str,
+                },
+                {
+                    "name": "ensure_exists",
+                    "description": "Assert context existence.",
+                    "type": bool,
+                    "default": True,
                 },
             ],
             "outputs": [
                 {
-                    "name": "folder_item",
-                    "type": FolderItem,
+                    "name": "context",
+                    "type": ContextItem,
                 }
             ],
         },
@@ -137,9 +145,9 @@ def get_plugins():
             "version": __version__,
             "inputs": [
                 {
-                    "name": "folder_item",
-                    "description": "The folder item associated to the Render.",
-                    "type": FolderItem,
+                    "name": "context",
+                    "description": "The render context.",
+                    "type": ContextItem,
                 },
                 {
                     "name": "nuke_script_path",
@@ -195,9 +203,9 @@ def get_plugins():
             "version": __version__,
             "inputs": [
                 {
-                    "name": "folder_item",
-                    "description": "The folder item associated to the Render.",
-                    "type": FolderItem,
+                    "name": "context",
+                    "description": "The render context.",
+                    "type": ContextItem,
                 },
                 {
                     "name": "blender_script_path",
@@ -237,18 +245,58 @@ def get_plugins():
                 }
             ],
         },
+        {
+            "name": "Publish",
+            "description": "Publish file(s) or a media.",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "input_path",
+                    "description": "The content to be published.",
+                    "type": Union[str, MediaType],
+                },
+                {
+                    "name": "context",
+                    "description": "The publish context",
+                    "type": Union[FolderItem, TaskItem],
+                },
+                {
+                    "name": "product_name",
+                    "description": "The publish product name.",
+                    "type": str,
+                },
+                {
+                    "name": "product_type",
+                    "description": "The publish product type.",
+                    "type": str,
+                },
+                {
+                    "name": "variant",
+                    "description": "The publish product variant.",
+                    "type": str,
+                    "default": "Main",
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "published_version",
+                    "type": object,
+                }
+            ],
+        },
     ]
 
 
 def get_plugin_function(name):
-    from . import essentials
+    from . import essentials, publish
     from .applications import nuke, blender
 
     func_mapping = {
         # Others
         "NoOp": essentials.pass_through,
+        "Publish": publish.publish_content,
 
-        "FolderItem": essentials.get_ayon_folder,
+        "Context": essentials.get_ayon_context,
         "Video": essentials.prepare_video,
         "ImageSequence": essentials.prepare_image_sequence,
 

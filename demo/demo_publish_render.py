@@ -1,7 +1,7 @@
-""" Demonstrate a graph with Blender + Nuke renders.
+""" Demonstrate a graph with Blender + Nuke renders then publish results.
 
 Requirement:
-* A valid AYON project
+* A valid AYON folder path within a project
 * Nuke and Blender applications correctly setup
 """
 import os
@@ -20,17 +20,21 @@ FRAME_RANGE = FrameRange(
 )
 
 
-def _build_graph(project_name: str) -> graph_editor.Graph:
+def _build_graph(
+        project_name: str,
+        folder_path: str,
+    ) -> graph_editor.Graph:
     # Discover all available node definitions
     register_plugins.register_plugins()
     graph = graph_editor.Graph(name="Demo")
 
-    # Retrieve project
-    project_node = graph.create_node(
-        "FolderItem",
+    # Retrieve context
+    context_node = graph.create_node(
+        "Context",
         label="AYON project"
     )
-    project_node["project_name"] = project_name
+    context_node["project_name"] = project_name
+    context_node["folder_path"] = folder_path
 
     # Render path
     render_node = graph.create_node(
@@ -82,16 +86,42 @@ def _build_graph(project_name: str) -> graph_editor.Graph:
     )
     nuke_node["frame_range"] = FRAME_RANGE
 
-    # Connections
-    project_node.connect(
-        "folder_item",
-        nuke_node,
-        "folder_item"
+    # Publish nodes (Blender)
+    publish_blender_node = graph.create_node(
+        "Publish",
+        label="Publish Blender render"
     )
-    project_node.connect(
-        "folder_item",
+    publish_blender_node["product_type"] = "render"
+    publish_blender_node["product_name"] = "renderBlender"
+
+    # Publish nodes (Nuke)
+    publish_nuke_node = graph.create_node(
+        "Publish",
+        label="Publish Nuke render"
+    )
+    publish_nuke_node["product_type"] = "render"
+    publish_nuke_node["product_name"] = "renderNuke"
+
+    # Connections
+    context_node.connect(
+        "context",
+        nuke_node,
+        "context"
+    )
+    context_node.connect(
+        "context",
         blender_node,
-        "folder_item"
+        "context"
+    )
+    context_node.connect(
+        "context",
+        publish_blender_node,
+        "context"
+    )
+    context_node.connect(
+        "context",
+        publish_nuke_node,
+        "context"
     )
     render_node.connect(
         "image_sequence",
@@ -103,10 +133,20 @@ def _build_graph(project_name: str) -> graph_editor.Graph:
         nuke_node,
         "input_media"
     )
+    blender_node.connect(
+        "rendered_media",
+        publish_blender_node,
+        "input_path"
+    )
     video_node.connect(
         "video",
         nuke_node,
         "output_media",
+    )
+    nuke_node.connect(
+        "rendered_media",
+        publish_nuke_node,
+        "input_path"
     )
     return graph
 
@@ -116,6 +156,12 @@ def _run_graph(graph: graph_editor.Graph):
     pprint.pprint(results)
 
 
-def run_demo(project_name: str):
-    graph = _build_graph(project_name)
+def run_demo(
+        project_name: str,
+        folder_path: str,
+    ):
+    graph = _build_graph(
+        project_name,
+        folder_path,
+    )
     _run_graph(graph)

@@ -32,7 +32,7 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
 
     def process(self, context):
         instances_to_collect = context.data.pop(
-            "instances_to_collect",
+            "ayonWorkflowInstances",
             None
         )
         if not instances_to_collect:
@@ -65,7 +65,7 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                 "family": instance_to_collect["product_type"],
                 "families": [instance_to_collect["product_type"]],
                 "folderPath": context.data["folder_path"],
-                "task": context.data["task_name"],
+                "task": context.data.get("task_name"),
                 "variant": instance_to_collect["variant"],
                 "representations": [],
             }

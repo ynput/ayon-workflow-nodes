@@ -5,7 +5,7 @@ from typing import Optional
 
 from ayon_workflow.datatypes import (
     MediaType,
-    FolderItem,
+    ContextItem,
     FrameRange,
 )
 
@@ -64,7 +64,7 @@ write_node['file'].fromUserText(sys.argv[3])
 
 
 def run_nuke_render(
-        folder_item: FolderItem,
+        context: ContextItem,
         nuke_script_path: str,
         input_media: MediaType,
         output_media: MediaType,
@@ -82,6 +82,7 @@ def run_nuke_render(
         app_args.extend(["-F", str(frame_range.format())])
     app_args.append(
         _base.get_render_python_script_path(
+            context.project_name,
             python_script_path=python_script_path,
             default_content=_default_py_render_logic(
                 read_node_name=read_node_name,
@@ -102,7 +103,7 @@ def run_nuke_render(
     # Start application.
     _ = _base.run_application(
         "nuke",
-        folder_item,
+        context,
         app_args=app_args,
         app_application_variant=nuke_application_variant,
     )
