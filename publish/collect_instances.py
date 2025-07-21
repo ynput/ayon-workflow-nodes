@@ -23,9 +23,9 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
     ) -> Union[str, List[str]]:
         if isinstance(file_entry, str):
             return file_entry
-        elif isinstance(file_entry, Video):
+        if isinstance(file_entry, Video):
             return file_entry.path
-        elif isinstance(file_entry, ImageSequence):
+        if isinstance(file_entry, ImageSequence):
             return list(file_entry)
 
         raise ValueError(f"Unsupported file entry provided: {file_entry}")
@@ -38,12 +38,12 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
         if not instances_to_collect:
             return
 
-        mandatory_keys = set([
+        mandatory_keys = {
             "product_name",
             "product_type",
             "variant",
             "file_groups",
-        ])
+        }
         for instance_to_collect in instances_to_collect:
 
             if (
@@ -52,7 +52,7 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
             ):
                 raise KnownPublishError(
                     f"Invalid instance to be collected: {instances_to_collect}"
-                    f"Missing mandatory keys: {mandatory_keys}."
+                    f" Missing mandatory keys: {mandatory_keys}."
                 )
 
             instance_data = {
@@ -81,11 +81,10 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                     files = os.path.basename(paths)
 
                 repre = {
-                    'name': ext,
-                    'ext': ext,
-                    'files': files,
+                    "name": ext,
+                    "ext": ext,
+                    "files": files,
                     "stagingDir": os.path.dirname(path),
-                    "tags": ["webreview"],
                 }
                 instance_data["representations"].append(repre)
 

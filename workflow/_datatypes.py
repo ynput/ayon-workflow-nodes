@@ -2,7 +2,7 @@
 """
 import os
 
-from typing import Optional, Union, List
+from typing import Optional, Union, Generator
 
 from dataclasses import dataclass
 
@@ -55,7 +55,7 @@ class ImageSequence:
 
         return seq
 
-    def __iter__(self) -> List[str]:
+    def __iter__(self) -> Generator[str, None, None]:
         if not self.frame_range:
             return
 
