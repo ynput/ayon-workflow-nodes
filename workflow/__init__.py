@@ -1,156 +1,271 @@
 """
 This should be as simple as possible to avoid import errors.
 """
+from typing import Any
+from ayon_workflow.datatypes import (
+    MediaType,
+    ImageSequence,
+    Video,
+    FolderItem,
+    FrameRange,
+)
 
-__version__ = "1.3.0"
+__version__ = "0.0.1"
 
 
 def get_plugins():
     return [
         {
-            "name": "Random Number",
-            "description": "Return a random number between 1 and 100",
-            "version": __version__,
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "result",
-                    "description": "A random [1:100] integer",
-                    "type": int,
-                }
-            ],
-        },
-        {
             "name": "NoOp",
-            "description": "Return input (pass-through does nothing)",
+            "description": "Return input as-is (no operation).",
             "version": __version__,
             "inputs": [
                 {
-                    "name": "input",
-                    "description": "whatever",
-                    "type": object,
+                    "name": "input_data",
+                    "description": "An input data to be returned as-is.",
+                    "type": Any,
                 }
             ],
             "outputs": [
                 {
-                    "name": "untouched_input",
-                    "type": object,
+                    "name": "output_data",
+                    "type": Any,
                 }
             ],
         },
         {
-            "name": "Print",
-            "description": "Print stuff",
+            "name": "FolderItem",
+            "description": "Gather a valid AYON folder item.",
             "version": __version__,
             "inputs": [
                 {
-                    "name": "input_str",
-                    "description": "whatever",
+                    "name": "project_name",
+                    "description": "The project name",
                     "type": str,
                 },
                 {
-                    "name": "template",
-                    "description": "whatever",
+                    "name": "folder_id",
+                    "description": "An optional folder ID.",
                     "type": str,
+                },
+                {
+                    "name": "folder_name",
+                    "description": "An optional folder name.",
+                    "type": str,
+                },
+                {
+                    "name": "folder_type",
+                    "description": "An optional folder type.",
+                    "type": str,
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "folder_item",
+                    "type": FolderItem,
                 }
             ],
-            "outputs": [],
         },
         {
-            "name": "Concatenate String",
-            "description": "Concatenate 2 strings",
+            "name": "Video",
+            "description": "Define a video path (existing or not).",
             "version": __version__,
             "inputs": [
                 {
-                    "name": "input_A",
-                    "description": "whatever",
+                    "name": "path",
+                    "description": "The path to the video.",
                     "type": str,
+                    "default": "movie.mov",
                 },
                 {
-                    "name": "input_B",
-                    "description": "whatever",
-                    "type": str,
-                },
-                {
-                    "name": "input_C",
-                    "description": "whatever",
-                    "type": str,
+                    "name": "frame_range",
+                    "description": "An optional frame_range.",
+                    "type": FrameRange,
                 },
             ],
-            "outputs": [],
+            "outputs": [
+                {
+                    "name": "video",
+                    "type": Video,
+                }
+            ],
         },
         {
-            "name": "Write to File",
-            "description": "Concatenate 2 strings",
+            "name": "ImageSequence",
+            "description": "Define an image sequence path (existing or not).",
             "version": __version__,
             "inputs": [
-                {
-                    "name": "content",
-                    "description": "whatever",
-                    "type": object,
-                },
-                {
-                    "name": "filepath",
-                    "description": "whatever",
-                    "type": str,
-                },
                 {
                     "name": "directory",
-                    "description": "whatever",
+                    "description": "The path to the parent directory.",
                     "type": str,
+                },
+                {
+                    "name": "head",
+                    "description": "The head of the sequence e.g. `img.`.",
+                    "type": str,
+                    "default": "img_seq.",
+                },
+                {
+                    "name": "tail",
+                    "description": "The tail of the sequence e.g. `.jpg`.",
+                    "type": str,
+                    "default": ".exr",
+                },
+                {
+                    "name": "frame_range",
+                    "description": "An optional frame_range.",
+                    "type": FrameRange,
+                },
+                {
+                    "name": "padding",
+                    "description": "An optional frame range padding.",
+                    "type": int,
+                    "default": 4,
                 },
             ],
             "outputs": [
                 {
-                    "name": "filepath",
-                    "type": object,
+                    "name": "image_sequence",
+                    "type": ImageSequence,
                 }
             ],
         },
         {
-            "name": "Fail",
-            "description": "Raise an exception",
+            "name": "NukeRender",
+            "description": "Perform a render through Nuke.",
             "version": __version__,
             "inputs": [
                 {
-                    "name": "message",
-                    "description": "whatever",
-                    "type": object,
+                    "name": "folder_item",
+                    "description": "The folder item associated to the Render.",
+                    "type": FolderItem,
                 },
+                {
+                    "name": "nuke_script_path",
+                    "description": "The path to the Nuke script.",
+                    "type": str,
+                },
+                {
+                    "name": "input_media",
+                    "description": "The input media",
+                    "type": MediaType,
+                },
+                {
+                    "name": "output_media",
+                    "description": "The output media",
+                    "type": MediaType,
+                },
+                {
+                    "name": "python_script_path",
+                    "description": "The path to a python script.",
+                    "type": str,
+                },
+                {
+                    "name": "frame_range",
+                    "description": "Restrictive frame range.",
+                    "type": FrameRange,
+                },
+                {
+                    "name": "read_node_name",
+                    "description": "Explicit a Read node to use.",
+                    "type": str,
+                },
+                {
+                    "name": "write_node_name",
+                    "description": "Explicit a Write node to use.",
+                    "type": str,
+                },
+                {
+                    "name": "nuke_application_variant",
+                    "description": "An application variant to use.",
+                    "type": str,
+                }
             ],
-            "outputs": [],
-        }
+            "outputs": [
+                {
+                    "name": "rendered_media",
+                    "type": MediaType,
+                }
+            ],
+        },
+        {
+            "name": "BlenderRender",
+            "description": "Perform a render through Blender.",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "folder_item",
+                    "description": "The folder item associated to the Render.",
+                    "type": FolderItem,
+                },
+                {
+                    "name": "blender_script_path",
+                    "description": "The path to the Blender script.",
+                    "type": str,
+                },
+                {
+                    "name": "input_resource_path",
+                    "description": "A path to an input resource",
+                    "type": str,
+                },
+                {
+                    "name": "output_media",
+                    "description": "The output media",
+                    "type": MediaType,
+                },
+                {
+                    "name": "python_script_path",
+                    "description": "The path to a python script.",
+                    "type": str,
+                },
+                {
+                    "name": "frame_range",
+                    "description": "Restrictive frame range.",
+                    "type": FrameRange,
+                },
+                {
+                    "name": "blender_application_variant",
+                    "description": "An application variant to use.",
+                    "type": str,
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "rendered_media",
+                    "type": MediaType,
+                }
+            ],
+        },
     ]
 
 
 def get_plugin_function(name):
-    from . import plugin1
+    from . import essentials
+    from .applications import nuke, blender
 
-    if name == "Random Number":
-        return plugin1.do_stuff
+    func_mapping = {
+        # Others
+        "NoOp": essentials.pass_through,
 
-    elif name == "NoOp":
-        return plugin1.pass_through
+        "FolderItem": essentials.get_ayon_folder,
+        "Video": essentials.prepare_video,
+        "ImageSequence": essentials.prepare_image_sequence,
 
-    elif name == "Print":
-        return plugin1.print_stuff
+        # Processes
+        "NukeRender": nuke.run_nuke_render,
+        "BlenderRender": blender.run_blender_render
+    }
 
-    elif name == "Concatenate String":
-        return plugin1.concatenate_as_string
-
-    elif name == "Write to File":
-        return plugin1.write_to_file
-
-    elif name == "Fail":
-        return plugin1.raise_exception
-
-    return None
+    return func_mapping.get(name)
 
 
 def get_plugin_revert_function(name):
-    from . import plugin1
-
-    if name == "Write to File":
-        return plugin1.revert_write_to_file
-
     return None
+
+
+__all__ = [
+    "get_plugins",
+    "get_plugin_function",
+    "get_plugin_revert_function",
+]
