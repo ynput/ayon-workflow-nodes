@@ -109,11 +109,11 @@ def run_nuke_render(
         nuke_application_variant: Optional[str] = None,
     ) -> Media:
     # Construct render command line args.
-    app_args = [
-        f"-X {write_node_name}" if write_node_name else "-x"
-    ]
+    app_args = ["-x"]
+    if write_node_name:
+        app_args = ["-X", write_node_name]
     if frame_range:
-        app_args.extend(["-F", f"{frame_range.format()}"])
+        app_args.extend(["-F", str(frame_range.format())])
     app_args.append(
         _get_render_python_script_path(
             python_script_path=python_script_path,
