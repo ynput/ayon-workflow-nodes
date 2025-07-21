@@ -1,45 +1,121 @@
-""" Demonstrate a Nuke render.
+""" Demonstrate a graph with Blender + Nuke renders.
 
 Requirement:
-* Nuke application correctly setup
-* valid AYON project
+* A valid AYON project
+* Nuke and Blender applications correctly setup
 """
 import os
+import pprint
 
-from ayon_workflow.plugins.workflow.applications import _base, nuke
+from ayon_workflow import graph_editor
+from ayon_workflow import graph_execution
+from ayon_workflow.plugins.workflow import FrameRange
+from ayon_workflow.plugin_system import register_plugins
 
 
-RESOURCE_DIR = os.path.abspath(
-    os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "resources"
-    ),
+AYON_WORKFLOW_DIR = os.path.dirname(os.path.abspath(__file__))
+FRAME_RANGE = FrameRange(
+    first_frame=1,
+    last_frame=5,
 )
 
 
-def run_nuke_render(project_name: str):
-    nuke_script_path = os.path.join(RESOURCE_DIR, "render_script.nk")
+def _build_graph(project_name: str) -> graph_editor.Graph:
+    # Discover all available node definitions
+    register_plugins.register_plugins()
+    graph = graph_editor.Graph(name="Demo")
 
-    current_project = _base.FolderItem(project_name=project_name)
-    input_media = _base.ImageSequence(
-        directory=RESOURCE_DIR,
-        head="img.",
-        tail=".jpg",
-        frame_range=_base.FrameRange(
-            first_frame=10,
-            last_frame=11,
+    # Retrieve project
+    project_node = graph.create_node(
+        "FolderItem",
+        label="AYON project"
+    )
+    project_node["project_name"] = project_name
+
+    # Render path
+    render_node = graph.create_node(
+        "ImageSequence",
+        label="Prepare img sequence"
+    )
+    render_node["directory"] = os.path.join(
+        os.path.join(AYON_WORKFLOW_DIR, "result")
+    )
+    render_node["head"] = "blender_render."
+    render_node["tail"] = ".jpg"
+    render_node["frame_range"] = FRAME_RANGE
+
+    # Video path
+    video_node = graph.create_node(
+        "Video",
+        label="Prepare video"
+    )
+    video_node["path"] = os.path.join(
+        os.path.join(
+            AYON_WORKFLOW_DIR,
+            "result",
+            "nuke_render.mov"
         )
     )
-    output_media = _base.ImageSequence(
-        directory=RESOURCE_DIR,
-        head="output.",
-        tail=".png",
-    )
 
-    nuke.run_nuke_render(
-        current_project,
-        nuke_script_path,
-        input_media,
-        output_media,
-        frame_range=_base.FrameRange(first_frame=48, last_frame=52),
+    # Blender render
+    blender_node = graph.create_node(
+        "BlenderRender",
+        label="Render a Blender scene"
     )
+    blender_node["blender_script_path"] = os.path.join(
+        AYON_WORKFLOW_DIR,
+        "resources",
+        "workfile.blend"
+    )
+    blender_node["frame_range"] = FRAME_RANGE
+
+
+    # Nuke render
+    nuke_node = graph.create_node(
+        "NukeRender",
+        label="Encode render with Nuke"
+    )
+    nuke_node["nuke_script_path"] = os.path.join(
+        AYON_WORKFLOW_DIR,
+        "resources",
+        "render_script.nk"
+    )
+    nuke_node["frame_range"] = FRAME_RANGE
+
+    # Connections
+    project_node.connect(
+        "folder_item",
+        nuke_node,
+        "folder_item"
+    )
+    project_node.connect(
+        "folder_item",
+        blender_node,
+        "folder_item"
+    )
+    render_node.connect(
+        "image_sequence",
+        blender_node,
+        "output_media",
+    )
+    blender_node.connect(
+        "rendered_media",
+        nuke_node,
+        "input_media"
+    )
+    video_node.connect(
+        "video",
+        nuke_node,
+        "output_media",
+    )
+    return graph
+
+
+def _run_graph(graph: graph_editor.Graph):
+    results = graph_execution.execute_graph(graph)
+    pprint.pprint(results)
+
+
+def run_demo(project_name: str):
+    graph = _build_graph(project_name)
+    _run_graph(graph)

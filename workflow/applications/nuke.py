@@ -1,21 +1,17 @@
-""" plugin.workflow.applications.render
+""" plugin.workflow.applications.nuke
 """
 
-from typing import Optional, Union
+from typing import Optional
 
-import os
-import tempfile
-
-from ._base import (
-    get_application,
+from ayon_workflow.datatypes import (
+    MediaType,
     FolderItem,
     FrameRange,
     ImageSequence,
     Video,
 )
 
-
-Media = Union[ImageSequence, Video]
+from . import _base
 
 
 def _default_py_render_logic(
@@ -69,45 +65,17 @@ write_node['file'].fromUserText(sys.argv[3])
     ])
 
 
-def _get_render_python_script_path(
-        python_script_path: Optional[str] = None,
-        read_node_name: Optional[str] = None,
-        write_node_name: Optional[str] = None,
-    ):
-    if python_script_path:
-        if not os.path.exists(python_script_path):
-            raise ValueError(
-                f"Unreachable python script {python_script_path}."
-            )
-        return python_script_path
-
-    # TODO implement a temporary centralized temporary directory.
-    with tempfile.NamedTemporaryFile(
-        suffix=".py",
-        mode="w",
-        delete=False
-    ) as fhandler:
-        fhandler.write(
-            _default_py_render_logic(
-                read_node_name=read_node_name,
-                write_node_name=write_node_name,
-            )
-        )
-        fhandler.flush()
-        return fhandler.name
-
-
 def run_nuke_render(
         folder_item: FolderItem,
         nuke_script_path: str,
-        input_media: Media,
-        output_media: Media,
+        input_media: MediaType,
+        output_media: MediaType,
         python_script_path: Optional[str] = None,
         frame_range: Optional[FrameRange] = None,
         read_node_name: Optional[str] = None,
         write_node_name: Optional[str] = None,
         nuke_application_variant: Optional[str] = None,
-    ) -> Media:
+    ) -> MediaType:
     # Construct render command line args.
     app_args = ["-x"]
     if write_node_name:
@@ -115,10 +83,12 @@ def run_nuke_render(
     if frame_range:
         app_args.extend(["-F", str(frame_range.format())])
     app_args.append(
-        _get_render_python_script_path(
+        _base.get_render_python_script_path(
             python_script_path=python_script_path,
-            read_node_name=read_node_name,
-            write_node_name=write_node_name,
+            default_content=_default_py_render_logic(
+                read_node_name=read_node_name,
+                write_node_name=write_node_name,
+            )
         )
     )
     if nuke_script_path:
@@ -131,20 +101,12 @@ def run_nuke_render(
     # assert the output_media exists
     app_args.append(output_media.format())
 
-    # Start Nuke application.
-    app_manager, app = get_application(
+    # Start application.
+    _ = _base.run_application(
         "nuke",
-        application_variant=nuke_application_variant
-    )
-    launch_context = app_manager.create_launch_context(
-        app.full_name,
-        project_name=folder_item.project_name,
+        folder_item,
         app_args=app_args,
+        app_application_variant=nuke_application_variant,
     )
-    process = launch_context.launch()
-
-    # TODO: check this, how can we interceipt errors.
-    if bool(process.returncode):
-        raise RuntimeError("Execution failed.")
 
     return output_media

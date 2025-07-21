@@ -1,69 +1,14 @@
 """ plugin.workflow.applications.render
 """
 import os
-from typing import Optional, Tuple
-from dataclasses import dataclass
+import subprocess
+import tempfile
+
+from typing import Optional, Tuple, List
 
 from ayon_applications import ApplicationManager, Application
 
-
-@dataclass
-class FrameRange:
-    """ A frame range container.
-    """
-    first_frame: int
-    last_frame: int
-    step: int = 1
-
-    # TODO: implement missing frames
-
-    def format(self) -> str:
-        if self.step == 1:
-            return f"{self.first_frame}-{self.last_frame}"
-
-        return f"{self.first_frame}-{self.last_frame}x{self.step}"
-
-
-@dataclass
-class Video:
-    """ A media container.
-    """
-    path: str
-    frame_range: Optional[FrameRange] = None
-
-    def format(self) -> str:
-        return self.path
-
-
-@dataclass
-class ImageSequence:
-    """ An image sequence container.
-    """
-    directory: str
-    head: str
-    tail: str
-    padding: int = 4
-    frame_range: Optional[FrameRange] = None
-
-    def format(self) -> str:
-        seq = os.path.join(
-            self.directory,
-            f"{self.head}%{self.padding:0>2}d{self.tail}"
-        )
-        if self.frame_range:
-            return f"{seq} {self.frame_range.format()}"
-
-        return seq
-
-
-@dataclass
-class FolderItem:
-    """ An AYON folder item container.
-    """
-    project_name: str
-    folder_type: Optional[str] = None
-    folder_name: Optional[str] = None
-    parent: Optional["FolderItem"] = None
+from ayon_workflow.datatypes import FolderItem
 
 
 def get_application(
@@ -95,3 +40,54 @@ def get_application(
             )
 
     return app_manager, app
+
+
+def get_render_python_script_path(
+        python_script_path: Optional[str] = None,
+        default_content: Optional[str] = None,
+    ):
+    if python_script_path:
+        if not os.path.exists(python_script_path):
+            raise ValueError(
+                f"Unreachable python script {python_script_path}."
+            )
+        return python_script_path
+
+    if not default_content:
+        raise RuntimeError("Missing default render content.")
+
+    # TODO implement a temporary centralized temporary directory.
+    with tempfile.NamedTemporaryFile(
+        suffix=".py",
+        mode="w",
+        delete=False
+    ) as fhandler:
+        fhandler.write(default_content)
+        fhandler.flush()
+        return fhandler.name
+
+
+def run_application(
+        application_group_name: str,
+        folder_item: FolderItem,
+        app_args: Optional[List[str]] = None,
+        app_application_variant: Optional[str] = None,
+    ) -> subprocess.Popen:
+    # Start application.
+    app_manager, app = get_application(
+        application_group_name,
+        application_variant=app_application_variant
+    )
+    launch_context = app_manager.create_launch_context(
+        app.full_name,
+        project_name=folder_item.project_name,
+        app_args=app_args or [],
+    )
+    process = launch_context.launch()
+
+    process.wait()
+    # TODO: check this, how can we interceipt errors.
+    if bool(process.returncode):
+        raise RuntimeError("Execution failed.")
+
+    return process
