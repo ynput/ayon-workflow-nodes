@@ -26,7 +26,7 @@ def publish_content(
     ) -> VersionItem:
     pyblish_context = pyblish.api.Context()
     pyblish_context.data["projectName"] = context.project_name
-    pyblish_context.data["folder_path"] = context.folder_path()
+    pyblish_context.data["folderPath"] = context.folder_path()
     pyblish_context.data["ayonWorkflowInstances"] = [
         {
             "product_name": product_name,
@@ -37,7 +37,7 @@ def publish_content(
     ]
 
     if isinstance(context, TaskItem):
-        pyblish_context.data["task_name"] = context.task_name
+        pyblish_context.data["taskName"] = context.task_name
 
     pyblish.api.register_host("shell")
 

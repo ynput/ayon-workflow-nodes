@@ -28,7 +28,7 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
         if isinstance(file_entry, ImageSequence):
             return list(file_entry)
 
-        raise ValueError(f"Unsupported file entry provided: {file_entry}")
+        raise TypeError(f"Unsupported file entry provided: {file_entry}")
 
     def process(self, context):
         instances_to_collect = context.data.pop(
