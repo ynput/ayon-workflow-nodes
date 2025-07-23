@@ -7,6 +7,7 @@ import pyblish.api
 import pyblish.util
 
 from ayon_core.pipeline import install_ayon_plugins
+from ayon_core.pipeline.create import get_product_name
 from ayon_core.pipeline.publish import publish_plugins_discover
 
 from ayon_workflow.datatypes import (
@@ -20,10 +21,24 @@ from ayon_workflow.datatypes import (
 def publish_content(
         input_path: Union[str, Video, ImageSequence],
         context: Union[FolderItem, TaskItem],
-        product_name: str,
         product_type: str,
         variant: Optional[str] = "Main",
     ) -> VersionItem:
+    task_name = None
+    task_type = None
+    if isinstance(context, TaskItem):
+        task_name = context.task_name
+        task_type = context.task_type
+
+    product_name = get_product_name(
+        context.project_name,
+        task_name,
+        task_type,
+        "workflow",
+        product_type,
+        variant,
+    )
+
     pyblish_context = pyblish.api.Context()
     pyblish_context.data["projectName"] = context.project_name
     pyblish_context.data["folderPath"] = context.folder_path()
@@ -39,7 +54,7 @@ def publish_content(
     if isinstance(context, TaskItem):
         pyblish_context.data["taskName"] = context.task_name
 
-    pyblish.api.register_host("shell")
+    pyblish.api.register_host("workflow")
 
     install_ayon_plugins()
     discover_result = publish_plugins_discover()

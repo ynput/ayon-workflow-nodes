@@ -35,6 +35,8 @@ def _build_graph(
     )
     context_node["project_name"] = project_name
     context_node["folder_path"] = folder_path
+    context_node["task_name"] = "previz"
+    context_node["task_type"] = "Previz"
 
     # Render path
     render_node = graph.create_node(
@@ -92,7 +94,7 @@ def _build_graph(
         label="Publish Blender render"
     )
     publish_blender_node["product_type"] = "render"
-    publish_blender_node["product_name"] = "renderBlender"
+    publish_blender_node["variant"] = "Blender"
 
     # Publish nodes (Nuke)
     publish_nuke_node = graph.create_node(
@@ -100,7 +102,7 @@ def _build_graph(
         label="Publish Nuke render"
     )
     publish_nuke_node["product_type"] = "render"
-    publish_nuke_node["product_name"] = "renderNuke"
+    publish_nuke_node["variant"] = "Nuke"
 
     # Connections
     context_node.connect(

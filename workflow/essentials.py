@@ -27,6 +27,7 @@ def _get_task_item(
         project_name: str,
         folder_item: FolderItem,
         task_name: str,
+        task_type: str,
         ensure_exists: Optional[bool] = True,
     ) -> TaskItem:
         if ensure_exists:
@@ -35,14 +36,20 @@ def _get_task_item(
                 folder_item.folder_id,
                 task_name,
             )
-            if not task_dict:
+
+            if (
+                not task_dict
+                or task_dict.get("taskType") != task_type
+            ):
                 raise ValueError(
-                    f"Invalid task {task_name} ({folder_item})"
+                    f"No task {task_name} ({task_type})"
+                    f"under {folder_item}."
                 )
 
         attrs = asdict(folder_item)
         attrs["parent"] = folder_item.parent
         attrs["task_name"] = task_name
+        attrs["task_type"] = task_type
         return TaskItem(**attrs)
 
 
@@ -104,6 +111,7 @@ def get_ayon_context(
     folder_id: Optional[str] = None,
     folder_path: Optional[str] = None,
     task_name: Optional[str] = None,
+    task_type: Optional[str] = None,
     ensure_exists: Optional[bool] = True,
 ) -> ContextItem:
 
@@ -120,11 +128,12 @@ def get_ayon_context(
             folder_id=folder_id,
             ensure_exists=ensure_exists,
         )
-        if task_name:
+        if task_name and task_type:
             return _get_task_item(
                 project_name,
                 folder_item,
                 task_name,
+                task_type,
                 ensure_exists=ensure_exists
             )
 

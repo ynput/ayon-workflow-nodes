@@ -13,9 +13,10 @@ from ayon_workflow.plugins.workflow import (
 
 
 class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
-    """ """
+    """ Collect instances prepared by the Publish node."""
     label = "Collect From Provided Files"
     order = pyblish.api.CollectorOrder - 0.5
+    hosts = ["workflow"]
 
     @staticmethod
     def _get_paths(
@@ -31,6 +32,7 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
         raise TypeError(f"Unsupported file entry provided: {file_entry}")
 
     def process(self, context):
+        context.data["currentFile"] = os.path.join(os.getcwd(), "<workflow>")
         instances_to_collect = context.data.pop(
             "ayonWorkflowInstances",
             None
@@ -64,8 +66,8 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                 "productType": instance_to_collect["product_type"],
                 "family": instance_to_collect["product_type"],
                 "families": [instance_to_collect["product_type"]],
-                "folderPath": context.data["folder_path"],
-                "task": context.data.get("task_name"),
+                "folderPath": context.data["folderPath"],
+                "task": context.data.get("taskName"),
                 "variant": instance_to_collect["variant"],
                 "representations": [],
             }

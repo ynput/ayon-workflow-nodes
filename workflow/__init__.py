@@ -61,6 +61,11 @@ def get_plugins():
                     "type": str,
                 },
                 {
+                    "name": "task_type",
+                    "description": "An optional task type.",
+                    "type": str,
+                },
+                {
                     "name": "ensure_exists",
                     "description": "Assert context existence.",
                     "type": bool,
@@ -259,11 +264,6 @@ def get_plugins():
                     "name": "context",
                     "description": "The publish context",
                     "type": Union[FolderItem, TaskItem],
-                },
-                {
-                    "name": "product_name",
-                    "description": "The publish product name.",
-                    "type": str,
                 },
                 {
                     "name": "product_type",
