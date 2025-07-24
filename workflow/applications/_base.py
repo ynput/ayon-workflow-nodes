@@ -7,8 +7,9 @@ import tempfile
 from typing import Optional, Tuple, List
 
 from ayon_applications import ApplicationManager, Application
+from ayon_core.pipeline import tempdir
 
-from ayon_workflow.datatypes import FolderItem
+from ayon_workflow.datatypes import ContextItem
 
 
 def get_application(
@@ -43,6 +44,7 @@ def get_application(
 
 
 def get_render_python_script_path(
+        project_name: str,
         python_script_path: Optional[str] = None,
         default_content: Optional[str] = None,
     ):
@@ -56,10 +58,11 @@ def get_render_python_script_path(
     if not default_content:
         raise RuntimeError("Missing default render content.")
 
-    # TODO implement a temporary centralized temporary directory.
+    temp_dir = tempdir.get_temp_dir(project_name)
     with tempfile.NamedTemporaryFile(
         suffix=".py",
         mode="w",
+        dir=temp_dir,
         delete=False
     ) as fhandler:
         fhandler.write(default_content)
@@ -69,7 +72,7 @@ def get_render_python_script_path(
 
 def run_application(
         application_group_name: str,
-        folder_item: FolderItem,
+        context: ContextItem,
         app_args: Optional[List[str]] = None,
         app_application_variant: Optional[str] = None,
     ) -> subprocess.Popen:
@@ -80,7 +83,7 @@ def run_application(
     )
     launch_context = app_manager.create_launch_context(
         app.full_name,
-        project_name=folder_item.project_name,
+        project_name=context.project_name,
         app_args=app_args or [],
     )
     process = launch_context.launch()

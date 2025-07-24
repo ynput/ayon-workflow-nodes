@@ -6,7 +6,7 @@ import os
 
 from ayon_workflow.datatypes import (
     ImageSequence,
-    FolderItem,
+    ContextItem,
     FrameRange,
 )
 
@@ -82,7 +82,7 @@ bpy.ops.render.render(animation=True)
 
 
 def run_blender_render(
-        folder_item: FolderItem,
+        context: ContextItem,
         blender_script_path: str,
         output_media: ImageSequence,
         input_resource_path: Optional[str] = None,
@@ -95,6 +95,7 @@ def run_blender_render(
         "-b",
         "-P",
         _base.get_render_python_script_path(
+            context.project_name,
             python_script_path=python_script_path,
             default_content=_default_py_render_logic(),
         ),
@@ -136,7 +137,7 @@ def run_blender_render(
     # Start application.
     _ = _base.run_application(
         "blender",
-        folder_item,
+        context,
         app_args=app_args,
         app_application_variant=blender_application_variant,
     )
