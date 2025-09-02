@@ -1,6 +1,7 @@
 """
 This should be as simple as possible to avoid import errors.
 """
+
 from typing import Any, Union
 from ayon_workflow.datatypes import (
     MediaType,
@@ -89,6 +90,11 @@ def get_plugins():
                     "description": "The path to the video.",
                     "type": str,
                     "default": "movie.mov",
+                    "widget": {
+                        "name": "filepath",
+                        "select": "file",
+                        "caption": "Select a directory",
+                    },
                 },
                 {
                     "name": "frame_range",
@@ -112,6 +118,9 @@ def get_plugins():
                     "name": "directory",
                     "description": "The path to the parent directory.",
                     "type": str,
+                    "widget": {
+                        "name": "filepath",
+                    },
                 },
                 {
                     "name": "head",
@@ -150,9 +159,9 @@ def get_plugins():
             "version": __version__,
             "inputs": [
                 {
-                    "name": "context",
-                    "description": "The render context.",
-                    "type": ContextItem,
+                    "name": "folder_item",
+                    "description": "The folder item associated to the Render.",
+                    "type": FolderItem,
                 },
                 {
                     "name": "nuke_script_path",
@@ -172,6 +181,26 @@ def get_plugins():
                 {
                     "name": "python_script_path",
                     "description": "The path to a python script.",
+                    "type": str,
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a Python file",
+                        "filter": "Python Script (*.py)",
+                    },
+                },
+                {
+                    "name": "frame_range",
+                    "description": "Restrictive frame range.",
+                    "type": FrameRange,
+                },
+                {
+                    "name": "read_node_name",
+                    "description": "Explicit a Read node to use.",
+                    "type": str,
+                },
+                {
+                    "name": "write_node_name",
+                    "description": "Explicit a Write node to use.",
                     "type": str,
                 },
                 {
@@ -193,7 +222,7 @@ def get_plugins():
                     "name": "nuke_application_variant",
                     "description": "An application variant to use.",
                     "type": str,
-                }
+                },
             ],
             "outputs": [
                 {
@@ -216,11 +245,17 @@ def get_plugins():
                     "name": "blender_script_path",
                     "description": "The path to the Blender script.",
                     "type": str,
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a Blender scene file",
+                        "filter": "Blender Scene (*.blend)",
+                    },
                 },
                 {
                     "name": "input_resource_path",
                     "description": "A path to an input resource",
                     "type": str,
+                    "widget": {"name": "filepath"},
                 },
                 {
                     "name": "output_media",
@@ -231,6 +266,11 @@ def get_plugins():
                     "name": "python_script_path",
                     "description": "The path to a python script.",
                     "type": str,
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a Python file",
+                        "filter": "Python Script (*.py)",
+                    },
                 },
                 {
                     "name": "frame_range",
@@ -241,7 +281,7 @@ def get_plugins():
                     "name": "blender_application_variant",
                     "description": "An application variant to use.",
                     "type": str,
-                }
+                },
             ],
             "outputs": [
                 {
@@ -284,6 +324,72 @@ def get_plugins():
                 }
             ],
         },
+        {
+            "name": "UI Test",
+            "description": "Shows all supported widgets for testing",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "string",
+                    "description": "whatever",
+                    "type": str,
+                    "default": "some string data",
+                },
+                {
+                    "name": "filepath",
+                    "description": "whatever",
+                    "widget": {"name": "filepath"},
+                    "type": str,
+                    "default": "/foo/bar.txt",
+                },
+                {
+                    "name": "text",
+                    "description": "whatever",
+                    "widget": {"name": "text"},
+                    "type": str,
+                    "default": "Enter longer text with line breaks.",
+                },
+                {
+                    "name": "choice",
+                    "description": "whatever",
+                    "widget": {
+                        "name": "choice",
+                        "options": ["GET", "POST", "PUT", "DELETE", "PATCH"],
+                    },
+                    "type": str,
+                    "default": "/foo/bar.txt",
+                },
+                {
+                    "name": "bool",
+                    "description": "A binary choice",
+                    "type": bool,
+                    "default": True,
+                },
+                {
+                    "name": "int",
+                    "description": "whatever",
+                    "type": int,
+                    "default": 42,
+                },
+                {
+                    "name": "enum",
+                    "description": "whatever",
+                    "widget": {
+                        "name": "enum",
+                        "fields": ["do this", "do that", "have a break"],
+                    },
+                    "type": int,
+                    "default": 1,
+                },
+                {
+                    "name": "float",
+                    "description": "whatever",
+                    "type": float,
+                    "default": 1.234567,
+                },
+            ],
+            "outputs": [],
+        },
     ]
 
 
@@ -295,14 +401,12 @@ def get_plugin_function(name):
         # Others
         "NoOp": essentials.pass_through,
         "Publish": publish.publish_content,
-
         "Context": essentials.get_ayon_context,
         "Video": essentials.prepare_video,
         "ImageSequence": essentials.prepare_image_sequence,
-
         # Processes
         "NukeRender": nuke.run_nuke_render,
-        "BlenderRender": blender.run_blender_render
+        "BlenderRender": blender.run_blender_render,
     }
 
     return func_mapping.get(name)
