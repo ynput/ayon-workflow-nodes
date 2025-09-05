@@ -11,6 +11,7 @@ from ayon_workflow.datatypes import (
     FolderItem,
     TaskItem,
     FrameRange,
+    VersionItem,
 )
 
 __version__ = "0.0.1"
@@ -320,7 +321,7 @@ def get_plugins():
             "outputs": [
                 {
                     "name": "published_version",
-                    "type": object,
+                    "type": VersionItem,
                 }
             ],
         },
