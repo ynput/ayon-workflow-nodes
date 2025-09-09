@@ -160,9 +160,9 @@ def get_plugins():
             "version": __version__,
             "inputs": [
                 {
-                    "name": "folder_item",
-                    "description": "The folder item associated to the Render.",
-                    "type": FolderItem,
+                    "name": "context",
+                    "description": "The render context.",
+                    "type": ContextItem,
                 },
                 {
                     "name": "nuke_script_path",
@@ -188,21 +188,6 @@ def get_plugins():
                         "caption": "Select a Python file",
                         "filter": "Python Script (*.py)",
                     },
-                },
-                {
-                    "name": "frame_range",
-                    "description": "Restrictive frame range.",
-                    "type": FrameRange,
-                },
-                {
-                    "name": "read_node_name",
-                    "description": "Explicit a Read node to use.",
-                    "type": str,
-                },
-                {
-                    "name": "write_node_name",
-                    "description": "Explicit a Write node to use.",
-                    "type": str,
                 },
                 {
                     "name": "frame_range",

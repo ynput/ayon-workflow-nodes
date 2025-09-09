@@ -1,7 +1,7 @@
 """ plugin.workflow.applications.blender
 """
 
-from typing import Optional
+from typing import Optional, Union
 import os
 
 from ayon_workflow.datatypes import (
@@ -87,7 +87,7 @@ def run_blender_render(
         output_media: ImageSequence,
         input_resource_path: Optional[str] = None,
         python_script_path: Optional[str] = None,
-        frame_range: Optional[FrameRange] = None,
+        frame_range: Optional[Union[dict, FrameRange]] = None,
         blender_application_variant: Optional[str] = None,
     ) -> ImageSequence:
     # Construct render command line args.
@@ -116,6 +116,9 @@ def run_blender_render(
             ]
         )
     if frame_range:
+        if isinstance(frame_range, dict):
+            frame_range = FrameRange(**frame_range)
+
         app_args.extend(
             [
                 "--start",

@@ -1,7 +1,7 @@
 """ plugin.workflow.applications.nuke
 """
 
-from typing import Optional
+from typing import Optional, Union
 
 from ayon_workflow.datatypes import (
     MediaType,
@@ -69,11 +69,15 @@ def run_nuke_render(
         input_media: MediaType,
         output_media: MediaType,
         python_script_path: Optional[str] = None,
-        frame_range: Optional[FrameRange] = None,
+        frame_range: Optional[Union[dict, FrameRange]] = None,
         read_node_name: Optional[str] = None,
         write_node_name: Optional[str] = None,
         nuke_application_variant: Optional[str] = None,
     ) -> MediaType:
+
+    if isinstance(frame_range, dict):
+        frame_range = FrameRange(**frame_range)
+
     # Construct render command line args.
     app_args = ["-x"]
     if write_node_name:

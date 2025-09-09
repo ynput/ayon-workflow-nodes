@@ -91,6 +91,7 @@ def run_application(
     process.wait()
     # TODO: check this, how can we interceipt errors.
     if bool(process.returncode):
-        raise RuntimeError("Execution failed.")
+        cmd_line = " ".join(launch_context.launch_args)
+        raise RuntimeError(f"Command line failed: {cmd_line}")
 
     return process
