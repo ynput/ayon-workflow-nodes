@@ -18,8 +18,11 @@ from ayon_workflow.datatypes import (
     Video,
 )
 
+publish_input = Union[str, Video, ImageSequence]
+
+
 def publish_content(
-        input_paths: Union[str, Video, ImageSequence, List[Union[str, Video, ImageSequence]]],
+        input_paths: Union[publish_input, List[publish_input]],
         context: Union[FolderItem, TaskItem],
         product_type: str,
         variant: Optional[str] = "Main",
