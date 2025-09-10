@@ -2,7 +2,7 @@
 This should be as simple as possible to avoid import errors.
 """
 
-from typing import Any, Union
+from typing import Any, Union, List
 from ayon_workflow.datatypes import (
     MediaType,
     ImageSequence,
@@ -34,6 +34,29 @@ def get_plugins():
                 {
                     "name": "output_data",
                     "type": Any,
+                }
+            ],
+        },
+        {
+            "name": "Append",
+            "description": "Group or Append inputs as a list.",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "input_1",
+                    "description": "Any input.",
+                    "type": Any,
+                },
+                {
+                    "name": "input_2",
+                    "description": "Any input.",
+                    "type": Any,
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "appended_data",
+                    "type": List[Any],
                 }
             ],
         },
@@ -282,7 +305,7 @@ def get_plugins():
             "version": __version__,
             "inputs": [
                 {
-                    "name": "input_path",
+                    "name": "input_paths",
                     "description": "The content to be published.",
                     "type": Union[str, MediaType],
                 },
@@ -390,6 +413,7 @@ def get_plugin_function(name):
         "Context": essentials.get_ayon_context,
         "Video": essentials.prepare_video,
         "ImageSequence": essentials.prepare_image_sequence,
+        "Append": essentials.append,
         # Processes
         "NukeRender": nuke.run_nuke_render,
         "BlenderRender": blender.run_blender_render,
