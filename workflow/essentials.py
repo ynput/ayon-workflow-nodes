@@ -3,7 +3,7 @@
 
 import os
 from dataclasses import asdict
-from typing import Optional, Any
+from typing import Optional, Any, List
 import tempfile
 
 import ayon_api
@@ -183,3 +183,11 @@ def prepare_video(
         path=os.path.join(directory, basename),
         frame_range=frame_range,
     )
+
+
+def append(input_1: Any, input_2: Any) -> List[Any]:
+    if isinstance(input_1, list):
+        input_1.append(input_2)
+        return input_1
+
+    return [input_1, input_2]

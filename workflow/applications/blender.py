@@ -89,6 +89,7 @@ def run_blender_render(
         python_script_path: Optional[str] = None,
         frame_range: Optional[Union[dict, FrameRange]] = None,
         blender_application_variant: Optional[str] = None,
+        log_file: Optional[str] = None,
     ) -> ImageSequence:
     # Construct render command line args.
     app_args = [
@@ -143,6 +144,7 @@ def run_blender_render(
         context,
         app_args=app_args,
         app_application_variant=blender_application_variant,
+        log_file=log_file,
     )
 
     # TODO: make output_media optional and

@@ -1,7 +1,7 @@
 """ Publish features.
 """
 
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 import pyblish.api
 import pyblish.util
@@ -18,8 +18,11 @@ from ayon_workflow.datatypes import (
     Video,
 )
 
+publish_input = Union[str, Video, ImageSequence]
+
+
 def publish_content(
-        input_path: Union[str, Video, ImageSequence],
+        input_paths: Union[publish_input, List[publish_input]],
         context: Union[FolderItem, TaskItem],
         product_type: str,
         variant: Optional[str] = "Main",
@@ -39,6 +42,7 @@ def publish_content(
         variant,
     )
 
+    in_data = input_paths if isinstance(input_paths, list) else [input_paths]
     pyblish_context = pyblish.api.Context()
     pyblish_context.data["projectName"] = context.project_name
     pyblish_context.data["folderPath"] = context.folder_path()
@@ -47,7 +51,7 @@ def publish_content(
             "product_name": product_name,
             "product_type": product_type,
             "variant": variant,
-            "file_groups": [input_path]
+            "file_groups": in_data
         }
     ]
 

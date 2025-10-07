@@ -23,6 +23,7 @@ def _default_py_render_logic(
 
 import nuke
 import sys
+import os
 
 # Load Nuke script provided as command line argument.
 in_script = nuke.scriptOpen(sys.argv[1])
@@ -54,6 +55,11 @@ except ValueError:
 # knobs are properly refreshed
 read_node['file'].fromUserText(sys.argv[2])
 write_node['file'].fromUserText(sys.argv[3])
+
+# save scene
+current_dir = os.path.dirname(sys.argv[3])
+output = os.path.join(current_dir, "workfile.nk")
+nuke.scriptSaveAs(output)
 """
     return "\n".join([
         begin,
@@ -73,6 +79,7 @@ def run_nuke_render(
         read_node_name: Optional[str] = None,
         write_node_name: Optional[str] = None,
         nuke_application_variant: Optional[str] = None,
+        log_file: Optional[str] = None,
     ) -> MediaType:
 
     if isinstance(frame_range, dict):
@@ -110,6 +117,7 @@ def run_nuke_render(
         context,
         app_args=app_args,
         app_application_variant=nuke_application_variant,
+        log_file=log_file,
     )
 
     return output_media

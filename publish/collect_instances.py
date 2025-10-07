@@ -65,7 +65,7 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                 "productName": instance_to_collect["product_name"],
                 "productType": instance_to_collect["product_type"],
                 "family": instance_to_collect["product_type"],
-                "families": [instance_to_collect["product_type"]],
+                "families": [instance_to_collect["product_type"], "review"],
                 "folderPath": context.data["folderPath"],
                 "task": context.data.get("taskName"),
                 "variant": instance_to_collect["variant"],
@@ -87,6 +87,7 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                     "ext": ext,
                     "files": files,
                     "stagingDir": os.path.dirname(path),
+                    "tags": ["review", "webreview"],
                 }
                 instance_data["representations"].append(repre)
 
