@@ -48,7 +48,11 @@ def _clean_up_pyside_in_env_path(env: str) -> str:
     # AYON-launcher adds Pyside6 in the environment.
     # This is causing issues when starting DCC such as Nuke from subprocesses.
     paths = env.split(";")
-    paths_to_remove = [path for path in paths if "PySide6" in path.split(os.sep)]
+    paths_to_remove = [
+        path for path in paths
+        if "PySide6" in path.split(os.sep)
+    ]
+
     for path_to_remove in paths_to_remove:
         paths.remove(path_to_remove)
 
