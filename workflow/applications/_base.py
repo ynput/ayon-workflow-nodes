@@ -44,6 +44,17 @@ def get_application(
     return app_manager, app
 
 
+def _clean_up_pyside_in_env_path(env: str) -> str:
+    # AYON-launcher adds Pyside6 in the environment.
+    # This is causing issues when starting DCC such as Nuke from subprocesses.
+    paths = env.split(";")
+    paths_to_remove = [path for path in paths if "PySide6" in path.split(os.sep)]
+    for path_to_remove in paths_to_remove:
+        paths.remove(path_to_remove)
+
+    return ";".join(paths)
+
+
 def get_render_python_script_path(
         project_name: str,
         python_script_path: Optional[str] = None,
@@ -90,13 +101,24 @@ def run_application(
         app_args=app_args or [],
         launch_type=LaunchTypes.automated,
     )
-    launch_context.kwargs["stdout"] = subprocess.PIPE
-    launch_context.kwargs["stderr"] = subprocess.STDOUT
-    launch_context.kwargs["text"] = True
 
     log_file = log_file or os.devnull
+
+    launch_args = launch_context.launch_args
+    kwargs = launch_context.kwargs
+    kwargs.update({
+        "stdout": subprocess.PIPE,
+        "stderr": subprocess.STDOUT,
+        "text": True,
+    })
+    env = kwargs.get("env", {})
+    env["PATH"] = _clean_up_pyside_in_env_path(
+        env.get("PATH", "")
+    )
+
     with open(log_file, "w") as f:
-        process = launch_context.launch()
+        process = subprocess.Popen(launch_args, **kwargs)
+
         for cha_ in iter(lambda: process.stdout.read(1), b""):
             sys.stdout.write(cha_)
             f.write(cha_)
@@ -109,6 +131,9 @@ def run_application(
     # TODO: check this, how can we interceipt errors.
     if bool(process.returncode):
         cmd_line = " ".join(launch_context.launch_args)
-        raise RuntimeError(f"Command line failed: {cmd_line}")
+        raise RuntimeError(
+            f"Command line failed: {cmd_line} "
+            f"with return code: {process.returncode}"
+        )
 
     return process

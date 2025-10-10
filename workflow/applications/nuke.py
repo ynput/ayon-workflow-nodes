@@ -59,7 +59,7 @@ write_node['file'].fromUserText(sys.argv[3])
 # save scene
 current_dir = os.path.dirname(sys.argv[3])
 output = os.path.join(current_dir, "workfile.nk")
-nuke.scriptSaveAs(output)
+nuke.scriptSaveAs(output, overwrite=1)
 """
     return "\n".join([
         begin,

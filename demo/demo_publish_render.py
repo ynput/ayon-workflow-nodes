@@ -35,8 +35,8 @@ def _build_graph(
     )
     context_node["project_name"] = project_name
     context_node["folder_path"] = folder_path
-    context_node["task_name"] = "previz"
-    context_node["task_type"] = "Previz"
+    context_node["task_name"] = "Generic"
+    context_node["task_type"] = "Generic"
 
     # Render path
     render_node = graph.create_node(
@@ -138,7 +138,7 @@ def _build_graph(
     blender_node.connect(
         "rendered_media",
         publish_blender_node,
-        "input_path"
+        "input_paths"
     )
     video_node.connect(
         "video",
@@ -148,7 +148,7 @@ def _build_graph(
     nuke_node.connect(
         "rendered_media",
         publish_nuke_node,
-        "input_path"
+        "input_paths"
     )
     return graph
 

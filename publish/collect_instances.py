@@ -24,10 +24,15 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
     ) -> Union[str, List[str]]:
         if isinstance(file_entry, str):
             return file_entry
+
         if isinstance(file_entry, Video):
             return file_entry.path
+
         if isinstance(file_entry, ImageSequence):
-            return list(file_entry)
+            paths = list(file_entry)
+            if len(paths) == 1:
+                return paths[0]  # single-frame image sequence
+            return paths
 
         raise TypeError(f"Unsupported file entry provided: {file_entry}")
 
@@ -73,6 +78,8 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
             }
             for file_group in instance_to_collect["file_groups"]:
                 paths = self._get_paths(file_group)
+
+                # Get representation extension.
                 path = paths[0] if isinstance(paths, list) else paths
                 _, ext = os.path.splitext(path)
                 ext = ext.strip(".")
