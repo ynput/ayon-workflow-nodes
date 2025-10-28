@@ -9,6 +9,7 @@ from ayon_workflow.datatypes import (
     Video,
     ContextItem,
     FolderItem,
+    PublishInput,
     TaskItem,
     FrameRange,
     VersionItem,
@@ -317,7 +318,7 @@ def get_plugins():
                 {
                     "name": "input_paths",
                     "description": "The content to be published.",
-                    "type": Union[str, MediaType],
+                    "type": Union[PublishInput, List[PublishInput]],
                 },
                 {
                     "name": "context",
