@@ -12,17 +12,14 @@ from ayon_core.pipeline.publish import publish_plugins_discover
 
 from ayon_workflow.datatypes import (
     FolderItem,
-    ImageSequence,
+    PublishInput,
     TaskItem,
     VersionItem,
-    Video,
 )
-
-publish_input = Union[str, Video, ImageSequence]
 
 
 def publish_content(
-        input_paths: Union[publish_input, List[publish_input]],
+        input_paths: Union[PublishInput, List[PublishInput]],
         context: Union[FolderItem, TaskItem],
         product_type: str,
         variant: Optional[str] = "Main",
