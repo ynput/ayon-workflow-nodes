@@ -94,7 +94,6 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                     "ext": ext,
                     "files": files,
                     "stagingDir": os.path.dirname(path),
-                    "tags": ["review", "webreview"],
                 }
                 instance_data["representations"].append(repre)
 
