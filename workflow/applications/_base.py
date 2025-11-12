@@ -1,6 +1,6 @@
 """ plugin.workflow.applications.render
 """
-import pprint
+import json
 import os
 import sys
 import subprocess
@@ -123,12 +123,13 @@ def run_application(
 
     with open(log_file, "w") as f:
         f.write(f"command line: {launch_args}\n")
-        f.write(f"environment: {pprint.pformat(env)}\n")
+        f.write(f"environment: {json.dumps(env, indent=4)}\n")
         process = subprocess.Popen(launch_args, **kwargs)
 
         for cha_ in iter(lambda: process.stdout.read(1), b""):
-            sys.stdout.write(cha_)
-            f.write(cha_)
+            chunk_str = cha_.decode("utf-8", errors="replace")
+            sys.stdout.write(chunk_str)
+            f.write(chunk_str)
 
             if process.poll() is not None and cha_ == '':
                 break
