@@ -115,21 +115,22 @@ def run_application(
         "stdout": subprocess.PIPE,
         "stderr": subprocess.STDOUT,
         "text": True,
+        "encoding": "utf-8",
+        "errors": "replace",
     })
     env = kwargs.get("env", {})
     env["PATH"] = _clean_up_pyside_in_env_path(
         env.get("PATH", "")
     )
 
-    with open(log_file, "w") as f:
+    with open(log_file, "w", encoding="utf-8") as f:
         f.write(f"command line: {launch_args}\n")
         f.write(f"environment: {json.dumps(env, indent=4)}\n")
         process = subprocess.Popen(launch_args, **kwargs)
 
         for cha_ in iter(lambda: process.stdout.read(1), b""):
-            chunk_str = cha_.decode("utf-8", errors="replace")
-            sys.stdout.write(chunk_str)
-            f.write(chunk_str)
+            sys.stdout.write(cha_)
+            f.write(cha_)
 
             if process.poll() is not None and cha_ == '':
                 break
