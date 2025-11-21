@@ -4,7 +4,7 @@ import logging
 import tempfile
 
 from ayon_workflow import addon, graph_editor
-from ayon_workflow.graph_execution.farm import submit
+from ayon_workflow.graph_execution.from_backend import job_description
 from ayon_workflow.plugin_system import register_plugins
 
 
@@ -29,24 +29,23 @@ video_node.connect("video", no_op, "input_data")
 
 # Create a new backend on disk.
 backend_dir = tempfile.mkdtemp(suffix="_backend")
-job_desc = submit.to_job_description(
+job_desc = job_description.to_job_description(
     my_graph,
     backend_dir=backend_dir
 )
 
 print("JOB DESCRIPTION IS DONE / BACKEND INITIALIZED")
 
-
 # Run command lines successively to execute graph from the backend.
 # (These can be executed from any machine having access to the backend,
 # not necessarily the one that create the backend initially.)
 for step in job_desc.steps:
     args = step.script.args
-    result = addon.execute(
+    result = addon.execute_from_backend(
         # Get command line to run.
         args[4],  # graph path,
-        backend_dir=args[6],  # backend directory
-        flow_id=args[8],  # flow id
+        args[6],  # backend directory
+        args[8],  # flow id
     )
     print(result)
 
