@@ -12,6 +12,8 @@ from ayon_core.pipeline import tempdir
 
 from ayon_workflow.datatypes import ContextItem
 
+from ._env import get_clean_envs
+
 
 def get_application(
         application_group_name: str,
@@ -42,21 +44,6 @@ def get_application(
             )
 
     return app_manager, app
-
-
-def _clean_up_pyside_in_env_path(env: str) -> str:
-    # AYON-launcher adds Pyside6 in the environment.
-    # This is causing issues when starting DCC such as Nuke from subprocesses.
-    paths = env.split(";")
-    paths_to_remove = [
-        path for path in paths
-        if "PySide6" in path.split(os.sep)
-    ]
-
-    for path_to_remove in paths_to_remove:
-        paths.remove(path_to_remove)
-
-    return ";".join(paths)
 
 
 def get_render_python_script_path(
@@ -104,6 +91,7 @@ def run_application(
         project_name=context.project_name,
         app_args=app_args or [],
         launch_type=LaunchTypes.automated,
+        env=get_clean_envs(),
     )
 
     log_file = log_file or os.devnull
@@ -115,10 +103,6 @@ def run_application(
         "stderr": subprocess.STDOUT,
         "text": True,
     })
-    env = kwargs.get("env", {})
-    env["PATH"] = _clean_up_pyside_in_env_path(
-        env.get("PATH", "")
-    )
 
     with open(log_file, "w") as f:
         process = subprocess.Popen(launch_args, **kwargs)
