@@ -67,7 +67,7 @@ def get_default_user_environment_windows():
             if not env_value:
                 break
             k, v = env_value.split("=", 1)
-            env[k] = v
+            env[k.upper()] = v
             env_value = ""
 
         return env
