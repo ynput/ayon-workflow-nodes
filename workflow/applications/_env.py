@@ -110,6 +110,7 @@ def get_default_user_environment_windows():
 
     for key in (
         "USER",
+        "USERDOMAIN",
         "USERNAME",
         "LOGNAME",
         "USERPROFILE",
