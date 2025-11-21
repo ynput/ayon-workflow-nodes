@@ -55,24 +55,23 @@ def get_default_user_environment_windows():
         # Cast to a pointer to wide characters
         wchar_ptr = ctypes.cast(lpEnv, ctypes.POINTER(ctypes.c_wchar))
         env = {}
-        s_chars = []
-        i = 0
-        # The block is "key=value\0key=value\0...\0\0"
+        idx = 0
+        env_value = ""
         while True:
-            ch = wchar_ptr[i]
-            i += 1
-            if ch == "\x00":
-                if not s_chars:
-                    # Two consecutive NULs -> end of block
-                    break
-                entry = "".join(s_chars)
-                s_chars = []
-                if "=" in entry:
-                    k, v = entry.split("=", 1)
-                    env[k] = v
-            else:
-                s_chars.append(ch)
+            ch = wchar_ptr[idx]
+            idx += 1
+            if ch != "\x00":
+                env_value += ch
+                continue
+
+            if not env_value:
+                break
+            k, v = env_value.split("=", 1)
+            env[k] = v
+            env_value = ""
+
         return env
+
     finally:
         # Always free the environment block
         DestroyEnvironmentBlock(lpEnv)
@@ -126,7 +125,7 @@ def get_default_like_login_env_posix():
     for entry in out.split(b"\x00"):
         if not entry:
             continue
-        k, _, v = entry.partition(b"=")
+        k, v = entry.split(b"=", 1)
         key = k.decode("utf-8", "replace")
         value = v.decode("utf-8", "replace")
         env_dict[key] = value
