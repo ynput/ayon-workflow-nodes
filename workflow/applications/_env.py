@@ -13,6 +13,7 @@ def get_default_user_environment_windows():
     userenv = ctypes.WinDLL("userenv", use_last_error=True)
     advapi32 = ctypes.WinDLL("Advapi32", use_last_error=True)
 
+    # Types
     LPVOID = ctypes.wintypes.LPVOID
     HANDLE = ctypes.wintypes.HANDLE
     PHANDLE = ctypes.POINTER(HANDLE)
@@ -33,7 +34,56 @@ def get_default_user_environment_windows():
 
     GetCurrentProcess = ctypes.windll.kernel32.GetCurrentProcess
 
+    ExpandEnvironmentStringsForUserW = userenv.ExpandEnvironmentStringsForUserW
+    ExpandEnvironmentStringsForUserW.argtypes = [
+        HANDLE,
+        ctypes.wintypes.LPCWSTR,
+        ctypes.wintypes.LPWSTR,
+        ctypes.wintypes.DWORD
+    ]
+    ExpandEnvironmentStringsForUserW.restype = ctypes.wintypes.BOOL
+
     TOKEN_QUERY = 0x0008
+
+    def _expand_for_user(h_token, value):
+        """Expand %VAR% in value."""
+        # Using '100' as maximum recursion depth
+        for _ in range(100):
+            needed = ExpandEnvironmentStringsForUserW(
+                h_token, value, None, 0
+            )
+            if not needed:
+                # API failed; return the original string
+                return value
+            buf = ctypes.create_unicode_buffer(needed)
+            ok = ExpandEnvironmentStringsForUserW(
+                h_token, value, buf, needed
+            )
+            if not ok:
+                return value
+            value = buf.value
+        return value
+
+    def _parse_env_block(lpEnv):
+        # Cast to a pointer to wide characters
+        wchar_ptr = ctypes.cast(lpEnv, ctypes.POINTER(ctypes.c_wchar))
+        env = {}
+        idx = 0
+        env_value = ""
+        while True:
+            ch = wchar_ptr[idx]
+            idx += 1
+            if ch != "\x00":
+                env_value += ch
+                continue
+
+            if not env_value:
+                break
+            k, v = env_value.split("=", 1)
+            env[k.upper()] = _expand_for_user(h_token, v)
+            env_value = ""
+
+        return env
 
     h_process = GetCurrentProcess()
     h_token = HANDLE()
@@ -52,29 +102,33 @@ def get_default_user_environment_windows():
         )
 
     try:
-        # Cast to a pointer to wide characters
-        wchar_ptr = ctypes.cast(lpEnv, ctypes.POINTER(ctypes.c_wchar))
-        env = {}
-        idx = 0
-        env_value = ""
-        while True:
-            ch = wchar_ptr[idx]
-            idx += 1
-            if ch != "\x00":
-                env_value += ch
-                continue
-
-            if not env_value:
-                break
-            k, v = env_value.split("=", 1)
-            env[k.upper()] = v
-            env_value = ""
-
-        return env
+        env = _parse_env_block(lpEnv)
 
     finally:
         # Always free the environment block
         DestroyEnvironmentBlock(lpEnv)
+
+    for key in (
+        "USER",
+        "USERNAME",
+        "LOGNAME",
+        "USERPROFILE",
+        "HOME",
+        "HOMEDRIVE",
+        "HOMEPATH",
+        "TMPDIR",
+        "TMP",
+        "TEMP",
+        "SHELL",
+        "COMSPEC",
+        "LANG",
+        "LC_ALL",
+    ):
+        if key not in env:
+            value = os.environ.get(key)
+            if value:
+                env[key] = value
+    return env
 
 
 def _user_identity():
