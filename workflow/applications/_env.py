@@ -18,7 +18,9 @@ def get_default_user_environment_windows():
     PHANDLE = ctypes.POINTER(HANDLE)
 
     CreateEnvironmentBlock = userenv.CreateEnvironmentBlock
-    CreateEnvironmentBlock.argtypes = [ctypes.POINTER(LPVOID), HANDLE, ctypes.wintypes.BOOL]
+    CreateEnvironmentBlock.argtypes = [
+        ctypes.POINTER(LPVOID), HANDLE, ctypes.wintypes.BOOL
+    ]
     CreateEnvironmentBlock.restype = ctypes.wintypes.BOOL
 
     DestroyEnvironmentBlock = userenv.DestroyEnvironmentBlock
