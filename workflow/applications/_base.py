@@ -10,7 +10,7 @@ from typing import Optional, Tuple, List
 from ayon_applications import ApplicationManager, Application, LaunchTypes
 from ayon_core.pipeline import tempdir
 
-from ayon_workflow.datatypes import ContextItem
+from ayon_workflow.datatypes import ContextItem, TaskItem
 
 from ._env import get_clean_envs
 
@@ -86,13 +86,28 @@ def run_application(
         application_variant=app_application_variant
     )
 
+    context_kwargs = {
+        "project_name": context.project_name,
+        "app_args": app_args or [],
+        "launch_type": LaunchTypes.automated,
+        "env": get_clean_envs(),
+    }
+
+    # If a TaskItem is not provided, the application will start
+    # from project environement and not all of the pre-hooks will
+    # be executed. This might result as an incomplete environment.
+    if isinstance(context, TaskItem):
+        context_kwargs.update({
+            "folder_path": context.folder_path(),
+            "task_name": context.task_name,
+            "task_type": context.task_type,
+        })
+
     launch_context = app_manager.create_launch_context(
         app.full_name,
-        project_name=context.project_name,
-        app_args=app_args or [],
-        launch_type=LaunchTypes.automated,
-        env=get_clean_envs(),
+        **context_kwargs,       
     )
+    launch_context.run_prelaunch_hooks()
 
     log_file = log_file or os.devnull
 
