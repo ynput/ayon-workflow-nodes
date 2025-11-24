@@ -105,7 +105,7 @@ def run_application(
 
     launch_context = app_manager.create_launch_context(
         app.full_name,
-        **context_kwargs,       
+        **context_kwargs,
     )
     launch_context.run_prelaunch_hooks()
 
