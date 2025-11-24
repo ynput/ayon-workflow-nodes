@@ -1,6 +1,7 @@
 import subprocess
 import platform
 import os
+import re
 
 
 def get_default_user_environment_windows():
@@ -45,22 +46,20 @@ def get_default_user_environment_windows():
 
     TOKEN_QUERY = 0x0008
 
+    expand_regex = re.compile(r"[^%]*(%[^%]*%)[^%]*")
+
     def _expand_for_user(h_token, value):
         """Expand %VAR% in value."""
         # Using '100' as maximum recursion depth
         for _ in range(100):
-            needed = ExpandEnvironmentStringsForUserW(
-                h_token, value, None, 0
-            )
-            if not needed:
-                # API failed; return the original string
+            buf = ctypes.create_unicode_buffer(32767)
+            if not expand_regex.match(value):
                 return value
-            buf = ctypes.create_unicode_buffer(needed)
             ok = ExpandEnvironmentStringsForUserW(
-                h_token, value, buf, needed
+                h_token, value, buf, 32767
             )
             if not ok:
-                return value
+                break
             value = buf.value
         return value
 
