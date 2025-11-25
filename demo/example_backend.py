@@ -27,6 +27,9 @@ no_op = my_graph.create_node("NoOp")
 video_node["path"] = "/path/to/a/video.mov"
 video_node.connect("video", no_op, "input_data")
 
+metadata_node = my_graph.create_node("DeadlineThinkbox")
+metadata_node.nodes = [video_node, no_op]
+
 # Create a new backend on disk.
 backend_dir = tempfile.mkdtemp(suffix="_backend")
 job_desc = job_description.to_job_description(
