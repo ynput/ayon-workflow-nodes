@@ -22,13 +22,27 @@ my_graph = graph_editor.Graph(
     name="backend_graph",
     description="this is a demo."
 )
+# Split 1 (Video node + NoOp)
 video_node = my_graph.create_node("Video", label="custom video node")
 no_op = my_graph.create_node("NoOp")
 video_node["path"] = "/path/to/a/video.mov"
 video_node.connect("video", no_op, "input_data")
 
-metadata_node = my_graph.create_node("DeadlineThinkbox")
-metadata_node.nodes = [video_node, no_op]
+
+# Split 2 (ImageSequence node + Append)
+img_seq_node = my_graph.create_node("ImageSequence", label="custom img node")
+append_node = my_graph.create_node("Append")
+img_seq_node["directory"] = "/path/to/a/"
+img_seq_node["head"] = "img."
+img_seq_node["tail"] = ".ext"
+no_op.connect("output_data", append_node, "input_1")
+img_seq_node.connect("image_sequence", append_node, "input_2")
+
+metadata_node2 = my_graph.create_node("DeadlineThinkbox", label="Split2")
+metadata_node2.nodes = [append_node, img_seq_node]
+
+metadata_node1 = my_graph.create_node("DeadlineThinkbox", label="Split1")
+metadata_node1.nodes = [video_node, no_op]
 
 # Create a new backend on disk.
 backend_dir = tempfile.mkdtemp(suffix="_backend")
@@ -49,6 +63,7 @@ for step in job_desc.steps:
         args[4],  # graph path,
         args[6],  # backend directory
         args[8],  # flow id
+        args[10] if len(args) > 10 else None,  # main flow id if provided
     )
     print(result)
 
