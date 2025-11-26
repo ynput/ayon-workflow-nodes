@@ -1,5 +1,6 @@
 """ plugin.workflow.applications.render
 """
+import json
 import os
 import sys
 import subprocess
@@ -114,13 +115,17 @@ def run_application(
         "stdout": subprocess.PIPE,
         "stderr": subprocess.STDOUT,
         "text": True,
+        "encoding": "utf-8",
+        "errors": "replace",
     })
     env = kwargs.get("env", {})
     env["PATH"] = _clean_up_pyside_in_env_path(
         env.get("PATH", "")
     )
 
-    with open(log_file, "w") as f:
+    with open(log_file, "w", encoding="utf-8") as f:
+        f.write(f"command line: {launch_args}\n")
+        f.write(f"environment: {json.dumps(env, indent=4)}\n")
         process = subprocess.Popen(launch_args, **kwargs)
 
         for cha_ in iter(lambda: process.stdout.read(1), b""):
@@ -130,14 +135,15 @@ def run_application(
             if process.poll() is not None and cha_ == '':
                 break
 
-    process.wait()
+        process.wait()
 
-    # TODO: check this, how can we interceipt errors.
-    if bool(process.returncode):
-        cmd_line = " ".join(launch_context.launch_args)
-        raise RuntimeError(
-            f"Command line failed: {cmd_line} "
-            f"with return code: {process.returncode}"
-        )
+        # TODO: check this, how can we interceipt errors.
+        if bool(process.returncode):
+            f.write(f"Process failed with returncode: {process.returncode}\n")
+            cmd_line = " ".join(launch_context.launch_args)
+            raise RuntimeError(
+                f"Command line failed: {cmd_line} "
+                f"with return code: {process.returncode}"
+            )
 
     return process
