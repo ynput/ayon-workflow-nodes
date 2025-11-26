@@ -1,4 +1,4 @@
-""" graph execution from backend
+""" split graph execution as multiple steps
 """
 import logging
 import tempfile
