@@ -46,9 +46,15 @@ for step in job_desc.steps:
     args = step.script.args
     result = addon.execute_from_backend(
         # Get command line to run.
-        args[4],  # graph path,
-        args[6],  # backend directory
-        args[8],  # flow id
+        #args[0] "addon",
+        #args[1]"workflow",
+        #args[2]"execute",
+        #args[3] "--graph-path",
+        graph_path =  args[4],
+        #args[5] "--backend-dir"
+        backend_dir = args[6],
+        #args[7] "--flow-id"
+        flow_id = args[8],
     )
     print(result)
 
