@@ -38,11 +38,17 @@ img_seq_node["tail"] = ".ext"
 no_op.connect("output_data", append_node, "input_1")
 img_seq_node.connect("image_sequence", append_node, "input_2")
 
-metadata_node2 = my_graph.create_node("DeadlineThinkbox", label="Split2")
-metadata_node2.nodes = [append_node, img_seq_node]
+metadata_container2 = my_graph.create_metadata_container(
+    "DeadlineThinkbox",
+    label="Split2"
+)
+metadata_container2.nodes = [append_node, img_seq_node]
 
-metadata_node1 = my_graph.create_node("DeadlineThinkbox", label="Split1")
-metadata_node1.nodes = [video_node, no_op]
+metadata_container1 = my_graph.create_metadata_container(
+    "DeadlineThinkbox",
+    label="Split1"
+)
+metadata_container1.nodes = [video_node, no_op]
 
 # Create a new backend on disk.
 backend_dir = tempfile.mkdtemp(suffix="_backend")
