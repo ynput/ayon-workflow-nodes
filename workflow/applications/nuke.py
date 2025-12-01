@@ -8,6 +8,7 @@ from ayon_workflow.datatypes import (
     ContextItem,
     FrameRange,
 )
+from ayon_workflow._utils import remap_input
 
 from . import _base
 
@@ -91,6 +92,12 @@ def run_nuke_render(
         app_args = ["-X", write_node_name]
     if frame_range:
         app_args.extend(["-F", str(frame_range.format())])
+    if python_script_path:
+        python_script_path = remap_input(
+            python_script_path,
+            context.project_name,
+        )
+
     app_args.append(
         _base.get_render_python_script_path(
             context.project_name,
@@ -102,14 +109,26 @@ def run_nuke_render(
         )
     )
     if nuke_script_path:
+        nuke_script_path = remap_input(
+            nuke_script_path,
+            context.project_name,
+        )
         app_args.append(nuke_script_path)
     if input_media:
+        input_media = remap_input(input_media, context.project_name)
         app_args.append(input_media.format())
 
     # TODO: make output_media optional and
     # identify media from resulting stdout instead.
     # assert the output_media exists
+    output_media = remap_input(output_media, context.project_name)
     app_args.append(output_media.format())
+
+    if log_file:
+        log_file = remap_input(
+            log_file,
+            context.project_name,
+        )
 
     # Start application.
     _ = _base.run_application(

@@ -16,6 +16,7 @@ from ayon_workflow.datatypes import (
     TaskItem,
     VersionItem,
 )
+from ayon_workflow._utils import remap_input
 
 
 def publish_content(
@@ -39,7 +40,14 @@ def publish_content(
         variant,
     )
 
-    in_data = input_paths if isinstance(input_paths, list) else [input_paths]
+    if isinstance(input_paths, list):
+        in_data = [
+            remap_input(input_path, context.project_name)
+            for input_path in input_paths
+        ]
+    else:
+        in_data = [remap_input(input_paths, context.project_name)]
+
     pyblish_context = pyblish.api.Context()
     pyblish_context.data["projectName"] = context.project_name
     pyblish_context.data["folderPath"] = context.folder_path()
