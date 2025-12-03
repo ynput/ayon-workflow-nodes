@@ -3,7 +3,7 @@
 import logging
 
 from ayon_workflow.graph_editor import graph
-from ayon_workflow.graph_execution import to_taskflow
+from ayon_workflow.graph_execution import execute_graph, GraphExecutionError
 from ayon_workflow.plugin_system import register_plugins
 
 
@@ -19,33 +19,32 @@ logging.getLogger("taskflow.engines.action_engine").setLevel(logging.INFO)
 # Create a new graph from scratch.
 my_graph = graph.Graph(name="My Graph", description="this is a demo.")
 
-# Create new "Random number" and "Write to File"
-random_node = my_graph.create_node("Random Number", label="custom label")
-write_node = my_graph.create_node("Write to File")
+image_sequence_node = my_graph.create_node(
+    "ImageSequence",
+    label="custom image sequence"
+)
+nuke_process_node = my_graph.create_node("NukeRender")
+image_sequence_node.connect(
+    "image_sequence",
+    nuke_process_node,
+    "input_media"
+)
+image_sequence_node.connect(
+    "image_sequence",
+    nuke_process_node,
+    "output_media"
+)
 
-# Write random number to a file
-random_node.connect("result", write_node, "content")
-
-# Add ensure graph fail with an additiona "Fail" node
-fail_node = my_graph.create_node("Fail")
-
-# Write random number to a file
-random_node.connect("result", write_node, "content")
-
-# Connect file path to fail message
-# (This way we ensure it happens after file is created)
-write_node.connect("filepath", fail_node, "message")
-
-
-# Create a node "Print" to be additionally executed on write_node revert
-print_node = my_graph.create_node("Print")
-print_node["template"] = "Deleting file: {input_str}."
-write_node.connect("revert", print_node, "input_str")
+# Create another "NoOp" node to be additionally
+# executed on image_sequence_node revert
+revert_node = my_graph.create_node("NoOp", label="Call on revert")
+image_sequence_node.connect("revert", revert_node, "input_data")
 
 # Execute the graph
+# NukeRender task will fail as no context was provided.
 try:
-    _ = to_taskflow.execute_graph(my_graph)
+    _ = execute_graph(my_graph)
 
 # With raise node, graph execution is expected to fail.
-except to_taskflow.GraphExecutionError as error:
+except GraphExecutionError as error:
     print(error)
