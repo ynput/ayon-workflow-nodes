@@ -5,14 +5,12 @@ import sys
 import subprocess
 import tempfile
 
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Dict
 
 from ayon_applications import ApplicationManager, Application, LaunchTypes
 from ayon_core.pipeline import tempdir
 
 from ayon_workflow.datatypes import ContextItem, TaskItem
-
-from ._env import get_clean_envs
 
 
 def get_application(
@@ -79,6 +77,7 @@ def run_application(
         app_args: Optional[List[str]] = None,
         app_application_variant: Optional[str] = None,
         log_file: Optional[str] = None,
+        env: Optional[Dict[str, str]] = None,
     ) -> subprocess.Popen:
     # Start application.
     app_manager, app = get_application(
@@ -90,7 +89,7 @@ def run_application(
         "project_name": context.project_name,
         "app_args": app_args or [],
         "launch_type": LaunchTypes.automated,
-        "env": get_clean_envs(),
+        "env": env,
     }
 
     # If a TaskItem is not provided, the application will start
