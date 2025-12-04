@@ -17,44 +17,71 @@ logging.getLogger("taskflow.engine").setLevel(logging.DEBUG)
 logging.getLogger("taskflow.engines.action_engine").setLevel(logging.INFO)
 
 
-# Create a new graph.
-my_graph = graph_editor.Graph(
-    name="backend_graph",
-    description="this is a demo."
+# Create a new workflow.
+my_workflow = graph_editor.Workflow(
+    name="backend_workflow_split_demo",
+    description="this is a demo.",
 )
+execution_graph = my_workflow.execution_graph
+
 # Split 1 (Video node + NoOp)
-video_node = my_graph.create_node("Video", label="custom video node")
-no_op = my_graph.create_node("NoOp")
+video_node = execution_graph.create_node("Video", label="custom video node")
+no_op = execution_graph.create_node("NoOp")
 video_node["path"] = "/path/to/a/video.mov"
 video_node.connect("video", no_op, "input_data")
 
 
 # Split 2 (ImageSequence node + Append)
-img_seq_node = my_graph.create_node("ImageSequence", label="custom img node")
-append_node = my_graph.create_node("Append")
+img_seq_node = execution_graph.create_node(
+    "ImageSequence",
+    label="custom img node"
+)
+append_node = execution_graph.create_node("Append")
 img_seq_node["directory"] = "/path/to/a/"
 img_seq_node["head"] = "img."
 img_seq_node["tail"] = ".ext"
 no_op.connect("output_data", append_node, "input_1")
 img_seq_node.connect("image_sequence", append_node, "input_2")
 
-metadata_container2 = my_graph.create_metadata_container(
+# Dispatch graphs
+# Define multiple dispatch graph logics
+
+# Dispatch logic 1 = 1 step with everything
+dispatch_graphA = graph_editor.DispatchGraph(
+    name="One Job Contains Everything"
+)
+my_workflow.dispatch_graphs.append(dispatch_graphA)
+
+dispatch_taskA = dispatch_graphA.create_node(
     "DeadlineThinkbox",
     label="Split2"
 )
-metadata_container2.nodes = [append_node, img_seq_node]
+dispatch_taskA.nodes = [append_node, img_seq_node, video_node, no_op]
 
-metadata_container1 = my_graph.create_metadata_container(
+# Dispatch logic 2 = split as 2 steps
+dispatch_graphB = graph_editor.DispatchGraph(name="One Job with 2 Steps")
+my_workflow.dispatch_graphs.append(dispatch_graphB)
+
+dispatch_taskB1 = dispatch_graphB.create_node(
+    "DeadlineThinkbox",
+    label="Split2"
+)
+dispatch_taskB1.nodes = [append_node, img_seq_node]
+
+dispatch_taskB2 = dispatch_graphB.create_node(
     "DeadlineThinkbox",
     label="Split1"
 )
-metadata_container1.nodes = [video_node, no_op]
+dispatch_taskB2.nodes = [video_node, no_op]
 
-# Create a new backend on disk.
+# Create a new backend directory on disk.
 backend_dir = tempfile.mkdtemp(suffix="_backend")
+
+# Split workflow using Dispatch logic 2
 job_desc = job_description.to_job_description(
-    my_graph,
-    backend_dir=backend_dir
+    my_workflow,
+    backend_dir=backend_dir,
+    dispatch_graph_name="One Job with 2 Steps",
 )
 
 print("JOB DESCRIPTION IS DONE / BACKEND INITIALIZED")
