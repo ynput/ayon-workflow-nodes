@@ -3,8 +3,8 @@
 import logging
 import tempfile
 
-from ayon_workflow import addon, graph_editor
-from ayon_workflow.graph_execution.from_backend import job_description
+from ayon_workflow import addon, workflow_editor
+from ayon_workflow.workflow_execution.from_backend import job_description
 from ayon_workflow.plugin_system import register_plugins
 
 
@@ -18,7 +18,7 @@ logging.getLogger("taskflow.engines.action_engine").setLevel(logging.INFO)
 
 
 # Create a new workflow.
-my_workflow = graph_editor.Workflow(
+my_workflow = workflow_editor.Workflow(
     name="backend_workflow_demo",
     description="this is a demo.",
 )
@@ -31,7 +31,7 @@ video_node["path"] = "/path/to/a/video.mov"
 video_node.connect("video", no_op, "input_data")
 
 # Append one dispatch graph that define a basic execution split.
-dispatch_graph = graph_editor.DispatchGraph(
+dispatch_graph = workflow_editor.DispatchGraph(
     name="Everything as one big task"
 )
 my_workflow.dispatch_graphs.append(dispatch_graph)

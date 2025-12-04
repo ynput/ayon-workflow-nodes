@@ -2,6 +2,7 @@
 
 Requirement:
 * A valid AYON folder path within a project
+* A task within this folder (task name="Generic", task type="Generic")
 * Nuke and Blender applications correctly setup
 """
 import os

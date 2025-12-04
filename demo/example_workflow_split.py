@@ -3,8 +3,8 @@
 import logging
 import tempfile
 
-from ayon_workflow import addon, graph_editor
-from ayon_workflow.graph_execution.from_backend import job_description
+from ayon_workflow import addon, workflow_editor
+from ayon_workflow.workflow_execution.from_backend import job_description
 from ayon_workflow.plugin_system import register_plugins
 
 
@@ -18,7 +18,7 @@ logging.getLogger("taskflow.engines.action_engine").setLevel(logging.INFO)
 
 
 # Create a new workflow.
-my_workflow = graph_editor.Workflow(
+my_workflow = workflow_editor.Workflow(
     name="backend_workflow_split_demo",
     description="this is a demo.",
 )
@@ -44,7 +44,7 @@ img_seq_node.connect("image_sequence", append_node, "input_2")
 
 # Append multiple dispatch graphs in the workflow
 # Dispatch logic 1 = 1 step with everything
-dispatch_graphA = graph_editor.DispatchGraph(
+dispatch_graphA = workflow_editor.DispatchGraph(
     name="One Deadline Job doing Everything"
 )
 my_workflow.dispatch_graphs.append(dispatch_graphA)
@@ -58,7 +58,7 @@ dispatch_taskA.nodes = [append_node, img_seq_node, video_node, no_op]
 # Dispatch logic 2 = split as 2 steps
 # Split 1 (Video node + NoOp)
 # Split 2 (ImageSequence node + Append)
-dispatch_graphB = graph_editor.DispatchGraph(
+dispatch_graphB = workflow_editor.DispatchGraph(
     name="One Job with 2 Deadline Steps"
 )
 my_workflow.dispatch_graphs.append(dispatch_graphB)

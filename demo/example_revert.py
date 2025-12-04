@@ -1,9 +1,12 @@
-""" revert graph execution example
+""" Workflow revert execution example
 """
 import logging
 
-from ayon_workflow.graph_editor import graph
-from ayon_workflow.graph_execution import to_taskflow
+from ayon_workflow.workflow_editor import Workflow
+from ayon_workflow.workflow_execution import(
+    execute_workflow,
+    WorkflowExecutionError
+)
 from ayon_workflow.plugin_system import register_plugins
 
 
@@ -17,35 +20,35 @@ logging.getLogger("taskflow.engines.action_engine").setLevel(logging.INFO)
 
 
 # Create a new graph from scratch.
-my_graph = graph.Graph(name="My Graph", description="this is a demo.")
+my_workflow = Workflow(name="My Workflow", description="this is a demo.")
+my_graph = my_workflow.execution_graph
 
-# Create new "Random number" and "Write to File"
-random_node = my_graph.create_node("Random Number", label="custom label")
-write_node = my_graph.create_node("Write to File")
+image_sequence_node = my_graph.create_node(
+    "ImageSequence",
+    label="custom image sequence"
+)
+nuke_process_node = my_graph.create_node("NukeRender")
+image_sequence_node.connect(
+    "image_sequence",
+    nuke_process_node,
+    "input_media"
+)
+image_sequence_node.connect(
+    "image_sequence",
+    nuke_process_node,
+    "output_media"
+)
 
-# Write random number to a file
-random_node.connect("result", write_node, "content")
+# Create another "NoOp" node to be additionally
+# executed on image_sequence_node revert
+revert_node = my_graph.create_node("NoOp", label="Call on revert")
+image_sequence_node.connect("revert", revert_node, "input_data")
 
-# Add ensure graph fail with an additiona "Fail" node
-fail_node = my_graph.create_node("Fail")
-
-# Write random number to a file
-random_node.connect("result", write_node, "content")
-
-# Connect file path to fail message
-# (This way we ensure it happens after file is created)
-write_node.connect("filepath", fail_node, "message")
-
-
-# Create a node "Print" to be additionally executed on write_node revert
-print_node = my_graph.create_node("Print")
-print_node["template"] = "Deleting file: {input_str}."
-write_node.connect("revert", print_node, "input_str")
-
-# Execute the graph
+# Execute the workflow.
+# NukeRender task will fail as no context was provided.
 try:
-    _ = to_taskflow.execute_graph(my_graph)
+    _ = execute_workflow(my_workflow)
 
 # With raise node, graph execution is expected to fail.
-except to_taskflow.GraphExecutionError as error:
+except WorkflowExecutionError as error:
     print(error)
