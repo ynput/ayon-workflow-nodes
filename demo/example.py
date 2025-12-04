@@ -4,8 +4,8 @@ import os
 import logging
 import tempfile
 
-from ayon_workflow import graph_editor
-from ayon_workflow import graph_execution
+from ayon_workflow import workflow_editor
+from ayon_workflow import workflow_execution
 from ayon_workflow.plugin_system import register_plugins
 
 
@@ -19,9 +19,10 @@ logging.getLogger("taskflow.engines.action_engine").setLevel(logging.INFO)
 
 
 # Create a new graph from scratch.
-my_graph = graph_editor.Graph(name="My Graph", description="this is a demo.")
+my_workflow = workflow_editor.Workflow(name="My Workflow", description="this is a demo.")
 
 # Create new node "Random number"
+my_graph = my_workflow.execution_graph
 random_node = my_graph.create_node("Random Number", label="custom label")
 assert random_node.name == "Random Number1"  # unique, not editable
 assert random_node.display_name == "custom label"

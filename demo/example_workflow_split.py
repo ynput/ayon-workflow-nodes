@@ -1,4 +1,4 @@
-""" split graph execution as multiple steps
+""" Workflow with multiple dispatch graphs.
 """
 import logging
 import tempfile
@@ -22,16 +22,15 @@ my_workflow = graph_editor.Workflow(
     name="backend_workflow_split_demo",
     description="this is a demo.",
 )
+
+# Edit random execution nodes in the execution graph.
 execution_graph = my_workflow.execution_graph
 
-# Split 1 (Video node + NoOp)
 video_node = execution_graph.create_node("Video", label="custom video node")
 no_op = execution_graph.create_node("NoOp")
 video_node["path"] = "/path/to/a/video.mov"
 video_node.connect("video", no_op, "input_data")
 
-
-# Split 2 (ImageSequence node + Append)
 img_seq_node = execution_graph.create_node(
     "ImageSequence",
     label="custom img node"
@@ -43,12 +42,10 @@ img_seq_node["tail"] = ".ext"
 no_op.connect("output_data", append_node, "input_1")
 img_seq_node.connect("image_sequence", append_node, "input_2")
 
-# Dispatch graphs
-# Define multiple dispatch graph logics
-
+# Append multiple dispatch graphs in the workflow
 # Dispatch logic 1 = 1 step with everything
 dispatch_graphA = graph_editor.DispatchGraph(
-    name="One Job Contains Everything"
+    name="One Deadline Job doing Everything"
 )
 my_workflow.dispatch_graphs.append(dispatch_graphA)
 
@@ -59,7 +56,11 @@ dispatch_taskA = dispatch_graphA.create_node(
 dispatch_taskA.nodes = [append_node, img_seq_node, video_node, no_op]
 
 # Dispatch logic 2 = split as 2 steps
-dispatch_graphB = graph_editor.DispatchGraph(name="One Job with 2 Steps")
+# Split 1 (Video node + NoOp)
+# Split 2 (ImageSequence node + Append)
+dispatch_graphB = graph_editor.DispatchGraph(
+    name="One Job with 2 Deadline Steps"
+)
 my_workflow.dispatch_graphs.append(dispatch_graphB)
 
 dispatch_taskB1 = dispatch_graphB.create_node(
@@ -77,16 +78,16 @@ dispatch_taskB2.nodes = [video_node, no_op]
 # Create a new backend directory on disk.
 backend_dir = tempfile.mkdtemp(suffix="_backend")
 
-# Split workflow using Dispatch logic 2
+# Split workflow using Dispatch logic 2 (2 steps)
 job_desc = job_description.to_job_description(
     my_workflow,
     backend_dir=backend_dir,
-    dispatch_graph_name="One Job with 2 Steps",
+    dispatch_graph_name="One Job with 2 Deadline Steps",
 )
 
 print("JOB DESCRIPTION IS DONE / BACKEND INITIALIZED")
 
-# Run command lines successively to execute graph from the backend.
+# Run command lines successively to execute workflow from the backend.
 # (These can be executed from any machine having access to the backend,
 # not necessarily the one that create the backend initially.)
 for step in job_desc.steps:

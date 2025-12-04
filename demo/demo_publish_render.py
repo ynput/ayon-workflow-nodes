@@ -1,4 +1,4 @@
-""" Demonstrate a graph with Blender + Nuke renders then publish results.
+""" Demonstrate a workflow with Blender + Nuke renders then publish results.
 
 Requirement:
 * A valid AYON folder path within a project
@@ -7,11 +7,9 @@ Requirement:
 import os
 import pprint
 
-from ayon_workflow import graph_editor
-from ayon_workflow import graph_execution
 from ayon_workflow.plugins.workflow import FrameRange
 from ayon_workflow.plugin_system import register_plugins
-
+from ayon_workflow import workflow_editor, workflow_execution
 
 AYON_WORKFLOW_DIR = os.path.dirname(os.path.abspath(__file__))
 FRAME_RANGE = FrameRange(
@@ -20,13 +18,15 @@ FRAME_RANGE = FrameRange(
 )
 
 
-def _build_graph(
+def _build_workflow(
         project_name: str,
         folder_path: str,
-    ) -> graph_editor.Graph:
+    ) -> workflow_editor.Workflow:
     # Discover all available node definitions
     register_plugins.register_plugins()
-    graph = graph_editor.Graph(name="Demo")
+
+    workflow = workflow_editor.Workflow(name="Demo")
+    graph = workflow.execution_graph
 
     # Retrieve context
     context_node = graph.create_node(
@@ -150,11 +150,11 @@ def _build_graph(
         publish_nuke_node,
         "input_paths"
     )
-    return graph
+    return workflow
 
 
-def _run_graph(graph: graph_editor.Graph):
-    results = graph_execution.execute_graph(graph)
+def _run_workflow(workflow: workflow_editor.Workflow):
+    results = workflow_execution.execute_workflow(workflow)
     pprint.pprint(results)
 
 
@@ -162,8 +162,8 @@ def run_demo(
         project_name: str,
         folder_path: str,
     ):
-    graph = _build_graph(
+    workflow = _build_workflow(
         project_name,
         folder_path,
     )
-    _run_graph(graph)
+    _run_workflow(workflow)

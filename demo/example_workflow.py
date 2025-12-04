@@ -1,4 +1,4 @@
-""" graph execution from backend
+""" Workflow execution from backend
 """
 import logging
 import tempfile
@@ -30,13 +30,16 @@ no_op = execution_graph.create_node("NoOp")
 video_node["path"] = "/path/to/a/video.mov"
 video_node.connect("video", no_op, "input_data")
 
-# Dispatch graph
-dispatch_graph = graph_editor.DispatchGraph(name="Basic Dispatch")
+# Append one dispatch graph that define a basic execution split.
+dispatch_graph = graph_editor.DispatchGraph(
+    name="Everything as one big task"
+)
 my_workflow.dispatch_graphs.append(dispatch_graph)
-dispatch_node = dispatch_graph.create_node("DeadlineThinkbox")
-dispatch_node.nodes = [video_node, no_op]
+dispatch_node = dispatch_graph.create_node("DispatchableTask")
+dispatch_node.nodes = [video_node, no_op]  # all execution nodes at once
 
 # Create a new backend directory on disk and convert to job description.
+# Job description will fallback to first dispatchable graph it can find.
 backend_dir = tempfile.mkdtemp(suffix="_backend")
 job_desc = job_description.to_job_description(
     my_workflow,
@@ -45,7 +48,7 @@ job_desc = job_description.to_job_description(
 
 print("JOB DESCRIPTION IS DONE / BACKEND INITIALIZED")
 
-# Run command lines successively to execute graph from the backend.
+# Run command lines successively to execute workflow from the backend.
 # (These can be executed from any machine having access to the backend,
 # not necessarily the one that create the backend initially.)
 for step in job_desc.steps:
