@@ -1,16 +1,17 @@
 """ plugin.workflow.applications.render
 """
+import json
 import os
 import sys
 import subprocess
 import tempfile
 
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Dict
 
 from ayon_applications import ApplicationManager, Application, LaunchTypes
 from ayon_core.pipeline import tempdir
 
-from ayon_workflow.datatypes import ContextItem
+from ayon_workflow.datatypes import ContextItem, TaskItem
 
 
 def get_application(
@@ -42,21 +43,6 @@ def get_application(
             )
 
     return app_manager, app
-
-
-def _clean_up_pyside_in_env_path(env: str) -> str:
-    # AYON-launcher adds Pyside6 in the environment.
-    # This is causing issues when starting DCC such as Nuke from subprocesses.
-    paths = env.split(";")
-    paths_to_remove = [
-        path for path in paths
-        if "PySide6" in path.split(os.sep)
-    ]
-
-    for path_to_remove in paths_to_remove:
-        paths.remove(path_to_remove)
-
-    return ";".join(paths)
 
 
 def get_render_python_script_path(
@@ -92,6 +78,7 @@ def run_application(
         app_args: Optional[List[str]] = None,
         app_application_variant: Optional[str] = None,
         log_file: Optional[str] = None,
+        env: Optional[Dict[str, str]] = None,
     ) -> subprocess.Popen:
     # Start application.
     app_manager, app = get_application(
@@ -99,12 +86,28 @@ def run_application(
         application_variant=app_application_variant
     )
 
+    context_kwargs = {
+        "project_name": context.project_name,
+        "app_args": app_args or [],
+        "launch_type": LaunchTypes.automated,
+        "env": env,
+    }
+
+    # If a TaskItem is not provided, the application will start
+    # from project environement and not all of the pre-hooks will
+    # be executed. This might result as an incomplete environment.
+    if isinstance(context, TaskItem):
+        context_kwargs.update({
+            "folder_path": context.folder_path(),
+            "task_name": context.task_name,
+            "task_type": context.task_type,
+        })
+
     launch_context = app_manager.create_launch_context(
         app.full_name,
-        project_name=context.project_name,
-        app_args=app_args or [],
-        launch_type=LaunchTypes.automated,
+        **context_kwargs,
     )
+    launch_context.run_prelaunch_hooks()
 
     log_file = log_file or os.devnull
 
@@ -114,13 +117,13 @@ def run_application(
         "stdout": subprocess.PIPE,
         "stderr": subprocess.STDOUT,
         "text": True,
+        "encoding": "utf-8",
+        "errors": "replace",
     })
-    env = kwargs.get("env", {})
-    env["PATH"] = _clean_up_pyside_in_env_path(
-        env.get("PATH", "")
-    )
 
-    with open(log_file, "w") as f:
+    with open(log_file, "w", encoding="utf-8") as f:
+        f.write(f"command line: {launch_args}\n")
+        f.write(f"environment: {json.dumps(env, indent=4)}\n")
         process = subprocess.Popen(launch_args, **kwargs)
 
         for cha_ in iter(lambda: process.stdout.read(1), b""):
@@ -130,14 +133,15 @@ def run_application(
             if process.poll() is not None and cha_ == '':
                 break
 
-    process.wait()
+        process.wait()
 
-    # TODO: check this, how can we interceipt errors.
-    if bool(process.returncode):
-        cmd_line = " ".join(launch_context.launch_args)
-        raise RuntimeError(
-            f"Command line failed: {cmd_line} "
-            f"with return code: {process.returncode}"
-        )
+        # TODO: check this, how can we interceipt errors.
+        if bool(process.returncode):
+            f.write(f"Process failed with returncode: {process.returncode}\n")
+            cmd_line = " ".join(launch_context.launch_args)
+            raise RuntimeError(
+                f"Command line failed: {cmd_line} "
+                f"with return code: {process.returncode}"
+            )
 
     return process
