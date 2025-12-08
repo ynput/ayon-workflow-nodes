@@ -1,9 +1,12 @@
-""" revert graph execution example
+""" Workflow revert execution example
 """
 import logging
 
-from ayon_workflow.graph_editor import graph
-from ayon_workflow.graph_execution import execute_graph, GraphExecutionError
+from ayon_workflow.workflow_editor import Workflow
+from ayon_workflow.workflow_execution import(
+    execute_workflow,
+    WorkflowExecutionError
+)
 from ayon_workflow.plugin_system import register_plugins
 
 
@@ -17,7 +20,8 @@ logging.getLogger("taskflow.engines.action_engine").setLevel(logging.INFO)
 
 
 # Create a new graph from scratch.
-my_graph = graph.Graph(name="My Graph", description="this is a demo.")
+my_workflow = Workflow(name="My Workflow", description="this is a demo.")
+my_graph = my_workflow.execution_graph
 
 image_sequence_node = my_graph.create_node(
     "ImageSequence",
@@ -40,11 +44,11 @@ image_sequence_node.connect(
 revert_node = my_graph.create_node("NoOp", label="Call on revert")
 image_sequence_node.connect("revert", revert_node, "input_data")
 
-# Execute the graph
+# Execute the workflow.
 # NukeRender task will fail as no context was provided.
 try:
-    _ = execute_graph(my_graph)
+    _ = execute_workflow(my_workflow)
 
 # With raise node, graph execution is expected to fail.
-except GraphExecutionError as error:
+except WorkflowExecutionError as error:
     print(error)

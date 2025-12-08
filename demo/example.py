@@ -1,11 +1,11 @@
-""" graph editing example
+""" Workflow editing example
 """
 import os
 import logging
 import tempfile
 
-from ayon_workflow import graph_editor
-from ayon_workflow import graph_execution
+from ayon_workflow import workflow_editor
+from ayon_workflow import workflow_execution
 from ayon_workflow.plugin_system import register_plugins
 
 
@@ -19,7 +19,8 @@ logging.getLogger("taskflow.engines.action_engine").setLevel(logging.INFO)
 
 
 # Create a new graph from scratch.
-my_graph = graph_editor.Graph(name="My Graph", description="this is a demo.")
+my_workflow = workflow_editor.Workflow(name="My Graph", description="demo.")
+my_graph = my_workflow.execution_graph
 
 # Create new node "Random number"
 random_node = my_graph.create_node("Video", label="custom label")
@@ -55,18 +56,18 @@ random_node["path"] = "/path/to/a/video.ext"
 # Delete no_op2
 my_graph.delete_node(no_op2)
 
-# Check resulting graph content
-assert my_graph.name == "My Graph"
-assert my_graph.description == "this is a demo."
+# Check resulting workflow content
+assert my_workflow.name == "My Graph"
+assert my_workflow.description == "demo."
 assert my_graph.get_nodes() == [random_node, no_op]
 
 
 # Check serialization/deserialization
 file_path = tempfile.NamedTemporaryFile(dir=os.getcwd(), suffix=".json").name
-my_graph.export_to_file(file_path)
-yet_another_graph = graph_editor.Graph.import_from_file(file_path)
+my_workflow.export_to_file(file_path)
+yet_another_workflow = workflow_editor.Workflow.import_from_file(file_path)
 print(f"Output file: {file_path}")
 
 # Execute the graph
-results = graph_execution.execute_graph(my_graph)
+results = workflow_execution.execute_workflow(my_workflow)
 print(f"Graph results: {results}")
