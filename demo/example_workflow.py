@@ -35,7 +35,7 @@ dispatch_graph = workflow_editor.DispatchGraph(
     name="Everything as one big task"
 )
 my_workflow.dispatch_graphs.append(dispatch_graph)
-dispatch_node = dispatch_graph.create_node("DispatchableTask")
+dispatch_node = dispatch_graph.create_node("GenericDispatchTask")
 dispatch_node.nodes = [video_node, no_op]  # all execution nodes at once
 
 # Create a new backend directory on disk and convert to job description.
