@@ -167,7 +167,7 @@ def prepare_image_sequence(
         head=head,
         tail=tail,
         padding=padding,
-        frame_range=frame_range,
+        _frame_range=frame_range,
     )
 
 

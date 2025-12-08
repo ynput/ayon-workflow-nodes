@@ -9,6 +9,7 @@ from ayon_workflow.datatypes import (
     ContextItem,
     FrameRange,
 )
+from ayon_workflow._utils import remap_input
 
 from . import _base
 
@@ -92,6 +93,17 @@ def run_blender_render(
         log_file: Optional[str] = None,
     ) -> ImageSequence:
     # Construct render command line args.
+    blender_script_path = remap_input(
+        blender_script_path,
+        context.project_name,
+    )
+
+    if python_script_path:
+        python_script_path = remap_input(
+            python_script_path,
+            context.project_name,
+        )
+
     app_args = [
         "-b",
         "-P",
@@ -107,6 +119,7 @@ def run_blender_render(
 
     # Add process-specific args
     if output_media:
+        output_media = remap_input(output_media, context.project_name)
         app_args.extend(
             [
                 "--output_path",
@@ -129,6 +142,10 @@ def run_blender_render(
             ]
         )
     if input_resource_path:
+        input_resource_path = remap_input(
+            input_resource_path,
+            context.project_name,
+        )
         app_args.extend(
             [
                 "--input_path",
@@ -136,7 +153,11 @@ def run_blender_render(
             ]
         )
 
-    print(" ".join(app_args))
+    if log_file:
+        log_file = remap_input(
+            log_file,
+            context.project_name,
+        )
 
     # Start application.
     _ = _base.run_application(
