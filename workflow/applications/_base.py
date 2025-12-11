@@ -6,12 +6,29 @@ import sys
 import subprocess
 import tempfile
 
+from contextlib import contextmanager
 from typing import Optional, Tuple, List, Dict
 
 from ayon_applications import ApplicationManager, Application, LaunchTypes
 from ayon_core.pipeline import tempdir
 
 from ayon_workflow.datatypes import ContextItem, TaskItem
+
+
+@contextmanager
+def force_stdout_utf8():
+    original_encoding = sys.stdout.encoding
+    original_errors = sys.stdout.errors
+
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        yield
+
+    finally:
+        sys.stdout.reconfigure(
+            encoding=original_encoding,
+            errors=original_errors
+        )
 
 
 def get_application(
@@ -31,13 +48,18 @@ def get_application(
         app = app_manager.find_latest_available_variant_for_group(
             app_group.name
         )
+        if app is None:
+            raise RuntimeError(
+                "Cannot find valid application with reachable executable "
+                f"for application group: {app_group.name}."
+            )
 
     else:
         # Retrieve explicit version.
         try:
             app = app_group.variants[application_variant]
         except KeyError:
-            raise ValueError(
+            raise RuntimeError(
                 f"Unknown variant {application_variant} "
                 f"for application group {application_group_name}."
             )
@@ -126,12 +148,13 @@ def run_application(
         f.write(f"environment: {json.dumps(env, indent=4)}\n")
         process = subprocess.Popen(launch_args, **kwargs)
 
-        for cha_ in iter(lambda: process.stdout.read(1), b""):
-            sys.stdout.write(cha_)
-            f.write(cha_)
+        with force_stdout_utf8():
+            for cha_ in iter(lambda: process.stdout.read(1), b""):
+                sys.stdout.write(cha_)
+                f.write(cha_)
 
-            if process.poll() is not None and cha_ == '':
-                break
+                if process.poll() is not None and cha_ == '':
+                    break
 
         process.wait()
 

@@ -47,7 +47,7 @@ def _get_task_item(
                 )
 
         attrs = asdict(folder_item)
-        attrs["parent"] = folder_item.parent
+        attrs["_parent"] = folder_item.parent
         attrs["task_name"] = task_name
         attrs["task_type"] = task_type
         return TaskItem(**attrs)
@@ -91,7 +91,7 @@ def _get_folder_item(
                     folder_name=folder_dict["name"],
                     folder_id=folder_dict["id"],
                     project_name=project_name,
-                    parent=parent_folder,
+                    _parent=parent_folder,
                 )
 
             raise ValueError(
