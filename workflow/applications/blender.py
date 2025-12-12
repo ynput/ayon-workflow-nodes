@@ -119,13 +119,13 @@ def run_blender_render(
 
     # Add process-specific args
     if output_media:
-        output_media = remap_input(output_media, context.project_name)
+        remapped_output_media = remap_input(output_media, context.project_name)
         app_args.extend(
             [
                 "--output_path",
                 os.path.join(
-                    output_media.directory,
-                    f"{output_media.head}"
+                    remapped_output_media.directory,
+                    f"{remapped_output_media.head}"
                 )
             ]
         )

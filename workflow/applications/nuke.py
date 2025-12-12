@@ -121,8 +121,8 @@ def run_nuke_render(
     # TODO: make output_media optional and
     # identify media from resulting stdout instead.
     # assert the output_media exists
-    output_media = remap_input(output_media, context.project_name)
-    app_args.append(output_media.format())
+    remapped_output_media = remap_input(output_media, context.project_name)
+    app_args.append(remapped_output_media.format())
 
     if log_file:
         log_file = remap_input(
