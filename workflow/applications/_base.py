@@ -145,7 +145,8 @@ def run_application(
 
     with open(log_file, "w", encoding="utf-8") as f:
         f.write(f"command line: {launch_args}\n")
-        f.write(f"environment: {json.dumps(env, indent=4)}\n")
+        env_log = json.dumps(env or dict(os.environ), indent=4)
+        f.write(f"environment: {env_log}\n")
         process = subprocess.Popen(launch_args, **kwargs)
 
         with force_stdout_utf8():
