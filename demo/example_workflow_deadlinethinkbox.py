@@ -138,7 +138,7 @@ subprocess.run(
         "--backend-dir",
         backend_directory,
 # Optional
-#        "--project-name",
+#        "--project",
 #        "my_project_name",
     ]
 )
