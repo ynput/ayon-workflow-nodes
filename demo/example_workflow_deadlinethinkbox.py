@@ -1,4 +1,5 @@
-""" A worlflow with Blender + Nuke (can be executed locally or dispatched to Deadline Thinkbox).
+""" A worlflow with Blender + Nuke
+(can be executed locally or dispatched to Deadline Thinkbox).
 
 * Blender render an image sequence from a script
 * Nuke encore the resulting image sequence from Blender as a video

@@ -145,10 +145,7 @@ def get_ayon_context(
 def _check_parent_directory(
         parent_directory: Optional[str],
     ) -> str:
-    if parent_directory:
-        os.makedirs(parent_directory, exist_ok=True)
-
-    elif not parent_directory:
+    if not parent_directory:
         parent_directory = tempfile.mkdtemp()
 
     return parent_directory
