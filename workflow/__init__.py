@@ -407,6 +407,22 @@ def get_plugins():
                     "type": float,
                     "default": 1.234567,
                 },
+                {
+                    "name": "string_array",
+                    "description": "whatever",
+                    "type": List[str],
+                    "default": ["foo", "bar", "baz"],
+                },
+                {
+                    "name": "float_array",
+                    "description": "whatever",
+                    "type": List[float],
+                },
+                {
+                    "name": "int_array",
+                    "description": "whatever",
+                    "type": List[int],
+                },
             ],
             "outputs": [],
         },
