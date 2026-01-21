@@ -84,6 +84,7 @@ job_desc = job_description.to_job_description(
     backend_dir=backend_dir,
     dispatch_graph_name="One Job with 2 Deadline Steps",
 )
+my_workflow.export_to_file("test_append.json")
 
 print("JOB DESCRIPTION IS DONE / BACKEND INITIALIZED")
 
