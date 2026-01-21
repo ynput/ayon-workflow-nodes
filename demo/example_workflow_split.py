@@ -39,8 +39,8 @@ append_node = execution_graph.create_node("Append")
 img_seq_node["directory"] = "/path/to/a/"
 img_seq_node["head"] = "img."
 img_seq_node["tail"] = ".ext"
-no_op.connect("output_data", append_node, "input_1")
-img_seq_node.connect("image_sequence", append_node, "input_2")
+no_op.connect("output_data", append_node, "inputs")
+img_seq_node.connect("image_sequence", append_node, "inputs")
 
 # Append multiple dispatch graphs in the workflow
 # Dispatch logic 1 = 1 step with everything

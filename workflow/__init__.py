@@ -44,15 +44,11 @@ def get_plugins():
             "version": __version__,
             "inputs": [
                 {
-                    "name": "input_1",
-                    "description": "Any input.",
-                    "type": Any,
+                    "name": "inputs",
+                    "description": "Any input(s).",
+                    "type": List[Any],
+                    "allow_multi_connection": True,
                 },
-                {
-                    "name": "input_2",
-                    "description": "Any input.",
-                    "type": Any,
-                }
             ],
             "outputs": [
                 {

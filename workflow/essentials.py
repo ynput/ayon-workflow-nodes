@@ -182,9 +182,14 @@ def prepare_video(
     )
 
 
-def append(input_1: Any, input_2: Any) -> List[Any]:
-    if isinstance(input_1, list):
-        input_1.append(input_2)
-        return input_1
+def append(inputs: List[Any]) -> List[Any]:
+    """ Merge provided input(s) in a single list.
+    """
+    result = []
+    for input in inputs:
+        if isinstance(input, list):
+            result.extend(input)
+        else:
+            result.append(input)
 
-    return [input_1, input_2]
+    return result
