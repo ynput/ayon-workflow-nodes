@@ -95,12 +95,13 @@ chunk_img_sequence.validate_chunks(
     dispatch_graph,
     my_workflow,
 )
+my_workflow.export_to_file("before.json")
 
 chunk_img_sequence.prepare_workflow(
     dispatch_graph,
     my_workflow,
 )
-
+my_workflow.export_to_file("after.json")
 # Create a new backend directory on disk.
 backend_dir = tempfile.mkdtemp(suffix="_backend")
 
