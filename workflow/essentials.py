@@ -6,7 +6,12 @@ from dataclasses import asdict
 from typing import Optional, Any, List
 import tempfile
 
-import ayon_api
+try:
+    import ayon_api
+
+except ImportError:
+    # Unit test mode
+    ayon_api = type("ayon_api", (), {})
 
 from ayon_workflow.datatypes import (
     ContextItem,
@@ -193,3 +198,27 @@ def append(inputs: List[Any]) -> List[Any]:
             result.append(input)
 
     return result
+
+
+def merge_sequences(img_sequences: List[ImageSequence]) -> ImageSequence:
+    if not img_sequences:
+        raise RuntimeError("Cannot merge: no sequence provided.")
+
+    ref_sequence = img_sequences.pop(0)
+    for img_sequence in img_sequences:
+        ref_str = ref_sequence.format().split(" ", 0)
+        img_str = img_sequence.format().split(" ", 0)
+        if ref_str != img_str:
+            raise RuntimeError(
+                f"Cannot merge {img_sequence} into {ref_sequence}."
+            )
+
+        ref_fr = ref_sequence.frame_range
+        img_fr = img_sequence.frame_range
+        ref_sequence.frame_range = FrameRange(
+            first_frame=min(ref_fr.first_frame, img_fr.first_frame),
+            last_frame=max(ref_fr.last_frame, img_fr.last_frame),
+            step=ref_fr.step,
+        )
+
+    return ref_sequence

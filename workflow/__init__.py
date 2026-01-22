@@ -175,6 +175,25 @@ def get_plugins():
             ],
         },
         {
+            "name": "MergeSequence",
+            "description": "Merge multiple image sequence together.",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "image_sequences",
+                    "description": "Any image sequence(s).",
+                    "type": List[ImageSequence],
+                    "allow_multi_connection": True,
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "merged_sequence",
+                    "type": ImageSequence,
+                }
+            ],
+        },
+        {
             "name": "NukeRender",
             "description": "Perform a render through Nuke.",
             "version": __version__,
@@ -436,6 +455,7 @@ def get_plugin_function(name):
         "Context": essentials.get_ayon_context,
         "Video": essentials.prepare_video,
         "ImageSequence": essentials.prepare_image_sequence,
+        "MergeSequence": essentials.merge_sequences,
         "Append": essentials.append,
         # Processes
         "NukeRender": nuke.run_nuke_render,
