@@ -46,12 +46,21 @@ img_seq_node["frame_range"] = datatypes.FrameRange(
 
 render_node = execution_graph.create_node(
     "NukeRender",
-    label="Render"
+    label="Render 1"
 )
 render_node2 = execution_graph.create_node(
     "NukeRender",
-    label="Render"
+    label="Render 2"
 )
+render_node3 = execution_graph.create_node(
+    "BlenderRender",
+    label="Render 3"
+)
+render_node3["frame_range"] = datatypes.FrameRange(
+    first_frame=1,
+    last_frame=5,
+)
+
 
 append_node = execution_graph.create_node("Append")
 no_op_node = execution_graph.create_node("NoOp")
@@ -62,6 +71,7 @@ img_seq_node.connect("image_sequence", append_node, "inputs")
 render_node.connect("rendered_media", append_node, "inputs")
 render_node.connect("rendered_media", render_node2, "input_media")
 render_node2.connect("rendered_media", no_op_node, "input_data")
+no_op_node.connect("output_data", render_node3, "input_resource_path")
 
 # Create a chunked dispatch graph with a single
 # dispatch task containing the whole execution.
@@ -72,14 +82,17 @@ dispatch_task = dispatch_graph.create_node(
     "DeadlineThinkbox",
     label="Prepping"
 )
-
 dispatch_task1 = dispatch_graph.create_node(
     "DeadlineThinkbox",
-    label="Rendering"
+    label="Chained Rendering"
 )
 dispatch_task2 = dispatch_graph.create_node(
     "DeadlineThinkbox",
     label="Appending"
+)
+dispatch_task3 = dispatch_graph.create_node(
+    "DeadlineThinkbox",
+    label="Rendering from Workfile"
 )
 
 dispatch_task1.task_chunk = workflow_editor.TaskChunkParameters(
@@ -87,21 +100,27 @@ dispatch_task1.task_chunk = workflow_editor.TaskChunkParameters(
     node_input_name="input_media",
     chunk_size=4,
 )
+dispatch_task3.task_chunk = workflow_editor.TaskChunkParameters(
+    node_name=render_node3.name,
+    node_input_name="frame_range",
+    chunk_size=3,
+)
+
 dispatch_task.nodes = [img_seq_node]
 dispatch_task1.nodes = [render_node, render_node2]
 dispatch_task2.nodes = [append_node, no_op_node]
+dispatch_task3.nodes = [render_node3]
 
 chunk_img_sequence.validate_chunks(
     dispatch_graph,
     my_workflow,
 )
-my_workflow.export_to_file("before.json")
 
 chunk_img_sequence.prepare_workflow(
     dispatch_graph,
     my_workflow,
 )
-my_workflow.export_to_file("after.json")
+
 # Create a new backend directory on disk.
 backend_dir = tempfile.mkdtemp(suffix="_backend")
 
