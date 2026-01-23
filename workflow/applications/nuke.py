@@ -1,11 +1,13 @@
 """ plugin.workflow.applications.nuke
 """
+import os
 
 from typing import Optional, Union
 
 from ayon_workflow.datatypes import (
     MediaType,
     ContextItem,
+    ImageSequence,
     FrameRange,
 )
 from ayon_workflow._utils import remap_input
@@ -90,6 +92,16 @@ def run_nuke_render(
     app_args = ["-x"]
     if write_node_name:
         app_args = ["-X", write_node_name]
+
+    if output_media.frame_range:
+        frame_range = frame_range or output_media.frame_range
+        if frame_range != output_media.frame_range:
+            raise RuntimeError(
+                "Ambiguous range between explicit "
+                f"set framerange {frame_range} and "
+                f"expected output {output_media.frame_range}."
+            )
+
     if frame_range:
         app_args.extend(["-F", str(frame_range.format())])
     if python_script_path:
@@ -125,6 +137,13 @@ def run_nuke_render(
     app_args.append(remapped_output_media.format())
 
     if log_file:
+        # Ensure logfile is unique per frame chunk.
+        if frame_range:
+            log_file = (
+                f"{log_file}._chunk{frame_range.first_frame}"
+                f"_{frame_range.last_frame}"
+            )
+
         log_file = remap_input(
             log_file,
             context.project_name,
@@ -138,5 +157,16 @@ def run_nuke_render(
         app_application_variant=nuke_application_variant,
         log_file=log_file,
     )
+
+    # Ensure expected output_media exists.
+    if isinstance(remapped_output_media, ImageSequence):  # img seq
+        for path in remapped_output_media:
+            if not os.path.exists(path):
+                raise RuntimeError(f"Expected frame {path} does not exists.")
+    else:
+        if not os.path.exists(remapped_output_media.path):  # video
+            raise RuntimeError(
+                f"Expected video {remapped_output_media.path} does not exists."
+            )
 
     return output_media

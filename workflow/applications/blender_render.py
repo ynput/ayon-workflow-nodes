@@ -1,4 +1,4 @@
-""" plugin.workflow.applications.blender
+""" plugin.workflow.applications.blender_render
 """
 
 from typing import Optional, Union
@@ -118,17 +118,26 @@ def run_blender_render(
     ]
 
     # Add process-specific args
-    if output_media:
-        remapped_output_media = remap_input(output_media, context.project_name)
-        app_args.extend(
-            [
-                "--output_path",
-                os.path.join(
-                    remapped_output_media.directory,
-                    f"{remapped_output_media.head}"
-                )
-            ]
-        )
+    remapped_output_media = remap_input(output_media, context.project_name)
+    app_args.extend(
+        [
+            "--output_path",
+            os.path.join(
+                remapped_output_media.directory,
+                f"{remapped_output_media.head}"
+            )
+        ]
+    )
+
+    if output_media.frame_range:
+        frame_range = frame_range or output_media.frame_range
+        if frame_range != output_media.frame_range:
+            raise RuntimeError(
+                "Ambiguous range between explicit "
+                f"set framerange {frame_range} and "
+                f"expected output {output_media.format()}."
+            )
+
     if frame_range:
         if isinstance(frame_range, dict):
             frame_range = FrameRange(**frame_range)
@@ -154,6 +163,13 @@ def run_blender_render(
         )
 
     if log_file:
+        # Ensure logfile is unique per frame chunk.
+        if frame_range:
+            log_file = (
+                f"{log_file}._chunk{frame_range.first_frame}"
+                f"_{frame_range.last_frame}"
+            )
+
         log_file = remap_input(
             log_file,
             context.project_name,
@@ -168,7 +184,11 @@ def run_blender_render(
         log_file=log_file,
     )
 
+    # Ensure expected output_media exists.
+    for path in remapped_output_media:
+        if not os.path.exists(path):
+            raise RuntimeError(f"Expected frame {path} does not exists.")
+
     # TODO: make output_media optional and
     # identify media from resulting stdout instead.
-    # assert the output_media exists
     return output_media

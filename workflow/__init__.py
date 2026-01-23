@@ -290,7 +290,7 @@ def get_plugins():
                 {
                     "name": "output_media",
                     "description": "The output media",
-                    "type": MediaType,
+                    "type": ImageSequence,
                 },
                 {
                     "name": "python_script_path",
@@ -321,7 +321,66 @@ def get_plugins():
             "outputs": [
                 {
                     "name": "rendered_media",
-                    "type": MediaType,
+                    "type": ImageSequence,
+                }
+            ],
+        },
+        {
+            "name": "BlenderWorkfile",
+            "description": "Assemble a workfile in Blender.",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "context",
+                    "description": "The render context.",
+                    "type": ContextItem,
+                },
+                {
+                    "name": "blender_script_path",
+                    "description": "The path to the Blender script.",
+                    "type": str,
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a Blender scene file",
+                        "filter": "Blender Scene (*.blend)",
+                    },
+                },
+                {
+                    "name": "input_resource_path",
+                    "description": "A path to an input resource",
+                    "type": str,
+                    "widget": {"name": "filepath"},
+                },
+                {
+                    "name": "output_workfile",
+                    "description": "The output workfile",
+                    "type": str,
+                },
+                {
+                    "name": "python_script_path",
+                    "description": "The path to a python script.",
+                    "type": str,
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a Python file",
+                        "filter": "Python Script (*.py)",
+                    },
+                },
+                {
+                    "name": "blender_application_variant",
+                    "description": "An application variant to use.",
+                    "type": str,
+                },
+                {
+                    "name": "log_file",
+                    "description": "Path to output logs.",
+                    "type": str,
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "blend_workfile",
+                    "type": str,
                 }
             ],
         },
@@ -343,6 +402,11 @@ def get_plugins():
                 {
                     "name": "product_type",
                     "description": "The publish product type.",
+                    "type": str,
+                },
+                {
+                    "name": "username",
+                    "description": "The username to use while publishing.",
                     "type": str,
                 },
                 {
@@ -446,7 +510,7 @@ def get_plugins():
 
 def get_plugin_function(name):
     from . import essentials, publish
-    from .applications import nuke, blender
+    from .applications import nuke, blender_render, blender_workfile
 
     func_mapping = {
         # Others
@@ -459,7 +523,8 @@ def get_plugin_function(name):
         "Append": essentials.append,
         # Processes
         "NukeRender": nuke.run_nuke_render,
-        "BlenderRender": blender.run_blender_render,
+        "BlenderRender": blender_render.run_blender_render,
+        "BlenderWorkfile": blender_workfile.run_blender_workfile,
     }
 
     return func_mapping.get(name)
