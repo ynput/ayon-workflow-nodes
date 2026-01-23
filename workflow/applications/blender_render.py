@@ -131,12 +131,6 @@ def run_blender_render(
 
     if output_media.frame_range:
         frame_range = frame_range or output_media.frame_range
-        if frame_range != output_media.frame_range:
-            raise RuntimeError(
-                "Ambiguous range between explicit "
-                f"set framerange {frame_range} and "
-                f"expected output {output_media.format()}."
-            )
 
     if frame_range:
         if isinstance(frame_range, dict):
