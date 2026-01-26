@@ -118,6 +118,23 @@ def run_blender_render(
     ]
 
     # Add process-specific args
+    if output_media.frame_range:
+        frame_range = frame_range or output_media.frame_range
+
+    if frame_range:
+        if isinstance(frame_range, dict):
+            frame_range = FrameRange(**frame_range)
+        output_media.frame_range = frame_range
+
+        app_args.extend(
+            [
+                "--start",
+                str(frame_range.first_frame),
+                "--end",
+                str(frame_range.last_frame),
+            ]
+        )
+
     remapped_output_media = remap_input(output_media, context.project_name)
     app_args.extend(
         [
@@ -129,21 +146,6 @@ def run_blender_render(
         ]
     )
 
-    if output_media.frame_range:
-        frame_range = frame_range or output_media.frame_range
-
-    if frame_range:
-        if isinstance(frame_range, dict):
-            frame_range = FrameRange(**frame_range)
-
-        app_args.extend(
-            [
-                "--start",
-                str(frame_range.first_frame),
-                "--end",
-                str(frame_range.last_frame),
-            ]
-        )
     if input_resource_path:
         input_resource_path = remap_input(
             input_resource_path,
