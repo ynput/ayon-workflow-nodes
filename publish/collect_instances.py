@@ -61,16 +61,18 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                     f"Invalid instance to be collected: {instances_to_collect}"
                     f" Missing mandatory keys: {mandatory_keys}."
                 )
-
+            
+            product_base_type = instance_to_collect["product_type"]
             instance_data = {
                 "publish": True,
                 "active": True,
                 "label": instance_to_collect["product_name"],
                 "name": instance_to_collect["product_name"],
                 "productName": instance_to_collect["product_name"],
-                "productType": instance_to_collect["product_type"],
-                "family": instance_to_collect["product_type"],
-                "families": [instance_to_collect["product_type"], "review"],
+                "productType": product_base_type,
+                "productBaseType": product_base_type,
+                "family": product_base_type,
+                "families": [product_base_type, "review"],
                 "folderPath": context.data["folderPath"],
                 "task": context.data.get("taskName"),
                 "variant": instance_to_collect["variant"],
