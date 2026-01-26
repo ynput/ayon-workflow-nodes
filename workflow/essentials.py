@@ -200,14 +200,14 @@ def append(inputs: List[Any]) -> List[Any]:
     return result
 
 
-def merge_sequences(img_sequences: List[ImageSequence]) -> ImageSequence:
-    if not img_sequences:
+def merge_sequences(image_sequences: List[ImageSequence]) -> ImageSequence:
+    if not image_sequences:
         raise RuntimeError("Cannot merge: no sequence provided.")
 
-    ref_sequence = img_sequences.pop(0)
-    for img_sequence in img_sequences:
-        ref_str = ref_sequence.format().split(" ", 0)
-        img_str = img_sequence.format().split(" ", 0)
+    ref_sequence = image_sequences.pop(0)
+    for img_sequence in image_sequences:
+        ref_str, _ = ref_sequence.format().rsplit(" ", 1)
+        img_str, _ = img_sequence.format().rsplit(" ", 1)
         if ref_str != img_str:
             raise RuntimeError(
                 f"Cannot merge {img_sequence} into {ref_sequence}."
