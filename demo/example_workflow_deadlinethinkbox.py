@@ -103,20 +103,20 @@ workflow.dispatch_graphs.append(dispatch_graph)
 prepare_split = dispatch_graph.create_node("DeadlineThinkbox", label="Prepare")
 prepare_split.job_name = "Prepare"
 prepare_split.comment = "Quick to execute could be merged with Blender job."
-prepare_split.nodes = [context_node, img_seq_node]
+prepare_split.node_names = [context_node.name, img_seq_node.name]
 
 # Make Blender run in its own slice to adjust pool
 blender_split = dispatch_graph.create_node("DeadlineThinkbox", label="Blender")
 blender_split.job_name = "Blender render"
 blender_split.priority = 88
 blender_split.pool = "cg_render_pool"
-blender_split.nodes = [blender_node]
+blender_split.node_names = [blender_node.name]
 
 # Make Nuke run in its own slice to adjust license.
 nuke_split = dispatch_graph.create_node("DeadlineThinkbox", label="Nuke")
 nuke_split.job_name = "Nuke render"
 nuke_split.limit_groups = ["nuke"]
-nuke_split.nodes = [nuke_node, video_node]
+nuke_split.node_names = [nuke_node.name, video_node.name]
 
 
 # Serialization
