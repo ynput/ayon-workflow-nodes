@@ -36,7 +36,10 @@ dispatch_graph = workflow_editor.DispatchGraph(
 )
 my_workflow.dispatch_graphs.append(dispatch_graph)
 dispatch_node = dispatch_graph.create_node("GenericDispatchTask")
-dispatch_node.nodes = [video_node, no_op]  # all execution nodes at once
+dispatch_node.node_names = [   # all execution nodes at once
+    video_node.name,
+    no_op.name
+]
 
 # Create a new backend directory on disk and convert to job description.
 # Job description will fallback to first dispatchable graph it can find.

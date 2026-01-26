@@ -106,10 +106,12 @@ dispatch_task3.task_chunk = workflow_editor.TaskChunkParameters(
     chunk_size=3,
 )
 
-dispatch_task.nodes = [img_seq_node]
-dispatch_task1.nodes = [render_node, render_node2]
-dispatch_task2.nodes = [append_node, no_op_node]
-dispatch_task3.nodes = [render_node3]
+dispatch_task.node_names = [img_seq_node.name]
+dispatch_task1.node_names = [render_node.name, render_node2.name]
+dispatch_task2.node_names = [append_node.name, no_op_node.name]
+dispatch_task3.node_names = [render_node3.name]
+
+my_workflow.validate()
 
 chunk_img_sequence.validate_chunks(
     dispatch_graph,
