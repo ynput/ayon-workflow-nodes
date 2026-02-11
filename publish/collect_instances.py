@@ -70,7 +70,7 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                 "productName": instance_to_collect["product_name"],
                 "productType": instance_to_collect["product_type"],
                 "family": instance_to_collect["product_type"],
-                "families": [instance_to_collect["product_type"], "review"],
+                "families": [instance_to_collect["product_type"]],
                 "folderPath": context.data["folderPath"],
                 "task": context.data.get("taskName"),
                 "variant": instance_to_collect["variant"],
@@ -95,6 +95,14 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                     "files": files,
                     "stagingDir": os.path.dirname(path),
                 }
+
+                # Add frame range if explicitely provided.
+                if getattr(file_group, "frame_range", None):
+                    repre.update({
+                        "frameStart": file_group.frame_range.first_frame,
+                        "frameEnd": file_group.frame_range.last_frame,
+                    })
+
                 instance_data["representations"].append(repre)
 
             instance = context.create_instance(instance_data["productName"])
