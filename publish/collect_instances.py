@@ -72,7 +72,7 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                 "productType": product_base_type,
                 "productBaseType": product_base_type,
                 "family": product_base_type,
-                "families": [product_base_type, "review"],
+                "families": [product_base_type],
                 "folderPath": context.data["folderPath"],
                 "task": context.data.get("taskName"),
                 "variant": instance_to_collect["variant"],
