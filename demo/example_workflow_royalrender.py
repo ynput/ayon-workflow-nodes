@@ -29,17 +29,19 @@ context_node = graph.create_node(
     "Context",
     label="AYON folder"
 )
-context_node["project_name"] = "TODO"
-context_node["folder_path"] = "TODO"
-context_node["task_name"] = "TODO"
-context_node["task_type"] = "TODO"
+context_node["project_name"] = "Dummy" # "TODO"
+context_node["folder_path"] = "/all_shots/edit_sequence/sh010"
+context_node["task_name"] = "Compositing"
+context_node["task_type"] = "Compositing"
 
 # Image Sequence
 img_seq_node = graph.create_node(
     "ImageSequence",
     label="Blender Output sequence"
 )
-img_seq_node["directory"] = "TODO"
+
+tmp_render = tempfile.mkdtemp()
+img_seq_node["directory"] = tmp_render # "TODO"
 img_seq_node["head"] = "blender_render."
 img_seq_node["tail"] = ".jpg"
 img_seq_node["frame_range"] = FRAME_RANGE
@@ -49,14 +51,15 @@ video_node = graph.create_node(
     "Video",
     label="Output video"
 )
-video_node["path"] = "TODO"
+video_node["path"] = os.path.join(tmp_render, "output.mov") # "TODO"
 
 # Blender render
 blender_node = graph.create_node(
     "BlenderRender",
     label="Render a Blender scene"
 )
-blender_node["blender_script_path"] = "TODO"
+current_dir = os.path.abspath(os.path.dirname(__file__))
+blender_node["blender_script_path"] = os.path.join(current_dir, "resources", "workfile.blend") # "TODO"
 blender_node["frame_range"] = FRAME_RANGE
 
 
@@ -65,7 +68,7 @@ nuke_node = graph.create_node(
     "NukeRender",
     label="Encode render with Nuke"
 )
-nuke_node["nuke_script_path"] = "TODO"
+nuke_node["nuke_script_path"] = os.path.join(current_dir, "resources", "render_script.nk") # "TODO"
 nuke_node["frame_range"] = FRAME_RANGE
 
 
@@ -97,26 +100,23 @@ video_node.connect(
 )
 
 # Dealine dispatch graph
-dispatch_graph = workflow_editor.DispatchGraph(name="RoyalRender")
-workflow.dispatch_graphs.append(dispatch_graph)
+dispatch_graph = workflow.create_dispatch_graph(name="RoyalRender")
 
 prepare_split = dispatch_graph.create_node("RoyalRender", label="Prepare")
 prepare_split.job_name = "Prepare"
-prepare_split.comment = "Quick to execute could be merged with Blender job."
-prepare_split.nodes = [context_node, img_seq_node]
+prepare_split.node_names = [context_node.name, img_seq_node.name]
 
 # Make Blender run in its own slice to adjust pool
 blender_split = dispatch_graph.create_node("RoyalRender", label="Blender")
 blender_split.job_name = "Blender render"
 blender_split.priority = 88
-blender_split.pool = "cg_render_pool"
-blender_split.nodes = [blender_node]
+blender_split.node_names = [blender_node.name]
 
 # Make Nuke run in its own slice to adjust license.
 nuke_split = dispatch_graph.create_node("RoyalRender", label="Nuke")
 nuke_split.job_name = "Nuke render"
-nuke_split.limit_groups = ["nuke"]
-nuke_split.nodes = [nuke_node, video_node]
+nuke_split.required_license = "nuke"
+nuke_split.node_names = [nuke_node.name, video_node.name]
 
 
 # Serialization
@@ -126,7 +126,9 @@ print(f"Workflow file: {file_path}")
 
 
 # Submit on the farm
-backend_directory = "TODO"  # need a directory on common storage
+#backend_directory = "TODO"  # need a directory on common storage
+backend_directory = tempfile.mkdtemp()
+
 subprocess.run(
     [
         os.environ["AYON_EXECUTABLE"],
@@ -137,10 +139,8 @@ subprocess.run(
         file_path,
         "--backend-dir",
         backend_directory,
-        # TODO: Specify the RoyalRender farm, or how does it detect which
-        #  target to submit to?
 # Optional
-#        "--project",
-#        "my_project_name",
+        "--project",
+        "Dummy",
     ]
 )

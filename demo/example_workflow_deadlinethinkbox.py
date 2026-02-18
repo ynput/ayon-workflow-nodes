@@ -97,8 +97,7 @@ video_node.connect(
 )
 
 # Dealine dispatch graph
-dispatch_graph = workflow_editor.DispatchGraph(name="Deadline")
-workflow.dispatch_graphs.append(dispatch_graph)
+dispatch_graph = workflow.create_dispatch_graph(name="Deadline")
 
 prepare_split = dispatch_graph.create_node("DeadlineThinkbox", label="Prepare")
 prepare_split.job_name = "Prepare"
