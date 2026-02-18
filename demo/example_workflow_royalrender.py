@@ -111,6 +111,11 @@ blender_split = dispatch_graph.create_node("RoyalRender", label="Blender")
 blender_split.job_name = "Blender render"
 blender_split.priority = 88
 blender_split.node_names = [blender_node.name]
+blender_split.task_chunk = workflow_editor.TaskChunkParameters(
+    node_name=blender_node.name,
+    node_input_name="frame_range",
+    chunk_size=3,
+)
 
 # Make Nuke run in its own slice to adjust license.
 nuke_split = dispatch_graph.create_node("RoyalRender", label="Nuke")
