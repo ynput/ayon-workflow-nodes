@@ -29,10 +29,10 @@ context_node = graph.create_node(
     "Context",
     label="AYON folder"
 )
-context_node["project_name"] = "Dummy" # "TODO"
-context_node["folder_path"] = "/all_shots/edit_sequence/sh010"
-context_node["task_name"] = "Compositing"
-context_node["task_type"] = "Compositing"
+context_node["project_name"] = "TODO"
+context_node["folder_path"] = "TODO"
+context_node["task_name"] = "TODO"
+context_node["task_type"] = "TODO"
 
 # Image Sequence
 img_seq_node = graph.create_node(
@@ -40,8 +40,7 @@ img_seq_node = graph.create_node(
     label="Blender Output sequence"
 )
 
-tmp_render = tempfile.mkdtemp()
-img_seq_node["directory"] = tmp_render # "TODO"
+img_seq_node["directory"] = "TODO"
 img_seq_node["head"] = "blender_render."
 img_seq_node["tail"] = ".jpg"
 img_seq_node["frame_range"] = FRAME_RANGE
@@ -51,7 +50,7 @@ video_node = graph.create_node(
     "Video",
     label="Output video"
 )
-video_node["path"] = os.path.join(tmp_render, "output.mov") # "TODO"
+video_node["path"] = "TODO"
 
 # Blender render
 blender_node = graph.create_node(
@@ -59,7 +58,11 @@ blender_node = graph.create_node(
     label="Render a Blender scene"
 )
 current_dir = os.path.abspath(os.path.dirname(__file__))
-blender_node["blender_script_path"] = os.path.join(current_dir, "resources", "workfile.blend") # "TODO"
+blender_node["blender_script_path"] = os.path.join(
+    current_dir,
+    "resources",
+    "workfile.blend"
+)
 blender_node["frame_range"] = FRAME_RANGE
 
 
@@ -68,7 +71,11 @@ nuke_node = graph.create_node(
     "NukeRender",
     label="Encode render with Nuke"
 )
-nuke_node["nuke_script_path"] = os.path.join(current_dir, "resources", "render_script.nk") # "TODO"
+nuke_node["nuke_script_path"] = os.path.join(
+    current_dir,
+    "resources",
+    "render_script.nk"
+)
 nuke_node["frame_range"] = FRAME_RANGE
 
 
@@ -131,8 +138,7 @@ print(f"Workflow file: {file_path}")
 
 
 # Submit on the farm
-#backend_directory = "TODO"  # need a directory on common storage
-backend_directory = tempfile.mkdtemp()
+backend_directory = "TODO"  # need a directory on common storage
 
 subprocess.run(
     [
@@ -145,7 +151,7 @@ subprocess.run(
         "--backend-dir",
         backend_directory,
 # Optional
-        "--project",
-        "Dummy",
+#        "--project",
+#        "project_name_here",
     ]
 )
