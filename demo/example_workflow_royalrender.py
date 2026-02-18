@@ -3,7 +3,7 @@
 
 * Blender render an image sequence from a script
 * Nuke encore the resulting image sequence from Blender as a video
-* Workflow is prepared to be dispatched a 3 dependent jobs on RoyalRender
+* Workflow is prepared to be dispatched as 3 dependent jobs on RoyalRender
 """
 import os
 import subprocess
