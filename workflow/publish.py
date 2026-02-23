@@ -1,7 +1,10 @@
 """ Publish features.
 """
+import os
 
 from typing import Optional, Union, List
+
+import ayon_api
 
 import pyblish.api
 import pyblish.util
@@ -23,8 +26,22 @@ def publish_content(
         input_paths: Union[PublishInput, List[PublishInput]],
         context: Union[FolderItem, TaskItem],
         product_type: str,
+        username: Optional[str] = None,
         variant: Optional[str] = "Main",
     ) -> VersionItem:
+
+    # Make public ayon api behave as other user
+    # - this works only if public ayon api is using service user
+    username = username or os.environ.get("AYON_USERNAME")
+    if username:
+        # ayon-python-api does not have public api function to find
+        # out if is used service user. So we need to have try-except.
+        con = ayon_api.get_server_api_connection()
+        try:
+            con.set_default_service_username(username)
+        except ValueError:
+            pass
+
     task_name = None
     task_type = None
     if isinstance(context, TaskItem):
