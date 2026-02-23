@@ -6,7 +6,12 @@ from dataclasses import asdict
 from typing import Optional, Any, List
 import tempfile
 
-import ayon_api
+try:
+    import ayon_api
+
+except ImportError:
+    # Unit test mode
+    ayon_api = type("ayon_api", (), {})
 
 from ayon_workflow.datatypes import (
     ContextItem,
@@ -182,9 +187,38 @@ def prepare_video(
     )
 
 
-def append(input_1: Any, input_2: Any) -> List[Any]:
-    if isinstance(input_1, list):
-        input_1.append(input_2)
-        return input_1
+def append(inputs: List[Any]) -> List[Any]:
+    """ Merge provided input(s) in a single list.
+    """
+    result = []
+    for input in inputs:
+        if isinstance(input, list):
+            result.extend(input)
+        else:
+            result.append(input)
 
-    return [input_1, input_2]
+    return result
+
+
+def merge_sequences(image_sequences: List[ImageSequence]) -> ImageSequence:
+    if not image_sequences:
+        raise RuntimeError("Cannot merge: no sequence provided.")
+
+    ref_sequence = image_sequences.pop(0)
+    for img_sequence in image_sequences:
+        ref_str, _ = ref_sequence.format().rsplit(" ", 1)
+        img_str, _ = img_sequence.format().rsplit(" ", 1)
+        if ref_str != img_str:
+            raise RuntimeError(
+                f"Cannot merge {img_sequence} into {ref_sequence}."
+            )
+
+        ref_fr = ref_sequence.frame_range
+        img_fr = img_sequence.frame_range
+        ref_sequence.frame_range = FrameRange(
+            first_frame=min(ref_fr.first_frame, img_fr.first_frame),
+            last_frame=max(ref_fr.last_frame, img_fr.last_frame),
+            step=ref_fr.step,
+        )
+
+    return ref_sequence

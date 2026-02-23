@@ -39,8 +39,8 @@ append_node = execution_graph.create_node("Append")
 img_seq_node["directory"] = "/path/to/a/"
 img_seq_node["head"] = "img."
 img_seq_node["tail"] = ".ext"
-no_op.connect("output_data", append_node, "input_1")
-img_seq_node.connect("image_sequence", append_node, "input_2")
+no_op.connect("output_data", append_node, "inputs")
+img_seq_node.connect("image_sequence", append_node, "inputs")
 
 # Append multiple dispatch graphs in the workflow
 # Dispatch logic 1 = 1 step with everything
@@ -53,7 +53,12 @@ dispatch_taskA = dispatch_graphA.create_node(
     "DeadlineThinkbox",
     label="Split2"
 )
-dispatch_taskA.nodes = [append_node, img_seq_node, video_node, no_op]
+dispatch_taskA.node_names = [
+    append_node.name,
+    img_seq_node.name,
+    video_node.name,
+    no_op.name
+]
 
 # Dispatch logic 2 = split as 2 steps
 # Split 1 (Video node + NoOp)
@@ -67,13 +72,13 @@ dispatch_taskB1 = dispatch_graphB.create_node(
     "DeadlineThinkbox",
     label="Split2"
 )
-dispatch_taskB1.nodes = [append_node, img_seq_node]
+dispatch_taskB1.node_names = [append_node.name, img_seq_node.name]
 
 dispatch_taskB2 = dispatch_graphB.create_node(
     "DeadlineThinkbox",
     label="Split1"
 )
-dispatch_taskB2.nodes = [video_node, no_op]
+dispatch_taskB2.node_names = [video_node.name, no_op.name]
 
 # Create a new backend directory on disk.
 backend_dir = tempfile.mkdtemp(suffix="_backend")
@@ -84,6 +89,7 @@ job_desc = job_description.to_job_description(
     backend_dir=backend_dir,
     dispatch_graph_name="One Job with 2 Deadline Steps",
 )
+my_workflow.export_to_file("test_append.json")
 
 print("JOB DESCRIPTION IS DONE / BACKEND INITIALIZED")
 
