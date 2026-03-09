@@ -178,18 +178,16 @@ def run_application(
 
             process.wait()
 
+            if bool(process.returncode):
+                f.write(f"Failed with returncode: {process.returncode}\n")
+                cmd_line = " ".join(launch_context.launch_args)
+                raise RuntimeError(
+                    f"Command line failed: {cmd_line} "
+                    f"with return code: {process.returncode}"
+                )
+
     finally:
         if temporary_directory:
             shutil.rmtree(temporary_directory)
-
-        # TODO: check this, how can we interceipt errors.
-        # on Linux returncode is 0 even if Blender render crash with memory.
-        if bool(process.returncode):
-            f.write(f"Process failed with returncode: {process.returncode}\n")
-            cmd_line = " ".join(launch_context.launch_args)
-            raise RuntimeError(
-                f"Command line failed: {cmd_line} "
-                f"with return code: {process.returncode}"
-            )
 
     return process
