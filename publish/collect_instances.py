@@ -97,6 +97,14 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                     "files": files,
                     "stagingDir": os.path.dirname(path),
                 }
+
+                # Add frame range if explicitely provided.
+                if getattr(file_group, "frame_range", None):
+                    repre.update({
+                        "frameStart": file_group.frame_range.first_frame,
+                        "frameEnd": file_group.frame_range.last_frame,
+                    })
+
                 instance_data["representations"].append(repre)
 
             instance = context.create_instance(instance_data["productName"])
