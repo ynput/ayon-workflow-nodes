@@ -66,6 +66,7 @@ def publish_content(
         in_data = [remap_input(input_paths, context.project_name)]
 
     pyblish_context = pyblish.api.Context()
+    pyblish_context.data["hostName"] = "workflow"
     pyblish_context.data["projectName"] = context.project_name
     pyblish_context.data["folderPath"] = context.folder_path()
     pyblish_context.data["ayonWorkflowInstances"] = [
