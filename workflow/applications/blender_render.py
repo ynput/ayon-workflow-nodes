@@ -99,19 +99,21 @@ def run_blender_render(
     )
 
     if python_script_path:
-        python_script_path = remap_input(
+        python_script_path = _base.check_python_script_path(
             python_script_path,
             context.project_name,
+        )
+        temp_dir = None
+
+    else:
+        temp_dir, python_script_path = _base.get_temp_python_script_path(
+            context.project_name,
+            default_content=_default_py_render_logic(),
         )
 
     app_args = [
         "-b",
-        "-P",
-        _base.get_render_python_script_path(
-            context.project_name,
-            python_script_path=python_script_path,
-            default_content=_default_py_render_logic(),
-        ),
+        "-P", python_script_path,
         "--",
         "--blend_file",
         blender_script_path,
@@ -178,6 +180,7 @@ def run_blender_render(
         app_args=app_args,
         app_application_variant=blender_application_variant,
         log_file=log_file,
+        temporary_directory=temp_dir,
     )
 
     # Ensure expected output_media exists.

@@ -99,21 +99,21 @@ def run_nuke_render(
     if frame_range:
         app_args.extend(["-F", str(frame_range.format())])
     if python_script_path:
-        python_script_path = remap_input(
+        python_script_path = _base.check_python_script_path(
             python_script_path,
             context.project_name,
         )
-
-    app_args.append(
-        _base.get_render_python_script_path(
+        temp_dir = None
+    else:
+        temp_dir, python_script_path = _base.get_temp_python_script_path(
             context.project_name,
-            python_script_path=python_script_path,
             default_content=_default_py_render_logic(
                 read_node_name=read_node_name,
                 write_node_name=write_node_name,
             )
         )
-    )
+    app_args.append(python_script_path)
+
     if nuke_script_path:
         nuke_script_path = remap_input(
             nuke_script_path,
@@ -150,6 +150,7 @@ def run_nuke_render(
         app_args=app_args,
         app_application_variant=nuke_application_variant,
         log_file=log_file,
+        temporary_directory=temp_dir,
     )
 
     # Ensure expected output_media exists.
