@@ -109,6 +109,7 @@ def run_blender_render(
         temp_dir, python_script_path = _base.get_temp_python_script_path(
             context.project_name,
             default_content=_default_py_render_logic(),
+            suffix_name="blender_render"
         )
 
     app_args = [

@@ -110,7 +110,8 @@ def run_nuke_render(
             default_content=_default_py_render_logic(
                 read_node_name=read_node_name,
                 write_node_name=write_node_name,
-            )
+            ),
+            suffix_name="nuke_render"
         )
     app_args.append(python_script_path)
 

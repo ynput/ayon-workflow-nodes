@@ -91,13 +91,14 @@ def check_python_script_path(
 def get_temp_python_script_path(
         project_name: str,
         default_content: str,
-        suffix_name: Optional[str] = "",
+        suffix_name: str = "",
     ) -> Tuple[str]:
     """ Create a temporary python script path from content.
     """
     if not default_content:
         raise RuntimeError("Missing default render content.")
 
+    suffix_name = f"_workflow_{suffix_name}"
     temp_dir = tempdir.get_temp_dir(project_name, suffix=suffix_name)
     with tempfile.NamedTemporaryFile(
         suffix=".py",
