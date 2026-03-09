@@ -71,7 +71,7 @@ def get_application(
 
 def check_python_script_path(
         project_name: str,
-        python_script_path: Optional[str] = None,
+        python_script_path: str,
     ) -> str:
     """ Ensure the provided python script path exists.
     """

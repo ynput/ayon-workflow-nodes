@@ -100,8 +100,8 @@ def run_blender_render(
 
     if python_script_path:
         python_script_path = _base.check_python_script_path(
-            python_script_path,
             context.project_name,
+            python_script_path,
         )
         temp_dir = None
 
