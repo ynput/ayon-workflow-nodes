@@ -37,6 +37,7 @@ def run_blender_workfile(
 
     app_args = [
         "-b",
+        "--python-exit-code", "1",  # ensure any exception in python raises
         "-P",
         python_script_path,
         "--",
