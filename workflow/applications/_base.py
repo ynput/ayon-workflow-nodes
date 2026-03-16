@@ -2,6 +2,7 @@
 """
 import json
 import os
+import shutil
 import sys
 import subprocess
 import tempfile
@@ -13,6 +14,7 @@ from ayon_applications import ApplicationManager, Application, LaunchTypes
 from ayon_core.pipeline import tempdir
 
 from ayon_workflow.datatypes import ContextItem, TaskItem
+from ayon_workflow._utils import remap_input
 
 
 @contextmanager
@@ -67,22 +69,37 @@ def get_application(
     return app_manager, app
 
 
-def get_render_python_script_path(
+def check_python_script_path(
         project_name: str,
-        python_script_path: Optional[str] = None,
-        default_content: Optional[str] = None,
-    ):
-    if python_script_path:
-        if not os.path.exists(python_script_path):
-            raise ValueError(
-                f"Unreachable python script {python_script_path}."
-            )
-        return python_script_path
+        python_script_path: str,
+    ) -> str:
+    """ Ensure the provided python script path exists.
+    """
+    remap_script_path = remap_input(
+        python_script_path,
+        project_name,
+    )
 
+    if not os.path.exists(remap_script_path):
+        raise ValueError(
+            f"Unreachable python script {remap_script_path}."
+        )
+
+    return remap_script_path
+
+
+def get_temp_python_script_path(
+        project_name: str,
+        default_content: str,
+        suffix_name: str = "",
+    ) -> Tuple[str]:
+    """ Create a temporary python script path from content.
+    """
     if not default_content:
         raise RuntimeError("Missing default render content.")
 
-    temp_dir = tempdir.get_temp_dir(project_name)
+    suffix_name = f"_workflow_{suffix_name}"
+    temp_dir = tempdir.get_temp_dir(project_name, suffix=suffix_name)
     with tempfile.NamedTemporaryFile(
         suffix=".py",
         mode="w",
@@ -91,7 +108,7 @@ def get_render_python_script_path(
     ) as fhandler:
         fhandler.write(default_content)
         fhandler.flush()
-        return fhandler.name
+        return temp_dir, fhandler.name
 
 
 def run_application(
@@ -101,6 +118,7 @@ def run_application(
         app_application_variant: Optional[str] = None,
         log_file: Optional[str] = None,
         env: Optional[Dict[str, str]] = None,
+        temporary_directory: Optional[str] = None
     ) -> subprocess.Popen:
     # Start application.
     app_manager, app = get_application(
@@ -143,30 +161,33 @@ def run_application(
         "errors": "replace",
     })
 
-    with open(log_file, "w", encoding="utf-8") as f:
-        f.write(f"command line: {launch_args}\n")
-        env_log = json.dumps(env or dict(os.environ), indent=4)
-        f.write(f"environment: {env_log}\n")
-        process = subprocess.Popen(launch_args, **kwargs)
+    try:
+        with open(log_file, "w", encoding="utf-8") as f:
+            f.write(f"command line: {launch_args}\n")
+            env_log = json.dumps(env or dict(os.environ), indent=4)
+            f.write(f"environment: {env_log}\n")
+            process = subprocess.Popen(launch_args, **kwargs)
 
-        with force_stdout_utf8():
-            for cha_ in iter(lambda: process.stdout.read(1), b""):
-                sys.stdout.write(cha_)
-                f.write(cha_)
+            with force_stdout_utf8():
+                for cha_ in iter(lambda: process.stdout.read(1), b""):
+                    sys.stdout.write(cha_)
+                    f.write(cha_)
 
-                if process.poll() is not None and cha_ == '':
-                    break
+                    if process.poll() is not None and cha_ == '':
+                        break
 
-        process.wait()
+            process.wait()
 
-        # TODO: check this, how can we interceipt errors.
-        # on Linux returncode is 0 even if Blender render crash with memory.
-        if bool(process.returncode):
-            f.write(f"Process failed with returncode: {process.returncode}\n")
-            cmd_line = " ".join(launch_context.launch_args)
-            raise RuntimeError(
-                f"Command line failed: {cmd_line} "
-                f"with return code: {process.returncode}"
-            )
+            if bool(process.returncode):
+                f.write(f"Failed with returncode: {process.returncode}\n")
+                cmd_line = " ".join(launch_context.launch_args)
+                raise RuntimeError(
+                    f"Command line failed: {cmd_line} "
+                    f"with return code: {process.returncode}"
+                )
+
+    finally:
+        if temporary_directory:
+            shutil.rmtree(temporary_directory)
 
     return process
