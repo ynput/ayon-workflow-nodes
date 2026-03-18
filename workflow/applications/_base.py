@@ -169,11 +169,11 @@ def run_application(
             process = subprocess.Popen(launch_args, **kwargs)
 
             with force_stdout_utf8():
-                for cha_ in iter(lambda: process.stdout.read(1), b""):
-                    sys.stdout.write(cha_)
-                    f.write(cha_)
+                for line in iter(lambda: process.stdout.readline(), b""):
+                    sys.stdout.write(line)
+                    f.write(line)
 
-                    if process.poll() is not None and cha_ == '':
+                    if process.poll() is not None and line == '':
                         break
 
             process.wait()
