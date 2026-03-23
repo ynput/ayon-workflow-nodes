@@ -155,7 +155,7 @@ def _build_workflow(
 
 
 def _run_workflow(workflow: workflow_editor.Workflow):
-    results = workflow_execution.execute_workflow(workflow)
+    results = workflow_execution.execute_in_memory(workflow)
     pprint.pprint(results)
 
 
@@ -168,3 +168,7 @@ def run_demo(
         folder_path,
     )
     _run_workflow(workflow)
+
+
+if __name__ == "__main__":
+    run_demo("TODO", "TODO")

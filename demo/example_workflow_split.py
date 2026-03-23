@@ -3,7 +3,7 @@
 import logging
 import tempfile
 
-from ayon_workflow import addon, workflow_editor
+from ayon_workflow import workflow_editor, workflow_execution
 from ayon_workflow.workflow_execution.from_backend import job_description
 from ayon_workflow.plugin_system import register_plugins
 
@@ -98,7 +98,7 @@ print("JOB DESCRIPTION IS DONE / BACKEND INITIALIZED")
 # not necessarily the one that create the backend initially.)
 for step in job_desc.steps:
     args = step.script.args
-    result = addon.execute_from_backend(
+    result = workflow_execution.execute_from_backend(
         # Get command line to run.
         #args[0] "--headless",
         #args[1] "addon",
