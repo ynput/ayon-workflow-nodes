@@ -2,7 +2,10 @@
 """
 import os
 import logging
+import subprocess
 import tempfile
+
+from ayon_core.lib import is_staging_enabled
 
 from ayon_workflow import workflow_editor
 from ayon_workflow import workflow_execution
@@ -68,6 +71,39 @@ my_workflow.export_to_file(file_path)
 yet_another_workflow = workflow_editor.Workflow.import_from_file(file_path)
 print(f"Output file: {file_path}")
 
-# Execute the graph
+# Execute the workflow
 results = workflow_execution.execute_workflow(my_workflow)
 print(f"Graph results: {results}")
+
+
+# Execute the workflow through CLI
+studio_bundle_name = os.getenv("AYON_STUDIO_BUNDLE_NAME")
+project_bundle_name = os.getenv("AYON_BUNDLE_NAME")
+if not studio_bundle_name:
+    studio_bundle_name = project_bundle_name
+if studio_bundle_name == project_bundle_name:
+    project_bundle_name = None
+
+args = [
+    os.environ["AYON_EXECUTABLE"],
+    "addon",
+    "workflow",
+    "execute",
+    "--workflow-path",
+    file_path,
+]
+args.extend(["--bundle", studio_bundle_name])
+if project_bundle_name:
+    args.extend(["--project-bundle", project_bundle_name])
+
+if is_staging_enabled():
+    args.extend(["--use-staging"])
+
+subprocess.run(
+    args,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    text=True,
+    check=True,
+)
+print("CLI execution completed")
