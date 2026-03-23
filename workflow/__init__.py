@@ -141,6 +141,8 @@ def get_plugins():
                     "type": str,
                     "widget": {
                         "name": "filepath",
+                        "select": "directory",
+                        "caption": "Select a directory",
                     },
                 },
                 {

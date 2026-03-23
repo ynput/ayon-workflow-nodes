@@ -86,8 +86,8 @@ backend_dir = tempfile.mkdtemp(suffix="_backend")
 # Split workflow using Dispatch logic 2 (2 steps)
 job_desc = job_description.to_job_description(
     my_workflow,
+    dispatch_graphB,
     backend_dir=backend_dir,
-    dispatch_graph_name="One Job with 2 Deadline Steps",
 )
 my_workflow.export_to_file("test_append.json")
 

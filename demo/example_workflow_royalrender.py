@@ -1,9 +1,9 @@
-""" A worlflow with Blender + Nuke
-(can be executed locally or dispatched to Deadline Thinkbox).
+""" A workflow with Blender + Nuke
+(can be executed locally or dispatched to RoyalRender).
 
 * Blender render an image sequence from a script
 * Nuke encore the resulting image sequence from Blender as a video
-* Workflow is prepared to be dispatched a 3 dependent jobs on Deadline Thinkbox
+* Workflow is prepared to be dispatched as 3 dependent jobs on RoyalRender
 """
 import os
 import subprocess
@@ -39,6 +39,7 @@ img_seq_node = graph.create_node(
     "ImageSequence",
     label="Blender Output sequence"
 )
+
 img_seq_node["directory"] = "TODO"
 img_seq_node["head"] = "blender_render."
 img_seq_node["tail"] = ".jpg"
@@ -56,7 +57,12 @@ blender_node = graph.create_node(
     "BlenderRender",
     label="Render a Blender scene"
 )
-blender_node["blender_script_path"] = "TODO"
+current_dir = os.path.abspath(os.path.dirname(__file__))
+blender_node["blender_script_path"] = os.path.join(
+    current_dir,
+    "resources",
+    "workfile.blend"
+)
 blender_node["frame_range"] = FRAME_RANGE
 
 
@@ -65,7 +71,11 @@ nuke_node = graph.create_node(
     "NukeRender",
     label="Encode render with Nuke"
 )
-nuke_node["nuke_script_path"] = "TODO"
+nuke_node["nuke_script_path"] = os.path.join(
+    current_dir,
+    "resources",
+    "render_script.nk"
+)
 nuke_node["frame_range"] = FRAME_RANGE
 
 
@@ -97,24 +107,27 @@ video_node.connect(
 )
 
 # Dealine dispatch graph
-dispatch_graph = workflow.create_dispatch_graph(name="Deadline")
+dispatch_graph = workflow.create_dispatch_graph(name="RoyalRender")
 
-prepare_split = dispatch_graph.create_node("DeadlineThinkbox", label="Prepare")
+prepare_split = dispatch_graph.create_node("RoyalRender", label="Prepare")
 prepare_split.job_name = "Prepare"
-prepare_split.comment = "Quick to execute could be merged with Blender job."
 prepare_split.node_names = [context_node.name, img_seq_node.name]
 
 # Make Blender run in its own slice to adjust pool
-blender_split = dispatch_graph.create_node("DeadlineThinkbox", label="Blender")
+blender_split = dispatch_graph.create_node("RoyalRender", label="Blender")
 blender_split.job_name = "Blender render"
 blender_split.priority = 88
-blender_split.pool = "cg_render_pool"
 blender_split.node_names = [blender_node.name]
+blender_split.task_chunk = workflow_editor.TaskChunkParameters(
+    node_name=blender_node.name,
+    node_input_name="frame_range",
+    chunk_size=3,
+)
 
 # Make Nuke run in its own slice to adjust license.
-nuke_split = dispatch_graph.create_node("DeadlineThinkbox", label="Nuke")
+nuke_split = dispatch_graph.create_node("RoyalRender", label="Nuke")
 nuke_split.job_name = "Nuke render"
-nuke_split.limit_groups = ["nuke"]
+nuke_split.required_license = "nuke"
 nuke_split.node_names = [nuke_node.name, video_node.name]
 
 
@@ -126,6 +139,7 @@ print(f"Workflow file: {file_path}")
 
 # Submit on the farm
 backend_directory = "TODO"  # need a directory on common storage
+
 subprocess.run(
     [
         os.environ["AYON_EXECUTABLE"],
@@ -138,6 +152,6 @@ subprocess.run(
         backend_directory,
 # Optional
 #        "--project",
-#        "my_project_name",
+#        "project_name_here",
     ]
 )

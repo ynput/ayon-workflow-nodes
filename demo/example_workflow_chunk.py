@@ -129,6 +129,7 @@ backend_dir = tempfile.mkdtemp(suffix="_backend")
 # Split workflow using Dispatch logic.
 job_desc = job_description.to_job_description(
     my_workflow,
+    dispatch_graph,
     backend_dir=backend_dir,
 )
 

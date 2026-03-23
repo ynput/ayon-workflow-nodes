@@ -46,6 +46,7 @@ dispatch_node.node_names = [   # all execution nodes at once
 backend_dir = tempfile.mkdtemp(suffix="_backend")
 job_desc = job_description.to_job_description(
     my_workflow,
+    dispatch_graph,
     backend_dir=backend_dir
 )
 
