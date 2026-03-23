@@ -209,6 +209,11 @@ def get_plugins():
                     "name": "nuke_script_path",
                     "description": "The path to the Nuke script.",
                     "type": str,
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a Nuke scene file",
+                        "filter": "Nuke Scene (*.nk)",
+                    },
                 },
                 {
                     "name": "input_media",
@@ -395,6 +400,7 @@ def get_plugins():
                     "name": "input_paths",
                     "description": "The content to be published.",
                     "type": Union[PublishInput, List[PublishInput]],
+                    "allow_multi_connection": True,
                 },
                 {
                     "name": "context",
