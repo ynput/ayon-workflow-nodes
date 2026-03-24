@@ -2,7 +2,7 @@
 This should be as simple as possible to avoid import errors.
 """
 
-from typing import Any, Union, List
+from typing import Any, Union, List, Dict
 from ayon_workflow.datatypes import (
     MediaType,
     ImageSequence,
@@ -14,6 +14,8 @@ from ayon_workflow.datatypes import (
     FrameRange,
     VersionItem,
 )
+from ayon_workflow.workflow_editor import Workflow
+from ayon_workflow.plugins.workflow.sub_graphs import ExecutionMode
 
 __version__ = "0.0.1"
 
@@ -431,6 +433,100 @@ def get_plugins():
                 }
             ],
         },
+
+        #####################################################################
+        {
+            "name": "Workflow",
+            "description": "Run a sub-workflow.",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "workflow",
+                    "description": "The workflow to run.",
+                    "type": Union[Workflow, str],
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a Workflow file",
+                        "filter": "Workflow file (*.json)",
+                    },
+                },
+                {
+                    "name": "workflow_inputs",
+                    "description": "The workflow inputs.",
+                    "type": Dict[str, Any],
+                },
+                {
+                    "name": "input_connection_mapping",
+                    "description": "The input connection mapping.",
+                    "type": Dict[str, Any],
+                },
+                {
+                    "name": "output_connection_mapping",
+                    "description": "The output connection mapping.",
+                    "type": Dict[str, Any],
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "execution_outputs",
+                    "type": Dict[str, Any],
+                }
+            ],
+        },
+        {
+            "name": "WorkflowLoop",
+            "description": "Loop through a sub-workflow.",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "workflow",
+                    "description": "The workflow to run.",
+                    "type": Union[Workflow, str],
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a Workflow file",
+                        "filter": "Workflow file (*.json)",
+                    },
+                },
+                {
+                    "name": "workflow_inputs",
+                    "description": "The workflow inputs.",
+                    "type": List[Dict[str, Any]],
+                },
+                {
+                    "name": "input_connection_mapping",
+                    "description": "The input connection mapping.",
+                    "type": Dict[str, Any],
+                },
+                {
+                    "name": "output_connection_mapping",
+                    "description": "The output connection mapping.",
+                    "type": Dict[str, Any],
+                },
+                {
+                    "name": "execution_mode",
+                    "description": "The execution mode.",
+                    "type": ExecutionMode,
+                    "default": ExecutionMode.SERIAL,
+                    "widget": {
+                        "name": "enum",
+                        "fields": [
+                            ExecutionMode.SERIAL.value,
+                            ExecutionMode.PARALLEL.value,
+                        ],
+                    }
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "execution_outputs",
+                    "type": Dict[str, Any],
+                }
+            ],
+        },
+
+
+        ######################################################################
         {
             "name": "UI Test",
             "description": "Shows all supported widgets for testing",
