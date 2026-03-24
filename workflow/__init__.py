@@ -1,10 +1,12 @@
 """
 This should be as simple as possible to avoid import errors.
 """
+from typing import Any, Union, List, Dict, Optional
+import os
 
-from typing import Any, Union, List, Dict
 from ayon_workflow.datatypes import (
     MediaType,
+    Image,
     ImageSequence,
     Video,
     ContextItem,
@@ -15,6 +17,7 @@ from ayon_workflow.datatypes import (
     VersionItem,
 )
 from ayon_workflow.workflow_editor import Workflow
+from ayon_workflow.plugins.workflow.ai import TextToImageModel, TextTo3DModel
 from ayon_workflow.plugins.workflow.sub_graphs import ExecutionMode
 
 __version__ = "0.0.1"
@@ -511,8 +514,8 @@ def get_plugins():
                     "widget": {
                         "name": "enum",
                         "fields": [
-                            ExecutionMode.SERIAL.value,
-                            ExecutionMode.PARALLEL.value,
+                            execution_mode.value
+                            for execution_mode in ExecutionMode
                         ],
                     }
                 },
@@ -524,7 +527,124 @@ def get_plugins():
                 }
             ],
         },
-
+        {
+            "name": "TextToImage",
+            "description": "Generate an image from a prompt using fal.ai.",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "context",
+                    "description": "The context",
+                    "type": ContextItem,
+                },
+                {
+                    "name": "prompt",
+                    "description": "The prompt to generate an image from.",
+                    "type": str,
+                },
+                {
+                    "name": "output_directory",
+                    "description": "A directory to save the generated image.",
+                    "type": str,
+                    "widget": {
+                        "name": "filepath",
+                        "select": "directory",
+                        "caption": "Select a directory",
+                    },
+                },
+                {
+                    "name": "fal_api_key",
+                    "description": "The API key for fal.ai.",
+                    "type": str,
+                    "default": os.getenv("FAL_KEY"),
+                    "widget": {
+                        "name": "text",
+                    },
+                },
+                {
+                    "name": "model",
+                    "description": "The model to use for generating image.",
+                    "type": str,
+                    "default": str(list(TextToImageModel)[0]),
+                    "widget": {
+                        "name": "enum",
+                        "fields": [
+                            str(model)
+                            for model in TextToImageModel
+                        ],
+                    }
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "output_image",
+                    "type": Image,
+                }
+            ],
+        },
+        {
+            "name": "ImageTextTo3D",
+            "description": (
+                "Generate a 3D model from a prompt and or"
+                "an input image using fal.ai."
+            ),
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "context",
+                    "description": "The context",
+                    "type": ContextItem,
+                },
+                {
+                    "name": "prompt",
+                    "description": "The prompt to generate the model from.",
+                    "type": Optional[str],
+                },
+                {
+                    "name": "image",
+                    "description": "The image to generate the model from.",
+                    "type": Optional[Image],
+                },
+                {
+                    "name": "output_directory",
+                    "description": "A directory to save the generated image.",
+                    "type": str,
+                    "widget": {
+                        "name": "filepath",
+                        "select": "directory",
+                        "caption": "Select a directory",
+                    },
+                },
+                {
+                    "name": "fal_api_key",
+                    "description": "The API key for fal.ai.",
+                    "type": str,
+                    "default": os.getenv("FAL_KEY"),
+                    "widget": {
+                        "name": "text",
+                    },
+                },
+                {
+                    "name": "model",
+                    "description": "The model to use for generating image.",
+                    "type": str,
+                    "default": str(list(TextTo3DModel)[0]),
+                    "widget": {
+                        "name": "enum",
+                        "fields": [
+                            str(model)
+                            for model in TextTo3DModel
+                        ],
+                    }
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "output_image",
+                    "type": Image,
+                }
+            ],
+        },
 
         ######################################################################
         {
@@ -614,21 +734,29 @@ def get_plugins():
 
 def get_plugin_function(name):
     from . import essentials, publish
+    from . import ai, sub_graphs
     from .applications import nuke, blender_render, blender_workfile
 
     func_mapping = {
-        # Others
-        "NoOp": essentials.pass_through,
-        "Publish": publish.publish_content,
+        # AI
+        "TextToImage": ai.text_to_image,
+        "ImageTextTo3D": ai.text_image_to_3d_model,
+        # Essentials
+        "Append": essentials.append,
         "Context": essentials.get_ayon_context,
-        "Video": essentials.prepare_video,
         "ImageSequence": essentials.prepare_image_sequence,
         "MergeSequence": essentials.merge_sequences,
-        "Append": essentials.append,
+        "NoOp": essentials.pass_through,
+        "Video": essentials.prepare_video,
         # Processes
-        "NukeRender": nuke.run_nuke_render,
         "BlenderRender": blender_render.run_blender_render,
         "BlenderWorkfile": blender_workfile.run_blender_workfile,
+        "NukeRender": nuke.run_nuke_render,
+        # Publish
+        "Publish": publish.publish_content,
+        # Workflow
+        "Workflow": sub_graphs.run_subgraph,
+        "WorkflowLoop": sub_graphs.run_loop_on_subgraph,
     }
 
     return func_mapping.get(name)
