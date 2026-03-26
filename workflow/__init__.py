@@ -8,6 +8,7 @@ from ayon_workflow.datatypes import (
     MediaType,
     Image,
     ImageSequence,
+    RepresentationItem,
     Video,
     ContextItem,
     FolderItem,
@@ -19,6 +20,7 @@ from ayon_workflow.datatypes import (
 from ayon_workflow.workflow_editor import Workflow
 from ayon_workflow.plugins.workflow.ai import TextToImageModel, TextTo3DModel
 from ayon_workflow.plugins.workflow.sub_graphs import ExecutionMode
+from ayon_workflow.plugins.workflow.usd import TurntableRenderer
 
 __version__ = "0.0.1"
 
@@ -439,6 +441,44 @@ def get_plugins():
 
         #####################################################################
         {
+            "name": "Representation",
+            "description": "Prepare a representation for publishing.",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "input_media",
+                    "description": "The content to be published.",
+                    "type": Union[str, MediaType],
+                },
+                {
+                    "name": "name",
+                    "description": "The representation name",
+                    "type": Optional[str],
+                },
+                {
+                    "name": "frame_range",
+                    "description": "The representation frame range.",
+                    "type": Optional[FrameRange],
+                },
+                {
+                    "name": "custom_tags",
+                    "description": "The representation custom tags.",
+                    "type": Optional[List[str]],
+                },
+                {
+                    "name": "tags",
+                    "description": "The representation tags.",
+                    "type": Optional[List[str]],
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "output_representation",
+                    "type": RepresentationItem,
+                }
+            ],
+        },
+        {
             "name": "Workflow",
             "description": "Run a sub-workflow.",
             "version": __version__,
@@ -541,6 +581,9 @@ def get_plugins():
                     "name": "prompt",
                     "description": "The prompt to generate an image from.",
                     "type": str,
+                    "widget": {
+                        "name": "text",
+                    },
                 },
                 {
                     "name": "output_directory",
@@ -599,6 +642,9 @@ def get_plugins():
                     "name": "prompt",
                     "description": "The prompt to generate the model from.",
                     "type": Optional[str],
+                    "widget": {
+                        "name": "text",
+                    },
                 },
                 {
                     "name": "image",
@@ -640,12 +686,100 @@ def get_plugins():
             ],
             "outputs": [
                 {
-                    "name": "output_image",
-                    "type": Image,
+                    "name": "mormalized_usd_mesh",
+                    "type": str,
                 }
             ],
         },
+        {
+            "name": "TurntableUSD",
+            "description": (
+                "Generate turntable render from a normalized USD mesh."
+            ),
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "context",
+                    "description": "The context",
+                    "type": ContextItem,
+                },
+                {
+                    "name": "usd_record_path",
+                    "description": "Path to the usd-record executable.",
+                    "type": str,
+                },
+                {
+                    "name": "usd_input",
+                    "description": (
+                        "The path to the USD asset to generate the turntable."
+                    ),
+                    "type": str,
+                },
+                {
+                    "name": "output_media",
+                    "description": "The output media",
+                    "type": ImageSequence,
+                },
+                {
+                    "name": "image_width",
+                    "description": "The output image width resolution.",
+                    "type": int,
+                    "default": 1920,
+                },
+                {
+                    "name": "renderer",
+                    "description": "The renderer to produce the turn images.",
+                    "type": str,
+                    "default": str(list(TurntableRenderer)[0]),
+                    "widget": {
+                        "name": "enum",
+                        "fields": [
+                            str(renderer)
+                            for renderer in TurntableRenderer
+                        ],
+                    }
+                },
 
+            ],
+            "outputs": [
+                {
+                    "name": "output_mesh",
+                    "type": str,
+                }
+            ],
+        },
+        {
+            "name": "FetchAttribute",
+            "description": "Fetch the attribute value of a provided folder.",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "folder",
+                    "description": "The folder to fetch the attribute from.",
+                    "type": FolderItem,
+                },
+                {
+                    "name": "attribute_name",
+                    "description": "The name of the attribute to fetch.",
+                    "type": str,
+                },
+                {
+                    "name": "default_value",
+                    "description": (
+                        "An optional default value to return "
+                        "if the attribute is not found."
+                    ),
+                    "type": Any,
+                    "default": None
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "attribute_value",
+                    "type": Any,
+                }
+            ],
+        },
         ######################################################################
         {
             "name": "UI Test",
@@ -734,7 +868,7 @@ def get_plugins():
 
 def get_plugin_function(name):
     from . import essentials, publish
-    from . import ai, sub_graphs
+    from . import ai, sub_graphs, usd
     from .applications import nuke, blender_render, blender_workfile
 
     func_mapping = {
@@ -744,6 +878,7 @@ def get_plugin_function(name):
         # Essentials
         "Append": essentials.append,
         "Context": essentials.get_ayon_context,
+        "FetchAttribute": essentials.fetch_folder_attribute,
         "ImageSequence": essentials.prepare_image_sequence,
         "MergeSequence": essentials.merge_sequences,
         "NoOp": essentials.pass_through,
@@ -754,6 +889,9 @@ def get_plugin_function(name):
         "NukeRender": nuke.run_nuke_render,
         # Publish
         "Publish": publish.publish_content,
+        "Representation": publish.prepare_representation,
+        # USD
+        "TurntableUSD": usd.run_turntable_with_record,
         # Workflow
         "Workflow": sub_graphs.run_subgraph,
         "WorkflowLoop": sub_graphs.run_loop_on_subgraph,

@@ -20,6 +20,8 @@ from ayon_workflow._utils import (
     remap_to_path,
     get_staging_dir,
 )
+from ayon_workflow.plugins.workflow.applications import _base
+
 
 logger = logging.getLogger(__name__)
 
@@ -38,16 +40,16 @@ class TextTo3DModel(enum.Enum):
     HYPER3D_RODIN = _Model3DInfo(
         "fal-ai/hyper3d/rodin",
         "Hyper3D Rodin",
-        "Text or image to 3D, supports USDZ/GLB/FBX, PBR",
+        "Text or image to 3D, top quality, PBR",
         "$0.40",
         supports_text=True,
         supports_image=True,
-        output_format="usdz",
+        output_format="glb",
     )
     MESHY_6 = _Model3DInfo(
         "fal-ai/meshy/v6/text-to-3d",
         "Meshy 6",
-        "Text to 3D, GLB, PBR maps, topology control",
+        "Text to 3D, PBR maps, topology control",
         "$0.10",
         supports_text=True,
         supports_image=False,
@@ -56,7 +58,7 @@ class TextTo3DModel(enum.Enum):
     TRELLIS = _Model3DInfo(
         "fal-ai/trellis",
         "Trellis",
-        "Image to 3D, GLB, fast and cheap",
+        "Image to 3D, fast and cheap",
         "$0.02",
         supports_text=False,
         supports_image=True,
@@ -65,7 +67,7 @@ class TextTo3DModel(enum.Enum):
     TRELLIS_2 = _Model3DInfo(
         "fal-ai/trellis-2",
         "Trellis 2",
-        "Image to 3D, GLB, higher quality",
+        "Image to 3D, higher quality",
         "$0.25-0.35",
         supports_text=False,
         supports_image=True,
@@ -105,12 +107,12 @@ def _build_arguments(
     """Build model-specific arguments."""
     if model == TextTo3DModel.HYPER3D_RODIN:
         args = {
-            "geometry_file_format": "usdz",
+            "geometry_file_format": "glb",
             "material": "PBR",
             "quality": "medium",
         }
         if image_url:
-            args["input_image_urls"] = image_url
+            args["input_image_urls"] = [image_url]
         elif prompt:
             args["prompt"] = prompt
         else:
@@ -177,7 +179,7 @@ def text_image_to_3d_model(
 
     logger.info("Uploading reference image...")
     image_url = client.upload_file(image.path) if image else None
-    logger.info("Generating 3D model...")
+    logger.info(f"Generating 3D model using {model.label}...")
     result = client.run(
         model.endpoint_id,
         arguments=_build_arguments(model, prompt, image_url)
@@ -203,10 +205,71 @@ def text_image_to_3d_model(
         suffix=suffix,
     ) as file_path:
         file_path.write(response.content)
+        out_path = file_path.name
 
-    if not os.path.exists(file_path.name):
+    if not os.path.exists(out_path):
         raise FileNotFoundError(f"Failed to download 3D model from {mesh_url}")
 
-    # TODO convert input to USD.
-    remap_model_path = remap_to_path(str(file_path.name), context.project_name)
+    # Convert input to USD with Blender if needed.
+    if not out_path.endswith("usdz"):
+        logger.info("Converting to USD...")
+        usd_path = os.path.splitext(out_path)[0] + ".usdz"
+        python_exr = f"""
+import bpy
+import mathutils
+
+bpy.ops.object.select_all(action='SELECT')
+bpy.ops.object.delete()
+bpy.ops.import_scene.gltf(
+    filepath={repr(out_path)},
+)
+
+
+# Normalize scale to 1.0
+imported = [
+    obj for obj in bpy.context.scene.objects
+    if obj.type == 'MESH'
+]
+
+min_co = [float('inf')] * 3
+max_co = [float('-inf')] * 3
+for obj in imported:
+    for corner in obj.bound_box:
+        world = obj.matrix_world @ mathutils.Vector(corner)
+        for i, co in enumerate(world):
+            min_co[i] = min(min_co[i], co)
+            max_co[i] = max(max_co[i], co)
+
+scale = 1.0 / max(max_co[i] - min_co[i] for i in range(3))
+
+for obj in imported:
+    obj.scale *= scale
+
+bpy.ops.object.select_all(action='DESELECT')
+for obj in imported:
+    obj.select_set(True)
+bpy.context.view_layer.objects.active = imported[0]
+bpy.ops.object.transform_apply(scale=True)
+
+bpy.ops.wm.usd_export(
+    filepath={repr(usd_path)},
+    relative_paths=True,
+    convert_orientation=True,
+)
+"""
+        app_args = [
+            "--background",
+            "--python-exit-code", "1",  # ensure any exception in python raises
+            "--python-expr",
+            python_exr,
+        ]
+        _ = _base.run_application(
+            "blender",
+            context,
+            app_args=app_args,
+            app_application_variant=None,
+        )
+        out_path = usd_path
+
+    remap_model_path = remap_to_path(out_path, context.project_name)
     return remap_model_path
