@@ -259,11 +259,6 @@ def get_plugins():
                     "name": "log_file",
                     "description": "Path to output logs.",
                     "type": str,
-                    "widget": {
-                        "name": "filepath",
-                        "caption": "Select a log file",
-                        "filter": "Text file (*.txt)",
-                    },
                 },
             ],
             "outputs": [
@@ -328,11 +323,6 @@ def get_plugins():
                     "name": "log_file",
                     "description": "Path to output logs.",
                     "type": str,
-                    "widget": {
-                        "name": "filepath",
-                        "caption": "Select a log file",
-                        "filter": "Text file (*.txt)",
-                    },
                 },
             ],
             "outputs": [
@@ -392,11 +382,6 @@ def get_plugins():
                     "name": "log_file",
                     "description": "Path to output logs.",
                     "type": str,
-                    "widget": {
-                        "name": "filepath",
-                        "caption": "Select a log file",
-                        "filter": "Text file (*.txt)",
-                    },
                 },
             ],
             "outputs": [
