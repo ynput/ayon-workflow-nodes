@@ -46,7 +46,7 @@ def get_plugins():
                 {
                     "name": "inputs",
                     "description": "Any input(s).",
-                    "type": List[Any],
+                    "type": Union[Any, List[Any]],
                     "allow_multi_connection": True,
                 },
             ],
@@ -184,7 +184,7 @@ def get_plugins():
                 {
                     "name": "image_sequences",
                     "description": "Any image sequence(s).",
-                    "type": List[ImageSequence],
+                    "type": Union[ImageSequence, List[ImageSequence]],
                     "allow_multi_connection": True,
                 },
             ],
@@ -259,6 +259,11 @@ def get_plugins():
                     "name": "log_file",
                     "description": "Path to output logs.",
                     "type": str,
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a log file",
+                        "filter": "Text file (*.txt)",
+                    },
                 },
             ],
             "outputs": [
@@ -323,6 +328,11 @@ def get_plugins():
                     "name": "log_file",
                     "description": "Path to output logs.",
                     "type": str,
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a log file",
+                        "filter": "Text file (*.txt)",
+                    },
                 },
             ],
             "outputs": [
@@ -382,6 +392,11 @@ def get_plugins():
                     "name": "log_file",
                     "description": "Path to output logs.",
                     "type": str,
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a log file",
+                        "filter": "Text file (*.txt)",
+                    },
                 },
             ],
             "outputs": [
