@@ -3,7 +3,7 @@
 import logging
 import os
 from dataclasses import asdict
-from typing import Optional, Any, List
+from typing import Optional, Any, List, Union
 import tempfile
 
 try:
@@ -223,7 +223,7 @@ def fetch_folder_attribute(
     return default_value
 
 
-def append(inputs: List[Any]) -> List[Any]:
+def append(inputs: Union[Any, List[Any]]) -> List[Any]:
     """ Merge provided input(s) in a single list.
     """
     result = []
@@ -237,9 +237,14 @@ def append(inputs: List[Any]) -> List[Any]:
     return result
 
 
-def merge_sequences(image_sequences: List[ImageSequence]) -> ImageSequence:
+def merge_sequences(
+    image_sequences: Union[ImageSequence, List[ImageSequence]]
+    ) -> ImageSequence:
     if not image_sequences:
         raise RuntimeError("Cannot merge: no sequence provided.")
+
+    if isinstance(image_sequences, ImageSequence):
+        return image_sequences
 
     ref_sequence = image_sequences.pop(0)
     for img_sequence in image_sequences:
