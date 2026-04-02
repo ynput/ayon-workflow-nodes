@@ -19,9 +19,9 @@ __version__ = "0.0.1"
 
 
 class _TestEnum(enum.Enum):
-    DO_THIS = "do this"
-    DO_THAT = "do that"
-    HAVE_A_BREAK = "have a break"
+    R = "RED"
+    G = "GREEN"
+    B = "BLUE"
 
 
 def get_plugins():
@@ -463,14 +463,24 @@ def get_plugins():
                     "default": "Enter longer text with line breaks.",
                 },
                 {
-                    "name": "choice",
+                     "name": "choice",
+                     "description": "whatever",
+                     "widget": {
+                         "name": "choice",
+                         "options": ["GET", "POST", "PUT", "DELETE", "PATCH"],
+                     },
+                     "type": str,
+                     "default": "GET",
+                },
+                {
+                    "name": "choice_from_enum",
                     "description": "whatever",
                     "widget": {
                         "name": "choice",
-                        "options": ["GET", "POST", "PUT", "DELETE", "PATCH"],
+                        "options": _TestEnum,
                     },
                     "type": str,
-                    "default": "/foo/bar.txt",
+                    "default": _TestEnum.G.value,
                 },
                 {
                     "name": "bool",
@@ -489,10 +499,10 @@ def get_plugins():
                     "description": "whatever",
                     "widget": {
                         "name": "enum",
-                        "fields": _TestEnum,
+                        "fields": ["do this", "do that", "have a break"],
                     },
                     "type": int,
-                    "default": _TestEnum.DO_THIS.value,
+                    "default": 1,
                 },
                 {
                     "name": "float",
