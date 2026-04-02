@@ -1,7 +1,7 @@
 """
 This should be as simple as possible to avoid import errors.
 """
-
+import enum
 from typing import Any, Union, List
 from ayon_workflow.datatypes import (
     MediaType,
@@ -16,6 +16,12 @@ from ayon_workflow.datatypes import (
 )
 
 __version__ = "0.0.1"
+
+
+class _TestEnum(enum.Enum):
+    DO_THIS = "do this"
+    DO_THAT = "do that"
+    HAVE_A_BREAK = "have a break"
 
 
 def get_plugins():
@@ -483,10 +489,10 @@ def get_plugins():
                     "description": "whatever",
                     "widget": {
                         "name": "enum",
-                        "fields": ["do this", "do that", "have a break"],
+                        "fields": _TestEnum,
                     },
                     "type": int,
-                    "default": 1,
+                    "default": _TestEnum.DO_THIS.value,
                 },
                 {
                     "name": "float",
