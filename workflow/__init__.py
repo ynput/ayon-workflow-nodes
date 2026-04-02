@@ -18,13 +18,13 @@ from ayon_workflow.datatypes import (
 __version__ = "0.0.1"
 
 
-class _TestEnum(enum.Enum):
-    R = "RED"
-    G = "GREEN"
-    B = "BLUE"
-
-
 def get_plugins():
+
+    class _TestEnum(enum.Enum):
+        R = "RED"
+        G = "GREEN"
+        B = "BLUE"
+
     return [
         {
             "name": "NoOp",
