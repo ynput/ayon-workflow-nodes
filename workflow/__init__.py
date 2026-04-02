@@ -46,7 +46,7 @@ def get_plugins():
                 {
                     "name": "inputs",
                     "description": "Any input(s).",
-                    "type": List[Any],
+                    "type": Union[Any, List[Any]],
                     "allow_multi_connection": True,
                 },
             ],
@@ -184,7 +184,7 @@ def get_plugins():
                 {
                     "name": "image_sequences",
                     "description": "Any image sequence(s).",
-                    "type": List[ImageSequence],
+                    "type": Union[ImageSequence, List[ImageSequence]],
                     "allow_multi_connection": True,
                 },
             ],
