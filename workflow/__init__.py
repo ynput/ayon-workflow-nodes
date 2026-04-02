@@ -463,14 +463,14 @@ def get_plugins():
                     "default": "Enter longer text with line breaks.",
                 },
                 {
-                     "name": "choice",
-                     "description": "whatever",
-                     "widget": {
-                         "name": "choice",
-                         "options": ["GET", "POST", "PUT", "DELETE", "PATCH"],
-                     },
-                     "type": str,
-                     "default": "GET",
+                    "name": "choice",
+                    "description": "whatever",
+                    "widget": {
+                        "name": "choice",
+                        "options": ["GET", "POST", "PUT", "DELETE", "PATCH"],
+                    },
+                    "type": str,
+                    "default": "GET",
                 },
                 {
                     "name": "choice_from_enum",
