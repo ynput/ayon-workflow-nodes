@@ -1,6 +1,7 @@
 """
 This should be as simple as possible to avoid import errors.
 """
+import enum
 from typing import Any, Union, List, Dict, Optional
 import os
 
@@ -26,6 +27,12 @@ __version__ = "0.0.1"
 
 
 def get_plugins():
+
+    class _TestEnum(enum.Enum):
+        R = "RED"
+        G = "GREEN"
+        B = "BLUE"
+
     return [
         {
             "name": "NoOp",
@@ -441,6 +448,40 @@ def get_plugins():
 
         #####################################################################
         {
+            "name": "ProductVersionRepresentation",
+            "description": "Fetch a representation from a product version.",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "context",
+                    "description": "The product context.",
+                    "type": ContextItem,
+                },
+                {
+                    "name": "product_id",
+                    "description": "The product ID",
+                    "type": str,
+                },
+                {
+                    "name": "product_version_id",
+                    "description": "The product version ID",
+                    "type": str,
+                },
+                {
+                    "name": "representation_name",
+                    "description": "The representation name",
+                    "type": str,
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "output_path",
+                    # TODO: allow to return a RepresentationItem ?
+                    "type": str,
+                }
+            ],
+        },
+        {
             "name": "Representation",
             "description": "Prepare a representation for publishing.",
             "version": __version__,
@@ -550,13 +591,10 @@ def get_plugins():
                     "name": "execution_mode",
                     "description": "The execution mode.",
                     "type": ExecutionMode,
-                    "default": ExecutionMode.SERIAL,
+                    "default": ExecutionMode.SERIAL.value,
                     "widget": {
-                        "name": "enum",
-                        "fields": [
-                            execution_mode.value
-                            for execution_mode in ExecutionMode
-                        ],
+                        "name": "choice",
+                        "options": ExecutionMode,
                     }
                 },
             ],
@@ -608,13 +646,10 @@ def get_plugins():
                     "name": "model",
                     "description": "The model to use for generating image.",
                     "type": str,
-                    "default": str(list(TextToImageModel)[0]),
+                    "default": TextToImageModel.FLUX_SCHNELL.value,
                     "widget": {
-                        "name": "enum",
-                        "fields": [
-                            str(model)
-                            for model in TextToImageModel
-                        ],
+                        "name": "choice",
+                        "options": TextToImageModel,
                     }
                 },
             ],
@@ -674,13 +709,10 @@ def get_plugins():
                     "name": "model",
                     "description": "The model to use for generating image.",
                     "type": str,
-                    "default": str(list(TextTo3DModel)[0]),
+                    "default": TextTo3DModel.TRELLIS.value,
                     "widget": {
-                        "name": "enum",
-                        "fields": [
-                            str(model)
-                            for model in TextTo3DModel
-                        ],
+                        "name": "choice",
+                        "options": TextTo3DModel,
                     }
                 },
             ],
@@ -730,16 +762,12 @@ def get_plugins():
                     "name": "renderer",
                     "description": "The renderer to produce the turn images.",
                     "type": str,
-                    "default": str(list(TurntableRenderer)[0]),
+                    "default": TurntableRenderer.BLENDER.value,
                     "widget": {
-                        "name": "enum",
-                        "fields": [
-                            str(renderer)
-                            for renderer in TurntableRenderer
-                        ],
+                        "name": "choice",
+                        "options": TurntableRenderer,
                     }
                 },
-
             ],
             "outputs": [
                 {
@@ -814,7 +842,17 @@ def get_plugins():
                         "options": ["GET", "POST", "PUT", "DELETE", "PATCH"],
                     },
                     "type": str,
-                    "default": "/foo/bar.txt",
+                    "default": "GET",
+                },
+                {
+                    "name": "choice_from_enum",
+                    "description": "whatever",
+                    "widget": {
+                        "name": "choice",
+                        "options": _TestEnum,
+                    },
+                    "type": str,
+                    "default": _TestEnum.G.value,
                 },
                 {
                     "name": "bool",
@@ -868,7 +906,7 @@ def get_plugins():
 
 def get_plugin_function(name):
     from . import essentials, publish
-    from . import ai, sub_graphs, usd
+    from . import ai, sub_graphs, usd, product
     from .applications import nuke, blender_render, blender_workfile
 
     func_mapping = {
@@ -887,6 +925,8 @@ def get_plugin_function(name):
         "BlenderRender": blender_render.run_blender_render,
         "BlenderWorkfile": blender_workfile.run_blender_workfile,
         "NukeRender": nuke.run_nuke_render,
+        # Product
+        "ProductVersionRepresentation": product.get_latest_product_path,
         # Publish
         "Publish": publish.publish_content,
         "Representation": publish.prepare_representation,
