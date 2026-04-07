@@ -771,8 +771,8 @@ def get_plugins():
             ],
             "outputs": [
                 {
-                    "name": "output_mesh",
-                    "type": str,
+                    "name": "output_sequence",
+                    "type": ImageSequence,
                 }
             ],
         },
@@ -807,6 +807,31 @@ def get_plugins():
                     "type": Any,
                 }
             ],
+        },
+        {
+            "name": "ReviewableUpload",
+            "description": (
+                "Upload a reviewable representation to a product version."
+            ),
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "context",
+                    "description": "The product context.",
+                    "type": ContextItem,
+                },
+                {
+                    "name": "product_version_id",
+                    "description": "The product version ID",
+                    "type": str,
+                },
+                {
+                    "name": "reviewable_media",
+                    "description": "The media to upload",
+                    "type": Union[str, MediaType],
+                }
+            ],
+            "outputs": [],
         },
         ######################################################################
         {
@@ -927,6 +952,7 @@ def get_plugin_function(name):
         "NukeRender": nuke.run_nuke_render,
         # Product
         "ProductVersionRepresentation": product.get_latest_product_path,
+        "ReviewableUpload": product.upload_reviewable,
         # Publish
         "Publish": publish.publish_content,
         "Representation": publish.prepare_representation,

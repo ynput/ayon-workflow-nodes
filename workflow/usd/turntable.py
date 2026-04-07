@@ -239,7 +239,7 @@ def run_turntable_with_record(
     output_media: ImageSequence,
     image_width: int = 1920,
     renderer: Union[str, TurntableRenderer] = TurntableRenderer.BLENDER,
-):
+) -> ImageSequence:
     if output_media.frame_range is None:
         output_media.frame_range = FrameRange(
             first_frame=1,
