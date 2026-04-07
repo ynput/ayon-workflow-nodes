@@ -61,10 +61,11 @@ def get_latest_product_path(
         product_id=product_id,
         product_version_id=product_version_id,
     )
-    return get_representation_path_with_anatomy(
+    repre_path = get_representation_path_with_anatomy(
         repre,
         _utils.get_project_anatomy(context.project_name),
     )
+    return _utils.remap_to_path(repre_path, context.project_name)
 
 
 def upload_reviewable(
@@ -91,10 +92,12 @@ def upload_reviewable(
             f"Not a valid reviewable media type: {reviewable_media}"
         )
 
+    mapped_path = _utils.remap_to_path(file_path, context.project_name)
+
     ayon_api.upload_reviewable(
         context.project_name,
         product_version_id,
-        file_path,
+        mapped_path,
         label=label,
         content_type=content_type,
         filename=filename,

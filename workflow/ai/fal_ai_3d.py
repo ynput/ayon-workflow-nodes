@@ -177,8 +177,13 @@ def text_image_to_3d_model(
             f"{model.label} does not support text, input will be ignored."
         )
 
-    logger.info("Uploading reference image...")
-    image_url = client.upload_file(image.path) if image else None
+    if image:
+        remapped_img_path = remap_to_path(image.path, context.project_name)
+        logger.info("Uploading reference image...")
+        image_url = client.upload_file(remapped_img_path)
+    else:
+        image_url = None
+
     logger.info(f"Generating 3D model using {model.label}...")
     result = client.run(
         model.endpoint_id,

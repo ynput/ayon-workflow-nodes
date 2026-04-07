@@ -253,8 +253,9 @@ def run_turntable_with_record(
     try:
         # Prepare turntable USD file ready for recording
         logger.info(f"Preparing turntable USD file: {usd_input}")
+        mapped_usd_input = remap_input(usd_input, context.project_name)
         turntable_path = prepare_turntable_usd(
-            usd_input,
+            mapped_usd_input,
             output_directory,
             output_media.frame_range,
         )
@@ -264,9 +265,13 @@ def run_turntable_with_record(
         if renderer == TurntableRenderer.USDRECORD:
             # TODO: usd-record exe is OS specific right now
             # register it as an AYON application.
+            usd_record_mapped_path = remap_input(
+                usd_record_path,
+                context.project_name
+            )
             logger.info(f"Rendering turn with usdrecord: {usd_record_path}")
             _run_usd_record(
-                usd_record_path,
+                usd_record_mapped_path,
                 turntable_path,
                 remapped_output_media,
                 image_width,
