@@ -20,6 +20,7 @@ from ayon_workflow.datatypes import (
 )
 from ayon_workflow.workflow_editor import Workflow
 from ayon_workflow.plugins.workflow.ai import TextToImageModel, TextTo3DModel
+from ayon_workflow.plugins.workflow.io import VideoCodecs
 from ayon_workflow.plugins.workflow.sub_graphs import ExecutionMode
 from ayon_workflow.plugins.workflow.usd import TurntableRenderer
 
@@ -490,6 +491,11 @@ def get_plugins():
                     "name": "input_media",
                     "description": "The content to be published.",
                     "type": Union[str, MediaType],
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a content",
+                        "filter": "All Files (*.*)",
+                    },
                 },
                 {
                     "name": "name",
@@ -685,6 +691,11 @@ def get_plugins():
                     "name": "image",
                     "description": "The image to generate the model from.",
                     "type": Optional[Image],
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select an image",
+                        "filter": "Image Files (*.png;*.jpg;*.jpeg)",
+                    },
                 },
                 {
                     "name": "output_directory",
@@ -739,6 +750,10 @@ def get_plugins():
                     "name": "usd_record_path",
                     "description": "Path to the usd-record executable.",
                     "type": str,
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select the executable file",
+                    },
                 },
                 {
                     "name": "usd_input",
@@ -746,6 +761,11 @@ def get_plugins():
                         "The path to the USD asset to generate the turntable."
                     ),
                     "type": str,
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a USD scene file",
+                        "filter": "USD Scene (*.usd*)",
+                    },
                 },
                 {
                     "name": "output_media",
@@ -829,9 +849,70 @@ def get_plugins():
                     "name": "reviewable_media",
                     "description": "The media to upload",
                     "type": Union[str, MediaType],
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a media file",
+                        "filter": "All Files (*.*)",
+                    },
                 }
             ],
             "outputs": [],
+        },
+        {
+            "name": "Encode",
+            "description": (
+                "Encode a media file to a Video."
+            ),
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "context",
+                    "description": "The product context.",
+                    "type": ContextItem,
+                },
+                {
+                    "name": "input_media",
+                    "description": "The input media to encode.",
+                    "type": Union[str, MediaType],
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a media file",
+                        "filter": "All Files (*.*)",
+                    },
+                },
+                {
+                    "name": "output_media",
+                    "description": "The output media to generate.",
+                    "type": Video,
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select an output file",
+                        "filter": "Video Files (*.mp4;*.mov;*.avi)",
+                    },
+                },
+                {
+                    "name": "codec",
+                    "description": "The video codec.",
+                    "type": str,
+                    "default": VideoCodecs.H264.value,
+                    "widget": {
+                        "name": "choice",
+                        "options": VideoCodecs,
+                    }
+                },
+                {
+                    "name": "fps",
+                    "description": "The frame rate.",
+                    "type": float,
+                    "default": 24.0,
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "output_video",
+                    "type": Video,
+                }
+            ]
         },
         ######################################################################
         {
@@ -931,7 +1012,7 @@ def get_plugins():
 
 def get_plugin_function(name):
     from . import essentials, publish
-    from . import ai, sub_graphs, usd, product
+    from . import ai, sub_graphs, usd, product, io
     from .applications import nuke, blender_render, blender_workfile
 
     func_mapping = {
@@ -946,6 +1027,8 @@ def get_plugin_function(name):
         "MergeSequence": essentials.merge_sequences,
         "NoOp": essentials.pass_through,
         "Video": essentials.prepare_video,
+        # IO
+        "Encode": io.encode,
         # Processes
         "BlenderRender": blender_render.run_blender_render,
         "BlenderWorkfile": blender_workfile.run_blender_workfile,
