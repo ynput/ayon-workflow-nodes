@@ -60,31 +60,32 @@ def encode(
 ) -> Video:
     """ Encode the input media into the output media.
     """
+    remapped_input_media = _utils.remap_input(
+        input_media,
+        context.project_name
+    )
     remapped_output_media = _utils.remap_input(
         output_media,
         context.project_name
     )
-
     kwargs = {
         "stdout": subprocess.PIPE,
         "stderr": subprocess.STDOUT,
         "encoding": "utf-8",
         "errors": "replace",
     }
-    encode_args = [subprocess.list2cmdline(get_ffmpeg_tool_args("ffmpeg"))]
-    if isinstance(input_media, (Video, Image)):
-        input_path = input_media.path
-    elif isinstance(input_media, ImageSequence):
-        if input_media.frame_range:
+    encode_args = [get_ffmpeg_tool_args("ffmpeg")]
+    if isinstance(remapped_input_media, (Video, Image)):
+        input_path = remapped_input_media.path
+    elif isinstance(remapped_input_media, ImageSequence):
+        if remapped_input_media.frame_range:
             encode_args.extend([
                 "-start_number",
-                str(input_media.frame_range.first_frame)
+                str(remapped_input_media.frame_range.first_frame)
             ])
-        input_path, _ = input_media.format().split(" ")
-    elif isinstance(input_media, str):
-        input_path = input_media
+        input_path, _ = remapped_input_media.format().split(" ")
     else:
-        raise ValueError(f"Unsupported input media type: {type(input_media)}")
+        input_path = remapped_input_media
 
     encode_args.extend(
         ('-y', '-r', str(fps), '-i', input_path)
@@ -98,7 +99,8 @@ def encode(
     # Run ffmpeg command
     cmd_line = " ".join(encode_args)
     logger.debug(f"Running encode command line: {cmd_line}\n")
-    process = subprocess.run(cmd_line, **kwargs, check=True)
+    # TODO: investigate not working on macOs.
+    process = subprocess.run(encode_args, **kwargs, check=True)
 
     if bool(process.returncode):
         logger.error(f"Failed with returncode: {process.returncode}\n")
