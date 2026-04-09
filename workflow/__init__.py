@@ -883,7 +883,7 @@ def get_plugins():
                 {
                     "name": "output_media",
                     "description": "The output media to generate.",
-                    "type": Video,
+                    "type": Union[str, Video],
                     "widget": {
                         "name": "filepath",
                         "caption": "Select an output file",

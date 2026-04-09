@@ -243,7 +243,7 @@ def run_turntable_with_record(
     if output_media.frame_range is None:
         output_media.frame_range = FrameRange(
             first_frame=1,
-            last_frame=2,  # TODO: change 80
+            last_frame=80,
         )
 
     if isinstance(renderer, str):
