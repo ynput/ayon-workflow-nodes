@@ -57,6 +57,7 @@ def encode(
     output_media: Video,
     codec: VideoCodecs,
     fps: float = 24.0,
+    # TODO: implement slate image input
 ) -> Video:
     """ Encode the input media into the output media.
     """
@@ -74,7 +75,7 @@ def encode(
         "encoding": "utf-8",
         "errors": "replace",
     }
-    encode_args = [get_ffmpeg_tool_args("ffmpeg")]
+    encode_args = get_ffmpeg_tool_args("ffmpeg")
     if isinstance(remapped_input_media, (Video, Image)):
         input_path = remapped_input_media.path
     elif isinstance(remapped_input_media, ImageSequence):
@@ -99,8 +100,7 @@ def encode(
     # Run ffmpeg command
     cmd_line = " ".join(encode_args)
     logger.debug(f"Running encode command line: {cmd_line}\n")
-    # TODO: investigate not working on macOs.
-    process = subprocess.run(encode_args, **kwargs, check=True)
+    process = subprocess.run(encode_args, **kwargs)
 
     if bool(process.returncode):
         logger.error(f"Failed with returncode: {process.returncode}\n")
