@@ -1,4 +1,5 @@
 from typing import Dict, Any, Optional, Union
+import os
 
 import ayon_api
 
@@ -7,9 +8,10 @@ from ayon_core.pipeline.load import get_representation_path_with_anatomy
 from ayon_workflow import _utils
 from ayon_workflow.datatypes import (
     ContextItem,
-    MediaType,
+    FrameRange,
     Image,
     ImageSequence,
+    MediaType,
     Video,
 )
 
@@ -39,12 +41,11 @@ def get_product_version_repre(
         )[0]
         product_version_id = latest_version["id"]
 
-    repre = ayon_api.get_representation_by_name(
+    return ayon_api.get_representation_by_name(
         context.project_name,
         representation_name,
         version_id=product_version_id
     )
-    return repre
 
 
 def get_latest_product_path(
@@ -52,7 +53,7 @@ def get_latest_product_path(
         representation_name: str,
         product_id: Optional[str] = None,
         product_version_id: Optional[str] = None,
-    ) -> str:
+    ) -> Union[str, Video, Image, ImageSequence]:
     """ Get the path of a specific representation for a version of a product.
     """
     repre = get_product_version_repre(
@@ -65,7 +66,31 @@ def get_latest_product_path(
         repre,
         _utils.get_project_anatomy(context.project_name),
     )
-    return _utils.remap_to_path(repre_path, context.project_name)
+    repre_context = repre["context"]
+
+    repre_path = _utils.remap_to_path(repre_path, context.project_name)
+    _, ext = os.path.splitext(repre_path)
+
+    from ayon_core.lib.transcoding import VIDEO_EXTENSIONS, IMAGE_EXTENSIONS
+    if ext in VIDEO_EXTENSIONS:
+        return Video(path=repre_path)
+    elif ext in IMAGE_EXTENSIONS:
+        frame = repre_context.get("frame")
+        if frame:
+            head, tail = repre_path.split(frame)
+            padding = len(frame)
+            return ImageSequence(
+                directory=os.path.dirname(repre_path),
+                head=head,
+                tail=tail,
+                padding=padding,
+                frame_range=FrameRange(
+                    first_frame=int(frame),
+                    last_frame=int(frame) + len(repre["files"]) - 1
+                )
+            )
+        return Image(path=repre_path)
+    return repre_path
 
 
 def upload_reviewable(

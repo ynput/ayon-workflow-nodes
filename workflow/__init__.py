@@ -233,7 +233,8 @@ def get_plugins():
                 {
                     "name": "input_media",
                     "description": "The input media",
-                    "type": MediaType,
+                    "type": Union[MediaType, List[MediaType]],
+                    "allow_multi_connection": True,
                 },
                 {
                     "name": "output_media",
@@ -256,9 +257,10 @@ def get_plugins():
                     "type": FrameRange,
                 },
                 {
-                    "name": "read_node_name",
+                    "name": "read_node_names",
                     "description": "Explicit a Read node to use.",
-                    "type": str,
+                    "type": List[str],
+                    "default": [],
                 },
                 {
                     "name": "write_node_name",
@@ -478,7 +480,7 @@ def get_plugins():
                 {
                     "name": "output_path",
                     # TODO: allow to return a RepresentationItem ?
-                    "type": str,
+                    "type": Union[str, Video, Image, ImageSequence],
                 }
             ],
         },
