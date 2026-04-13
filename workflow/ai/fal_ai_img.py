@@ -12,6 +12,7 @@ from typing import Optional, Union
 import fal_client
 import httpx
 
+from ayon_workflow import _utils
 from ayon_workflow.datatypes import (
     ContextItem,
     Image,
@@ -133,6 +134,11 @@ def text_to_image(
         "image",  # product_type
         "image",  # product_name
         "image",  # product_base_type
+    )
+
+    output_directory = _utils.remap_input(
+        output_directory,
+        context.project_name,
     )
 
     # Download and save image locally.

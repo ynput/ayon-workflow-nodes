@@ -93,9 +93,14 @@ def encode(
     remapped_input_media = _utils.remap_input(
         input_media, context.project_name
     )
+
+    if isinstance(output_media, str):
+        output_media = Video(path=output_media)
     remapped_output_media = _utils.remap_input(
-        output_media, context.project_name
+        output_media.path,
+        context.project_name
     )
+
     kwargs = {
         "stdout": subprocess.PIPE,
         "stderr": subprocess.STDOUT,
@@ -141,6 +146,4 @@ def encode(
         )
 
     logger.debug(process.stdout)
-    if isinstance(output_media, str):
-        return Video(path=output_media)
     return output_media

@@ -12,6 +12,7 @@ from typing import Optional, Union
 import fal_client
 import httpx
 
+from ayon_workflow import _utils
 from ayon_workflow.datatypes import (
     ContextItem,
     Image,
@@ -197,6 +198,11 @@ def text_image_to_3d_model(
         "model",  # product_type
         "model",  # product_name
         "model",  # product_base_type
+    )
+
+    output_directory = _utils.remap_input(
+        output_directory,
+        context.project_name,
     )
 
     logger.info("Saving 3D model...")

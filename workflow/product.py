@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional, Union
+from typing import Dict, Any, Optional, Union, List
 import os
 
 import ayon_api
@@ -12,6 +12,7 @@ from ayon_workflow.datatypes import (
     Image,
     ImageSequence,
     MediaType,
+    VersionItem,
     Video,
 )
 
@@ -127,3 +128,39 @@ def upload_reviewable(
         content_type=content_type,
         filename=filename,
     )
+
+
+def append_version_to_server_list(
+    context: ContextItem,
+    input_versions: Union[VersionItem, List[VersionItem]],
+    list_label: str,
+    create_list: bool = True,
+):
+    """ Append a version to a server list.
+    """
+    if not isinstance(input_versions, list):
+        input_versions = [input_versions]
+
+    # Get or create list
+    all_lists = list(ayon_api.get_entity_lists(context.project_name))
+    for project_list in all_lists:
+        if project_list["label"] == list_label:
+            list_id = project_list["id"]
+            break
+    else:
+        if create_list:
+            list_id = ayon_api.create_entity_list(
+                context.project_name,
+                entity_type="version",
+                label=list_label,
+            )
+        else:
+            raise ValueError(f"List not found: {list_label}")
+
+    # Append versions to list
+    for version in input_versions:
+        ayon_api.create_entity_list_item(
+            context.project_name,
+            list_id,
+            data={"entityId": version.version_id},
+        )

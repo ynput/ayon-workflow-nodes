@@ -916,6 +916,39 @@ def get_plugins():
                 }
             ]
         },
+        {
+            "name": "AppendVersionToList",
+            "description": (
+                "Encode a version item to an AYON server list."
+            ),
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "context",
+                    "description": "The product context.",
+                    "type": ContextItem,
+                },
+                {
+                    "name": "input_versions",
+                    "description": "The input version(s) to append.",
+                    "type": Union[VersionItem, List[VersionItem]],
+                    "allow_multiple": True,
+                },
+                {
+                    "name": "list_label",
+                    "description": "The name of the AYON list.",
+                    "type": str,
+                    "default": "new_AYON_list",
+                },
+                {
+                    "name": "create_list",
+                    "description": "Create the AYON list if needed.",
+                    "type": bool,
+                    "default": True,
+                }
+            ],
+            "outputs": []
+        },
         ######################################################################
         {
             "name": "UI Test",
@@ -1036,6 +1069,7 @@ def get_plugin_function(name):
         "BlenderWorkfile": blender_workfile.run_blender_workfile,
         "NukeRender": nuke.run_nuke_render,
         # Product
+        "AppendVersionToList": product.append_version_to_server_list,
         "ProductVersionRepresentation": product.get_latest_product_path,
         "ReviewableUpload": product.upload_reviewable,
         # Publish
