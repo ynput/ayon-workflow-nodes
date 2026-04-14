@@ -907,6 +907,11 @@ def get_plugins():
                     "description": "The frame rate.",
                     "type": float,
                     "default": 24.0,
+                },
+                {
+                    "name": "slate",
+                    "description": "An optional slate image.",
+                    "type": Optional[Image],
                 }
             ],
             "outputs": [
@@ -949,6 +954,59 @@ def get_plugins():
             ],
             "outputs": []
         },
+        {
+            "name": "Slater",
+            "description": (
+                "Generate a slate using ayon-slater."
+            ),
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "context",
+                    "description": "The product context.",
+                    "type": ContextItem,
+                },
+                {
+                    "name": "input_sequence",
+                    "description": "The input sequence.",
+                    "type": ImageSequence,
+                },
+                {
+                    "name": "product_base_type",
+                    "description": "Product base type.",
+                    "type": str,
+                },
+                {
+                    "name": "product_name",
+                    "description": "Product name.",
+                    "type": str,
+                },
+                {
+                    "name": "comment",
+                    "description": "The slate comment",
+                    "widget": {"name": "text"},
+                    "type": str,
+                    "default": "Enter slate comment here.",
+                },
+                {
+                    "name": "output_directory",
+                    "description": "A directory to save the generated image.",
+                    "type": str,
+                    "widget": {
+                        "name": "filepath",
+                        "select": "directory",
+                        "caption": "Select a directory",
+                    },
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "output_slate",
+                    "type": Image,
+                }
+            ]
+        },
+
         ######################################################################
         {
             "name": "UI Test",
@@ -1064,6 +1122,7 @@ def get_plugin_function(name):
         "Video": essentials.prepare_video,
         # IO
         "Encode": io.encode,
+        "Slater": io.generate_slate,
         # Processes
         "BlenderRender": blender_render.run_blender_render,
         "BlenderWorkfile": blender_workfile.run_blender_workfile,

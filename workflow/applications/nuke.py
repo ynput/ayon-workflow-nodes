@@ -96,6 +96,8 @@ def run_nuke_render(
 
     if output_media.frame_range:
         frame_range = frame_range or output_media.frame_range
+    elif input_media.frame_range:
+        frame_range = frame_range or input_media.frame_range
 
     if frame_range:
         app_args.extend(["-F", str(frame_range.format())])
@@ -176,5 +178,8 @@ def run_nuke_render(
             raise RuntimeError(
                 f"Expected video {remapped_output_media.path} does not exists."
             )
+
+    if hasattr(output_media, "frame_range"):
+        output_media.frame_range = frame_range
 
     return output_media
