@@ -63,6 +63,12 @@ def get_latest_product_path(
         product_id=product_id,
         product_version_id=product_version_id,
     )
+    if repre is None:
+        raise ValueError(
+            f"Could not find representation {representation_name} "
+            f"for product_id {product_id} "
+            f"and product_version_id {product_version_id}"
+        )
     repre_path = get_representation_path_with_anatomy(
         repre,
         _utils.get_project_anatomy(context.project_name),
