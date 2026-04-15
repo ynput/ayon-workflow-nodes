@@ -27,7 +27,7 @@ def publish_content(
         context: Union[FolderItem, TaskItem],
         product_type: str,
         username: Optional[str] = None,
-        variant: Optional[str] = "Main",
+        variant: str = "Main",
     ) -> VersionItem:
 
     # Make public ayon api behave as other user
@@ -42,19 +42,35 @@ def publish_content(
         except ValueError:
             pass
 
-    task_name = None
-    task_type = None
+
+    folder_path = context.folder_path()
+    project_name = context.project_name
+    folder_entity = ayon_api.get_folder_by_path(
+        project_name=context.project_name,
+        folder_path=context.folder_path(),
+    )
+    if not folder_entity:
+        raise RuntimeError(
+            f"Unable to find folder '{folder_path}' in project"
+            f" '{project_name}'."
+        )
+
+    task_entity = None
     if isinstance(context, TaskItem):
-        task_name = context.task_name
-        task_type = context.task_type
+        task_entity = ayon_api.get_task_by_name(
+            project_name=project_name,
+            folder_id=folder_entity["id"],
+            task_name=context.task_name,
+        )
 
     product_name = get_product_name(
-        context.project_name,
-        task_name,
-        task_type,
-        "workflow",
-        product_type,
-        variant,
+        project_name=project_name,
+        folder_entity=folder_entity,
+        task_entity=task_entity,
+        product_base_type=product_type,
+        product_type=product_type,
+        host_name="workflow",
+        variant=variant,
     )
 
     if isinstance(input_paths, list):
