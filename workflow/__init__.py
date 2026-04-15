@@ -423,6 +423,12 @@ def get_plugins():
                     "type": str,
                     "default": "Main",
                 },
+                {
+                    "name": "comment",
+                    "description": "The publish comment.",
+                    "type": str,
+                    "default": "",
+                },
             ],
             "outputs": [
                 {
