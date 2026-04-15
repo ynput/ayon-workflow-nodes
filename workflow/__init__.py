@@ -428,6 +428,7 @@ def get_plugins():
                     "description": "The publish comment.",
                     "type": str,
                     "default": "",
+                    "widget": {"name": "text"},
                 },
             ],
             "outputs": [
