@@ -28,6 +28,7 @@ def publish_content(
         product_type: str,
         username: Optional[str] = None,
         variant: Optional[str] = "Main",
+        comment: str = "",
     ) -> VersionItem:
 
     # Make public ayon api behave as other user
@@ -77,6 +78,9 @@ def publish_content(
             "file_groups": in_data
         }
     ]
+
+    if comment:
+        pyblish_context.data["comment"] = comment
 
     if isinstance(context, TaskItem):
         pyblish_context.data["taskName"] = context.task_name
