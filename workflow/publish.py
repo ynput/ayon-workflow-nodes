@@ -27,7 +27,7 @@ def publish_content(
         context: Union[FolderItem, TaskItem],
         product_type: str,
         username: Optional[str] = None,
-        variant: Optional[str] = "Main",
+        variant: str = "Main",
         comment: str = "",
     ) -> VersionItem:
 
@@ -43,33 +43,60 @@ def publish_content(
         except ValueError:
             pass
 
-    task_name = None
-    task_type = None
+    folder_path: str = context.folder_path()
+    project_name: str = context.project_name
+    folder_entity = ayon_api.get_folder_by_path(
+        project_name=context.project_name,
+        folder_path=context.folder_path(),
+    )
+    if not folder_entity:
+        raise RuntimeError(
+            f"Unable to find folder '{folder_path}' in project"
+            f" '{project_name}'."
+        )
+
+    task_entity = None
     if isinstance(context, TaskItem):
-        task_name = context.task_name
-        task_type = context.task_type
+        task_entity = ayon_api.get_task_by_name(
+            project_name=project_name,
+            folder_id=folder_entity["id"],
+            task_name=context.task_name,
+        )
+        if not task_entity:
+            raise RuntimeError(
+                f"Unable to find task '{context.task_name}'"
+                f" in folder '{folder_path}'"
+                f" in project '{project_name}'."
+            )
+        if context.task_type and task_entity["taskType"] != context.task_type:
+            raise RuntimeError(
+                "Task type mismatch for {context.task_name}."
+                f" Expected: '{context.task_type}'."
+                f" Got: '{task_entity['taskType']}'."
+            )
 
     product_name = get_product_name(
-        context.project_name,
-        task_name,
-        task_type,
-        "workflow",
-        product_type,
-        variant,
+        project_name=project_name,
+        folder_entity=folder_entity,
+        task_entity=task_entity,
+        product_base_type=product_type,
+        product_type=product_type,
+        host_name="workflow",
+        variant=variant,
     )
 
     if isinstance(input_paths, list):
         in_data = [
-            remap_input(input_path, context.project_name)
+            remap_input(input_path, project_name)
             for input_path in input_paths
         ]
     else:
-        in_data = [remap_input(input_paths, context.project_name)]
+        in_data = [remap_input(input_paths, project_name)]
 
     pyblish_context = pyblish.api.Context()
     pyblish_context.data["hostName"] = "workflow"
-    pyblish_context.data["projectName"] = context.project_name
-    pyblish_context.data["folderPath"] = context.folder_path()
+    pyblish_context.data["projectName"] = project_name
+    pyblish_context.data["folderPath"] = folder_path
     pyblish_context.data["ayonWorkflowInstances"] = [
         {
             "product_name": product_name,
