@@ -525,7 +525,6 @@ def get_plugins():
 
 def get_plugin_function(name):
     from . import essentials, publish
-    from .applications import nuke, blender_render, blender_workfile
 
     func_mapping = {
         # Others
@@ -536,11 +535,24 @@ def get_plugin_function(name):
         "ImageSequence": essentials.prepare_image_sequence,
         "MergeSequence": essentials.merge_sequences,
         "Append": essentials.append,
-        # Processes
-        "NukeRender": nuke.run_nuke_render,
-        "BlenderRender": blender_render.run_blender_render,
-        "BlenderWorkfile": blender_workfile.run_blender_workfile,
     }
+    if name in func_mapping:
+        return func_mapping[name]
+
+    if name == "NukeRender":
+        from .applications import nuke
+
+        return nuke.run_nuke_render
+
+    if name == "BlenderRender":
+        from .applications import blender_render
+
+        return blender_render.run_blender_render
+
+    if name == "BlenderWorkfile":
+        from .applications import blender_workfile
+
+        return blender_workfile.run_blender_workfile
 
     return func_mapping.get(name)
 

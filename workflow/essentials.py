@@ -6,12 +6,7 @@ from dataclasses import asdict
 from typing import Optional, Any, List, Union
 import tempfile
 
-try:
-    import ayon_api
-
-except ImportError:
-    # Unit test mode
-    ayon_api = type("ayon_api", (), {})
+from ayon_workflow.plugins.workflow._runtime_requirements import get_ayon_api
 
 from ayon_workflow.datatypes import (
     ContextItem,
@@ -36,6 +31,7 @@ def _get_task_item(
         ensure_exists: Optional[bool] = True,
     ) -> TaskItem:
         if ensure_exists:
+            ayon_api = get_ayon_api()
             task_dict = ayon_api.get_task_by_name(
                 project_name,
                 folder_item.folder_id,
@@ -65,6 +61,7 @@ def _get_folder_item(
         ensure_exists: Optional[bool] = True,
     ) -> FolderItem:
         if ensure_exists:
+            ayon_api = get_ayon_api()
             if not (folder_id or folder_path):
                 raise ValueError(
                     "Missing folder_path or folder_id."
@@ -123,7 +120,7 @@ def get_ayon_context(
     if not project_name:
         raise ValueError("No project name provided.")
 
-    if ensure_exists and not ayon_api.get_project(project_name):
+    if ensure_exists and not get_ayon_api().get_project(project_name):
         raise ValueError(f"Project {project_name} does not exist.")
 
     if folder_id or folder_path:
