@@ -912,6 +912,11 @@ def get_plugins():
                     "name": "slate",
                     "description": "An optional slate image.",
                     "type": Optional[Image],
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select an image",
+                        "filter": "Image Files (*.png;*.jpg;*.jpeg)",
+                    },
                 }
             ],
             "outputs": [
@@ -1004,6 +1009,129 @@ def get_plugins():
                     "name": "output_slate",
                     "type": Image,
                 }
+            ]
+        },
+
+        ##########################    MOCKUPS    ############################
+        {
+            "name": "OnStatusChanged",
+            "description": (
+                "React from an event."
+            ),
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "entity_type",
+                    "description": "The entity type.",
+                    "type": str,
+                    "widget": {
+                        "name": "choice",
+                        "options": ["Folder", "Version", "Task"],
+                    },
+                    "default": "Task",
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "context",
+                    "type": ContextItem,
+                },
+                {
+                    "name": "new_status",
+                    "type": str,
+                }
+            ]
+        },
+        {
+            "name": "GetParentFolder",
+            "description": (
+                "React from an event."
+            ),
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "context",
+                    "description": "The input context.",
+                    "type": ContextItem,
+                },
+                {
+                    "name": "entity_type",
+                    "description": "The entity type.",
+                    "type": str,
+                    "widget": {
+                        "name": "choice",
+                        "options": [
+                            "Project",
+                            "Asset",
+                            "Shot",
+                            "Sequence",
+                            "Parent"
+                        ],
+                    },
+                    "default": "Parent",
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "parent_context",
+                    "type": ContextItem,
+                },
+            ]
+        },
+        {
+            "name": "UpdateStatus",
+            "description": (
+                "Set a status to an AYON entity."
+            ),
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "entity",
+                    "description": "The input context.",
+                    "type": ContextItem,
+                },
+                {
+                    "name": "new_status",
+                    "description": "The new status.",
+                    "type": str,
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "updated_context",
+                    "type": ContextItem,
+                },
+            ]
+        },
+        {
+            # TODO: implement generic "If" with taskflow deciders
+            # Provide common deciders for status check etc..
+            "name": "If",
+            "description": (
+                "Condition."
+            ),
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "input_data",
+                    "description": "The input data.",
+                    "type": Any,
+                },
+                {
+                    "name": "expression",
+                    "description": "The condition as an expression.",
+                    "type": str,
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "true",
+                    "type": Any,
+                },
+                {
+                    "name": "false",
+                    "type": Any,
+                },
             ]
         },
 
