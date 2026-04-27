@@ -2,6 +2,7 @@
 """
 import json
 import os
+import logging
 import shutil
 import sys
 import subprocess
@@ -15,6 +16,9 @@ from ayon_core.pipeline import tempdir
 
 from ayon_workflow.datatypes import ContextItem, TaskItem
 from ayon_workflow._utils import remap_input
+
+
+log = logging.getLogger(__name__)
 
 
 @contextmanager
@@ -118,7 +122,8 @@ def run_application(
         app_application_variant: Optional[str] = None,
         log_file: Optional[str] = None,
         env: Optional[Dict[str, str]] = None,
-        temporary_directory: Optional[str] = None
+        temporary_directory: Optional[str] = None,
+        allow_project_context: Optional[bool] = True,
     ) -> subprocess.Popen:
     # Start application.
     app_manager, app = get_application(
@@ -133,15 +138,31 @@ def run_application(
         "env": env,
     }
 
-    # If a TaskItem is not provided, the application will start
-    # from project environement and not all of the pre-hooks will
-    # be executed. This might result as an incomplete environment.
     if isinstance(context, TaskItem):
         context_kwargs.update({
             "folder_path": context.folder_path(),
             "task_name": context.task_name,
             "task_type": context.task_type,
         })
+
+    else:
+        # If a TaskItem is not provided, the application will start
+        # from project environement and not all of the pre-hooks will
+        # be executed. This might result as an incomplete environment.
+        # - missing application tools
+        # - missing OCIO
+        # ...
+        if allow_project_context:
+            log.warning(
+                f"Provided context {context} for {application_group_name} "
+                "is not a Task. Launching from project "
+                "which might result in an incomplete environment !"
+            )
+        else:
+            raise ValueError(
+                f"Cannot execute application {application_group_name} "
+                f"from non-Task context: {context}"
+            )
 
     launch_context = app_manager.create_launch_context(
         app.full_name,

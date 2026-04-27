@@ -91,6 +91,7 @@ def run_blender_render(
         frame_range: Optional[Union[dict, FrameRange]] = None,
         blender_application_variant: Optional[str] = None,
         log_file: Optional[str] = None,
+        allow_project_context: Optional[bool] = True,
     ) -> ImageSequence:
     # Construct render command line args.
     blender_script_path = remap_input(
@@ -183,6 +184,7 @@ def run_blender_render(
         app_application_variant=blender_application_variant,
         log_file=log_file,
         temporary_directory=temp_dir,
+        allow_project_context=allow_project_context,
     )
 
     # Ensure expected output_media exists.
