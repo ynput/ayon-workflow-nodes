@@ -6,7 +6,10 @@ from typing import Optional, Union, List
 
 from ayon_workflow.datatypes import (
     FolderItem,
+    FrameRange,
+    MediaType,
     PublishInput,
+    RepresentationItem,
     TaskItem,
     VersionItem,
 )
@@ -130,4 +133,20 @@ def publish_content(
         version_id=data.get("id"),
         product_id=data.get("productId"),
         version=data.get("version"),
+    )
+
+
+def prepare_representation(
+    input_media: Union[str, MediaType],
+    name: Optional[str] = None,
+    frame_range: Optional[FrameRange] = None,
+    custom_tags: Optional[List[str]] = None,
+    tags: Optional[List[str]] = None,
+) -> RepresentationItem:
+    return RepresentationItem(
+        input_media=input_media,
+        name=name,
+        frame_range=frame_range,
+        custom_tags=custom_tags,
+        tags=tags,
     )
