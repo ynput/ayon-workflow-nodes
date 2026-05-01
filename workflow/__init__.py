@@ -28,6 +28,7 @@ __version__ = "0.0.1"
 
 
 def get_plugins():
+    from . import python_scripts
 
     class _TestEnum(enum.Enum):
         R = "RED"
@@ -457,6 +458,101 @@ def get_plugins():
         },
 
         #####################################################################
+        {
+            "name": "RunPythonUV",
+            "description": (
+                "Run a Python snippet in an isolated uv-managed environment. "
+                "Packages listed in 'requirements' are installed on demand "
+                "via 'uv run --with'. Connect upstream nodes to 'inputs' to "
+                "make them available as the 'inputs' list inside the script."
+            ),
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "snippet",
+                    "description": "Python snippet to execute.",
+                    "type": str,
+                    "default": python_scripts.DEFAULT_SCRIPT,
+                    "widget": {
+                        "name": "python_code",
+                        "language": "python",
+                        "default_height": 440,
+                    },
+                },
+                {
+                    "name": "inputs",
+                    "description": (
+                        "Data from upstream nodes, available as the 'inputs' "
+                        "list inside the snippet. Connect multiple upstream "
+                        "nodes to pass several values."
+                    ),
+                    "type": Any,
+                    "allow_multi_connection": True,
+                },
+                {
+                    "name": "requirements",
+                    "description": (
+                        "PEP 508 package requirements "
+                        "(for example 'requests>=2.28' or 'pillow')."
+                    ),
+                    "type": List[str],
+                    "default": [],
+                },
+                {
+                    "name": "python_version",
+                    "description": (
+                        "Python version for uv, for example '3.11'. "
+                        "Leave empty to use the default."
+                    ),
+                    "type": str,
+                    "default": "",
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "outputs",
+                    "type": Any,
+                }
+            ],
+        },
+        {
+            "name": "RunPythonAYON",
+            "description": (
+                "Run a Python snippet using AYON's Python interpreter. "
+                "Connect upstream nodes to 'inputs' to make them available "
+                "as the 'inputs' list inside the script."
+            ),
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "snippet",
+                    "description": "Python snippet to execute.",
+                    "type": str,
+                    "default": python_scripts.DEFAULT_SCRIPT,
+                    "widget": {
+                        "name": "python_code",
+                        "language": "python",
+                        "default_height": 440,
+                    },
+                },
+                {
+                    "name": "inputs",
+                    "description": (
+                        "Data from upstream nodes, available as the 'inputs' "
+                        "list inside the snippet. Connect multiple upstream "
+                        "nodes to pass several values."
+                    ),
+                    "type": Any,
+                    "allow_multi_connection": True,
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "outputs",
+                    "type": Any,
+                }
+            ],
+        },
         {
             "name": "ProductVersionRepresentation",
             "description": "Fetch a representation from a product version.",
@@ -1239,7 +1335,7 @@ def get_plugins():
 
 
 def get_plugin_function(name):
-    from . import essentials, publish
+    from . import essentials, publish, python_scripts
     from . import ai, sub_graphs, usd, product, io
     from .applications import nuke, blender_render, blender_workfile
 
@@ -1269,6 +1365,8 @@ def get_plugin_function(name):
         # Publish
         "Publish": publish.publish_content,
         "Representation": publish.prepare_representation,
+        "RunPythonAYON": python_scripts.run_python_ayon,
+        "RunPythonUV": python_scripts.run_python_uv,
         # USD
         "TurntableUSD": usd.run_turntable_with_record,
         # Workflow
