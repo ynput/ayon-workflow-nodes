@@ -459,14 +459,38 @@ def get_plugins():
 
         #####################################################################
         {
-            "name": "RunPythonUV",
+            "name": "PythonUV",
             "description": (
                 "Run a Python snippet in an isolated uv-managed environment. "
                 "Packages listed in 'requirements' are installed on demand "
-                "via 'uv run --with'. Connect upstream nodes to 'inputs' to "
-                "make them available as the 'inputs' list inside the script."
+                "via 'uv run --with'. New nodes start with removable custom "
+                "'input' and 'output' ports exposed inside the script."
             ),
             "version": __version__,
+            "custom_ports": {
+                "enabled": True,
+                "inputs": True,
+                "outputs": True,
+                "supported_types": ["Any", "str", "int", "float", "bool"],
+                "default_custom_inputs": [
+                    {
+                        "name": "input",
+                        "type": "Any",
+                    }
+                ],
+                "default_custom_outputs": [
+                    {
+                        "name": "output",
+                        "type": "Any",
+                    }
+                ],
+                "reserved_names": [
+                    "snippet",
+                    "requirements",
+                    "python_version",
+                    "revert",
+                ],
+            },
             "inputs": [
                 {
                     "name": "snippet",
@@ -478,16 +502,6 @@ def get_plugins():
                         "language": "python",
                         "default_height": 440,
                     },
-                },
-                {
-                    "name": "inputs",
-                    "description": (
-                        "Data from upstream nodes, available as the 'inputs' "
-                        "list inside the snippet. Connect multiple upstream "
-                        "nodes to pass several values."
-                    ),
-                    "type": Any,
-                    "allow_multi_connection": True,
                 },
                 {
                     "name": "requirements",
@@ -508,21 +522,38 @@ def get_plugins():
                     "default": "",
                 },
             ],
-            "outputs": [
-                {
-                    "name": "outputs",
-                    "type": Any,
-                }
-            ],
+            "outputs": [],
         },
         {
-            "name": "RunPythonAYON",
+            "name": "PythonAYON",
             "description": (
                 "Run a Python snippet using AYON's Python interpreter. "
-                "Connect upstream nodes to 'inputs' to make them available "
-                "as the 'inputs' list inside the script."
+                "New nodes start with removable custom 'input' and 'output' "
+                "ports exposed inside the script."
             ),
             "version": __version__,
+            "custom_ports": {
+                "enabled": True,
+                "inputs": True,
+                "outputs": True,
+                "supported_types": ["Any", "str", "int", "float", "bool"],
+                "default_custom_inputs": [
+                    {
+                        "name": "input",
+                        "type": "Any",
+                    }
+                ],
+                "default_custom_outputs": [
+                    {
+                        "name": "output",
+                        "type": "Any",
+                    }
+                ],
+                "reserved_names": [
+                    "snippet",
+                    "revert",
+                ],
+            },
             "inputs": [
                 {
                     "name": "snippet",
@@ -535,23 +566,8 @@ def get_plugins():
                         "default_height": 440,
                     },
                 },
-                {
-                    "name": "inputs",
-                    "description": (
-                        "Data from upstream nodes, available as the 'inputs' "
-                        "list inside the snippet. Connect multiple upstream "
-                        "nodes to pass several values."
-                    ),
-                    "type": Any,
-                    "allow_multi_connection": True,
-                },
             ],
-            "outputs": [
-                {
-                    "name": "outputs",
-                    "type": Any,
-                }
-            ],
+            "outputs": [],
         },
         {
             "name": "ProductVersionRepresentation",
@@ -1365,8 +1381,8 @@ def get_plugin_function(name):
         # Publish
         "Publish": publish.publish_content,
         "Representation": publish.prepare_representation,
-        "RunPythonAYON": python_scripts.run_python_ayon,
-        "RunPythonUV": python_scripts.run_python_uv,
+        "PythonAYON": python_scripts.run_python_ayon,
+        "PythonUV": python_scripts.run_python_uv,
         # USD
         "TurntableUSD": usd.run_turntable_with_record,
         # Workflow
