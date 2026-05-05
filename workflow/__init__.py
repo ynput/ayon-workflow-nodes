@@ -295,10 +295,10 @@ def get_plugins():
                     "type": str,
                 },
                 {
-                    "name": "allow_project_context",
-                    "description": "Whether to allow project context.",
+                    "name": "restrict_to_task",
+                    "description": "Raises if context is not a Task.",
                     "type": bool,
-                    "default": True,
+                    "default": False,
                 },
             ],
             "outputs": [
@@ -365,10 +365,10 @@ def get_plugins():
                     "type": str,
                 },
                 {
-                    "name": "allow_project_context",
-                    "description": "Whether to allow project context.",
+                    "name": "restrict_to_task",
+                    "description": "Raises if context is not a Task.",
                     "type": bool,
-                    "default": True,
+                    "default": False,
                 },
             ],
             "outputs": [
@@ -430,10 +430,10 @@ def get_plugins():
                     "type": str,
                 },
                 {
-                    "name": "allow_project_context",
-                    "description": "Whether to allow project context.",
+                    "name": "restrict_to_task",
+                    "description": "Raises if context is not a Task.",
                     "type": bool,
-                    "default": True,
+                    "default": False,
                 },
             ],
             "outputs": [

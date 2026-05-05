@@ -123,7 +123,7 @@ def run_application(
         log_file: Optional[str] = None,
         env: Optional[Dict[str, str]] = None,
         temporary_directory: Optional[str] = None,
-        allow_project_context: Optional[bool] = True,
+        restrict_to_task: Optional[bool] = False,
     ) -> subprocess.Popen:
     # Start application.
     app_manager, app = get_application(
@@ -145,24 +145,24 @@ def run_application(
             "task_type": context.task_type,
         })
 
+    elif restrict_to_task:
+        raise ValueError(
+            f"Cannot execute application {application_group_name} "
+            f"from non-Task context: {context}"
+        )
+
+    # The application will start from project environment, meaning
+    # not all of the pre-hooks will be executed.
+    # This might result as an incomplete environment.
+    # - missing application tools
+    # - missing OCIO
+    # ...
     else:
-        # If a TaskItem is not provided, the application will start
-        # from project environement and not all of the pre-hooks will
-        # be executed. This might result as an incomplete environment.
-        # - missing application tools
-        # - missing OCIO
-        # ...
-        if allow_project_context:
-            log.warning(
-                f"Provided context {context} for {application_group_name} "
-                "is not a Task. Launching from project "
-                "which might result in an incomplete environment !"
-            )
-        else:
-            raise ValueError(
-                f"Cannot execute application {application_group_name} "
-                f"from non-Task context: {context}"
-            )
+        log.warning(
+            f"Provided context {context} for {application_group_name} "
+            "is not a Task. Launching from project "
+            "which might result in an incomplete environment !"
+        )
 
     launch_context = app_manager.create_launch_context(
         app.full_name,

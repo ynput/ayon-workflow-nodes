@@ -86,7 +86,7 @@ def run_nuke_render(
         write_node_name: Optional[str] = None,
         nuke_application_variant: Optional[str] = None,
         log_file: Optional[str] = None,
-        allow_project_context: Optional[bool] = True,
+        restrict_to_task: Optional[bool] = False,
     ) -> MediaType:
 
     if isinstance(frame_range, dict):
@@ -157,7 +157,7 @@ def run_nuke_render(
         app_application_variant=nuke_application_variant,
         log_file=log_file,
         temporary_directory=temp_dir,
-        allow_project_context=allow_project_context,
+        restrict_to_task=restrict_to_task,
     )
 
     # Ensure expected output_media exists.
