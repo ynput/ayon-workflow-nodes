@@ -193,6 +193,8 @@ def fetch_folder_attribute(
     attribute_name: str,
     default_value: Optional[Any] = None,
 ) -> Any:
+    ayon_api = get_ayon_api()
+
     if folder.folder_id:
         folder_entity = ayon_api.get_folder_by_id(
             folder.project_name,

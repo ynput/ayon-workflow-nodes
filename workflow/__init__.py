@@ -467,6 +467,8 @@ def get_plugins():
                 "'input' and 'output' ports exposed inside the script."
             ),
             "version": __version__,
+            # KNOWN LIMITATION: custom_ports are not supported from backend.
+            # TODO: implement these in exported Taksflow.Atom definition.
             "custom_ports": {
                 "enabled": True,
                 "inputs": True,
@@ -532,6 +534,8 @@ def get_plugins():
                 "ports exposed inside the script."
             ),
             "version": __version__,
+            # KNOWN LIMITATION: custom_ports are not supported from backend.
+            # TODO: implement these in exported Taksflow.Atom definition
             "custom_ports": {
                 "enabled": True,
                 "inputs": True,
