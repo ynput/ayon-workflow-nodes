@@ -19,6 +19,7 @@ def run_blender_workfile(
         input_resource_path: Optional[str] = None,
         blender_application_variant: Optional[str] = None,
         log_file: Optional[str] = None,
+        restrict_to_task: Optional[bool] = False,
     ) -> str:
     blender_script_path = remap_input(
         blender_script_path,
@@ -72,6 +73,7 @@ def run_blender_workfile(
         app_args=app_args,
         app_application_variant=blender_application_variant,
         log_file=log_file,
+        restrict_to_task=restrict_to_task,
     )
 
     return output_workfile

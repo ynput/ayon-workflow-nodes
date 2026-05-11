@@ -102,6 +102,40 @@ def get_plugins():
             ],
         },
         {
+            "name": "TaskContext",
+            "description": "Gather a valid AYON task context.",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "project_name",
+                    "description": "The project name",
+                    "type": str,
+                },
+                {
+                    "name": "task_id",
+                    "description": "An optional task id.",
+                    "type": str,
+                },
+                {
+                    "name": "task_path",
+                    "description": "An optional task path.",
+                    "type": str,
+                },
+                {
+                    "name": "ensure_exists",
+                    "description": "Assert context existence.",
+                    "type": bool,
+                    "default": True,
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "task_context",
+                    "type": TaskItem,
+                }
+            ],
+        },
+        {
             "name": "Video",
             "description": "Define a video path (existing or not).",
             "version": __version__,
@@ -260,6 +294,12 @@ def get_plugins():
                     "description": "Path to output logs.",
                     "type": str,
                 },
+                {
+                    "name": "restrict_to_task",
+                    "description": "Raises if context is not a Task.",
+                    "type": bool,
+                    "default": False,
+                },
             ],
             "outputs": [
                 {
@@ -324,6 +364,12 @@ def get_plugins():
                     "description": "Path to output logs.",
                     "type": str,
                 },
+                {
+                    "name": "restrict_to_task",
+                    "description": "Raises if context is not a Task.",
+                    "type": bool,
+                    "default": False,
+                },
             ],
             "outputs": [
                 {
@@ -382,6 +428,12 @@ def get_plugins():
                     "name": "log_file",
                     "description": "Path to output logs.",
                     "type": str,
+                },
+                {
+                    "name": "restrict_to_task",
+                    "description": "Raises if context is not a Task.",
+                    "type": bool,
+                    "default": False,
                 },
             ],
             "outputs": [
@@ -532,6 +584,7 @@ def get_plugin_function(name):
         "NoOp": essentials.pass_through,
         "Publish": publish.publish_content,
         "Context": essentials.get_ayon_context,
+        "TaskContext": essentials.get_task_context,
         "Video": essentials.prepare_video,
         "ImageSequence": essentials.prepare_image_sequence,
         "MergeSequence": essentials.merge_sequences,
