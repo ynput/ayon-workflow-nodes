@@ -28,9 +28,6 @@ import nuke
 import sys
 import os
 
-import pprint
-pprint.pprint(dict(os.environ))
-
 # Load Nuke script provided as command line argument.
 in_script = nuke.scriptOpen(sys.argv[1])
 """
