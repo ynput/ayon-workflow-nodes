@@ -5,6 +5,7 @@ This should be as simple as possible to avoid import errors.
 from typing import Any, Dict, Union, List, Optional
 from ayon_workflow.datatypes import (
     MediaType,
+    Image,
     ImageSequence,
     Video,
     ContextItem,
@@ -137,6 +138,30 @@ def get_plugins():
             ],
         },
         {
+            "name": "Image",
+            "description": "Define an Image path (existing or not).",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "path",
+                    "description": "The path to the image.",
+                    "type": str,
+                    "default": "img.png",
+                    "widget": {
+                        "name": "filepath",
+                        "select": "file",
+                        "caption": "Select an image file.",
+                    },
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "image",
+                    "type": Image,
+                }
+            ],
+        },
+        {
             "name": "Video",
             "description": "Define a video path (existing or not).",
             "version": __version__,
@@ -149,7 +174,7 @@ def get_plugins():
                     "widget": {
                         "name": "filepath",
                         "select": "file",
-                        "caption": "Select a directory",
+                        "caption": "Select a video file.",
                     },
                 },
                 {
@@ -635,10 +660,10 @@ def get_plugin_function(name):
     func_mapping = {
         # Others
         "NoOp": essentials.pass_through,
-        "Publish": publish.publish_content,
         "Context": essentials.get_ayon_context,
         "TaskContext": essentials.get_task_context,
         "Video": essentials.prepare_video,
+        "Image": essentials.prepare_image,
         "ImageSequence": essentials.prepare_image_sequence,
         "MergeSequence": essentials.merge_sequences,
         "Append": essentials.append,
@@ -646,6 +671,9 @@ def get_plugin_function(name):
         "NukeRender": nuke.run_nuke_render,
         "BlenderRender": blender_render.run_blender_render,
         "BlenderWorkfile": blender_workfile.run_blender_workfile,
+        # Publish
+        "Publish": publish.publish_content,
+        "Representation": publish.prepare_representations,
     }
 
     return func_mapping.get(name)
