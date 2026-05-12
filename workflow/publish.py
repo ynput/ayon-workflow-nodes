@@ -1,5 +1,6 @@
 """ Publish features.
 """
+import copy
 import os
 
 from typing import Optional, Union, List, Dict, Any
@@ -163,9 +164,9 @@ def prepare_representations(
             input_media=media,
             name=name,
             frame_range=frame_range,
-            data=data,
-            custom_tags=custom_tags,
-            tags=tags,
+            data=copy.deepcopy(data),
+            custom_tags=copy.deepcopy(custom_tags),
+            tags=copy.deepcopy(tags),
         )
         for media in input_media
     ]
