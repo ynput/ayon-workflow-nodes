@@ -2,7 +2,7 @@
 """
 import os
 
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Dict, Any
 
 import ayon_api
 
@@ -15,7 +15,10 @@ from ayon_core.pipeline.publish import publish_plugins_discover
 
 from ayon_workflow.datatypes import (
     FolderItem,
+    FrameRange,
+    MediaType,
     PublishInput,
+    RepresentationItem,
     TaskItem,
     VersionItem,
 )
@@ -132,3 +135,37 @@ def publish_content(
         product_id=data.get("productId"),
         version=data.get("version"),
     )
+
+
+def prepare_representations(
+    input_media: Union[str, MediaType, List[Union[str, MediaType]]],
+    name: Optional[str] = None,
+    frame_range: Optional[FrameRange] = None,
+    data: Optional[Dict[str, Any]] = None,
+    custom_tags: Optional[List[str]] = None,
+    tags: Optional[List[str]] = None,
+) -> Union[RepresentationItem, List[RepresentationItem]]:
+    # single entry, return it as representation.
+    if not isinstance(input_media, list):
+        return RepresentationItem(
+            input_media=input_media,
+            name=name,
+            frame_range=frame_range,
+            data=data,
+            custom_tags=custom_tags,
+            tags=tags,
+        )
+
+    # multiple entries, return a list of representations replicating
+    # the same data, frame_range, custom_tags, tags for each entry.
+    return [
+        RepresentationItem(
+            input_media=media,
+            name=name,
+            frame_range=frame_range,
+            data=data,
+            custom_tags=custom_tags,
+            tags=tags,
+        )
+        for media in input_media
+    ]

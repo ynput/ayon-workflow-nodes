@@ -2,7 +2,7 @@
 This should be as simple as possible to avoid import errors.
 """
 
-from typing import Any, Union, List
+from typing import Any, Dict, Union, List, Optional
 from ayon_workflow.datatypes import (
     MediaType,
     ImageSequence,
@@ -13,6 +13,7 @@ from ayon_workflow.datatypes import (
     TaskItem,
     FrameRange,
     VersionItem,
+    RepresentationItem,
 )
 
 __version__ = "0.0.1"
@@ -487,6 +488,58 @@ def get_plugins():
                 {
                     "name": "published_version",
                     "type": VersionItem,
+                }
+            ],
+        },
+        {
+            "name": "Representation",
+            "description": "Prepare a representation for publishing.",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "input_media",
+                    "description": "The content to be published.",
+                    "type": Union[str, MediaType, List[Union[str, MediaType]]],
+                    "allow_multi_connection": True,
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a content",
+                        "filter": "All Files (*.*)",
+                    },
+                },
+                {
+                    "name": "name",
+                    "description": "The representation name",
+                    "type": Optional[str],
+                },
+                {
+                    "name": "frame_range",
+                    "description": "The representation frame range.",
+                    "type": Optional[FrameRange],
+                },
+                {
+                    "name": "data",
+                    "description": "The representation data.",
+                    "type": Optional[Dict[str, Any]],
+                },
+                {
+                    "name": "custom_tags",
+                    "description": "The representation custom tags.",
+                    "type": Optional[List[str]],
+                },
+                {
+                    "name": "tags",
+                    "description": "The representation tags.",
+                    "type": Optional[List[str]],
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "output_representation",
+                    "type": Union[
+                        RepresentationItem,
+                        List[RepresentationItem],
+                    ],
                 }
             ],
         },
