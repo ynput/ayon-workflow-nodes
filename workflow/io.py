@@ -96,6 +96,28 @@ _CODECS = {
 VideoCodecs = enum.Enum("VideoCodecs", {key: key for key in _CODECS})
 
 
+def _run_logged_subprocess(command: list[str]) -> tuple[int, str]:
+    """Run a subprocess and stream combined output through the workflow logger."""
+    process = subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        encoding="utf-8",
+        errors="replace",
+    )
+    output_lines: list[str] = []
+
+    assert process.stdout is not None
+    for raw_line in process.stdout:
+        line = raw_line.rstrip("\r\n")
+        if not line:
+            continue
+        output_lines.append(line)
+        logger.info(line)
+
+    return process.wait(), "\n".join(output_lines)
+
+
 def encode(
     context: ContextItem,
     input_media: Union[str, MediaType],
@@ -115,13 +137,6 @@ def encode(
         output_media.path,
         context.project_name
     )
-
-    kwargs = {
-        "stdout": subprocess.PIPE,
-        "stderr": subprocess.STDOUT,
-        "encoding": "utf-8",
-        "errors": "replace",
-    }
 
     encode_args = []
     if isinstance(remapped_input_media, (Video, Image)):
@@ -166,19 +181,26 @@ def encode(
 
     # Run ffmpeg command
     cmd_line = " ".join(encode_args)
-    logger.debug(f"Running encode command line: {cmd_line}\n")
-    process = subprocess.run(encode_args, **kwargs)
+    logger.info(
+        "Running encode command line: %s",
+        cmd_line,
+    )
+    returncode, combined_output = _run_logged_subprocess(encode_args)
 
-    if bool(process.returncode):
-        logger.debug("stdout: %s", process.stdout)
-        logger.debug("stderr: %s", process.stderr)
-        logger.error(f"Failed with returncode: {process.returncode}\n")
+    if bool(returncode):
+        logger.error(
+            "Failed with returncode: %s",
+            returncode,
+        )
         raise RuntimeError(
             f"Command line failed: {cmd_line} "
-            f"with return code: {process.returncode}"
+            f"with return code: {returncode}"
         )
 
-    logger.debug(process.stdout)
+    if not combined_output:
+        logger.info(
+            "Encode completed without ffmpeg console output.",
+        )
     return output_media
 
 
