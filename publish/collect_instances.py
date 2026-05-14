@@ -6,9 +6,7 @@ import pyblish.api
 from ayon_core.pipeline import KnownPublishError
 
 from ayon_workflow.datatypes import (
-    Image,
     ImageSequence,
-    RepresentationItem,
     Video,
 )
 
@@ -21,12 +19,12 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
 
     @staticmethod
     def _get_paths(
-        file_entry: Union[str, Image, ImageSequence, Video]
+        file_entry: Union[str, ImageSequence, Video]
     ) -> Union[str, List[str]]:
         if isinstance(file_entry, str):
             return file_entry
 
-        if isinstance(file_entry, (Image, Video)):
+        if isinstance(file_entry, Video):
             return file_entry.path
 
         if isinstance(file_entry, ImageSequence):
@@ -80,14 +78,7 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                 "representations": [],
             }
             for file_group in instance_to_collect["file_groups"]:
-
-                if isinstance(file_group, RepresentationItem):
-                    paths = self._get_paths(file_group.input_media)
-                    repre_dict = file_group.to_repre_dict()
-
-                else:
-                    paths = self._get_paths(file_group)
-                    repre_dict = {}
+                paths = self._get_paths(file_group)
 
                 # Get representation extension.
                 path = paths[0] if isinstance(paths, list) else paths
@@ -112,10 +103,6 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                         "frameStart": file_group.frame_range.first_frame,
                         "frameEnd": file_group.frame_range.last_frame,
                     })
-
-                # User-provided representation data.
-                if repre_dict:
-                    repre.update(repre_dict)
 
                 instance_data["representations"].append(repre)
 
