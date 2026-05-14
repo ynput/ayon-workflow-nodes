@@ -29,7 +29,7 @@ def _get_task_item(
         project_name: str,
         folder_item: FolderItem,
         task_name: str,
-        task_type: str,
+        task_type: Optional[str] = None,
         ensure_exists: Optional[bool] = True,
     ) -> TaskItem:
         if ensure_exists:
@@ -42,18 +42,22 @@ def _get_task_item(
 
             if (
                 not task_dict
-                or task_dict.get("taskType") != task_type
+                or (task_type and task_dict.get("taskType") != task_type)
             ):
                 raise ValueError(
-                    f"No task {task_name} ({task_type})"
+                    f"No task {task_name} ({task_type}) "
                     f"under {folder_item}."
                 )
 
-        attrs = asdict(folder_item)
-        attrs["_parent"] = folder_item.parent
-        attrs["task_name"] = task_name
-        attrs["task_type"] = task_type
-        return TaskItem(**attrs)
+            attrs = asdict(folder_item)
+            attrs["_parent"] = folder_item.parent
+            attrs["task_name"] = task_name
+            attrs["task_type"] = task_dict.get("taskType")
+            return TaskItem(**attrs)
+
+        raise NotImplementedError(
+            "Promised task is not implemented yet."
+        )
 
 
 def _get_folder_item(
@@ -106,7 +110,7 @@ def _get_folder_item(
             )
 
         raise NotImplementedError(
-            "Promised folder are not implemented yet."
+            "Promised folder is not implemented yet."
         )
 
 
@@ -132,12 +136,12 @@ def get_ayon_context(
             folder_id=folder_id,
             ensure_exists=ensure_exists,
         )
-        if task_name and task_type:
+        if task_name:
             return _get_task_item(
                 project_name,
                 folder_item,
                 task_name,
-                task_type,
+                task_type=task_type,
                 ensure_exists=ensure_exists
             )
 
@@ -146,6 +150,33 @@ def get_ayon_context(
 
     logger.info(f"Returning project item: {project_name}")
     return ProjectItem(project_name=project_name)
+
+
+def get_task_context(
+    project_name: str,
+    task_id: Optional[str] = None,
+    task_path: Optional[str] = None,
+    ensure_exists: Optional[bool] = True,
+) -> TaskItem:
+    if not task_id and not task_path:
+        raise ValueError("Either task_id or task_path must be provided.")
+
+    if task_id:
+        task_dict = ayon_api.get_task_by_id(project_name, task_id) or {}
+        task_name = task_dict.get("name", "unknown")
+        folder_path = None
+        folder_id = task_dict.get("folderId", "unknown")
+    else:
+        folder_path, task_name = task_path.rsplit("/", 1)
+        folder_id = None
+
+    return get_ayon_context(
+        project_name,
+        folder_id=folder_id,
+        folder_path=folder_path,
+        task_name=task_name,
+        ensure_exists=ensure_exists,
+    )
 
 
 def _check_parent_directory(
