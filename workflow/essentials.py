@@ -1,12 +1,17 @@
 """ Essential features to be exposed as nodes.
 """
-import logging
+
 import os
 from dataclasses import asdict
 from typing import Optional, Any, List, Union
 import tempfile
 
-from ayon_workflow.plugins.workflow._runtime_requirements import get_ayon_api
+try:
+    import ayon_api
+
+except ImportError:
+    # Unit test mode
+    ayon_api = type("ayon_api", (), {})
 
 from ayon_workflow.datatypes import (
     ContextItem,
@@ -17,8 +22,6 @@ from ayon_workflow.datatypes import (
     TaskItem,
     Video,
 )
-
-logger = logging.getLogger(__name__)
 
 
 def pass_through(input_data: Any) -> Any:
@@ -33,7 +36,6 @@ def _get_task_item(
         ensure_exists: Optional[bool] = True,
     ) -> TaskItem:
         if ensure_exists:
-            ayon_api = get_ayon_api()
             task_dict = ayon_api.get_task_by_name(
                 project_name,
                 folder_item.folder_id,
@@ -67,7 +69,6 @@ def _get_folder_item(
         ensure_exists: Optional[bool] = True,
     ) -> FolderItem:
         if ensure_exists:
-            ayon_api = get_ayon_api()
             if not (folder_id or folder_path):
                 raise ValueError(
                     "Missing folder_path or folder_id."
@@ -126,7 +127,7 @@ def get_ayon_context(
     if not project_name:
         raise ValueError("No project name provided.")
 
-    if ensure_exists and not get_ayon_api().get_project(project_name):
+    if ensure_exists and not ayon_api.get_project(project_name):
         raise ValueError(f"Project {project_name} does not exist.")
 
     if folder_id or folder_path:
@@ -145,10 +146,8 @@ def get_ayon_context(
                 ensure_exists=ensure_exists
             )
 
-        logger.info(f"Returning folder item: {folder_item}")
         return folder_item
 
-    logger.info(f"Returning project item: {project_name}")
     return ProjectItem(project_name=project_name)
 
 
@@ -219,40 +218,6 @@ def prepare_video(
     )
 
 
-def fetch_folder_attribute(
-    folder: FolderItem,
-    attribute_name: str,
-    default_value: Optional[Any] = None,
-) -> Any:
-    ayon_api = get_ayon_api()
-
-    if folder.folder_id:
-        folder_entity = ayon_api.get_folder_by_id(
-            folder.project_name,
-            folder.folder_id,
-        )
-
-    elif folder.folder_path:
-        folder_entity = ayon_api.get_folder_by_path(
-            folder.project_name,
-            folder.folder_path,
-        )
-
-    else:
-        raise ValueError(f"Not a valid folder: {folder}")
-
-    ayon_value = (
-        folder_entity.get(attribute_name)
-        or folder_entity.get("attrib", {}).get(attribute_name)
-    )
-    if ayon_value:
-        logger.info(f"Fetched folder {attribute_name} value: {ayon_value}")
-        return ayon_value
-
-    logger.info(f"Returning default value: {default_value}")
-    return default_value
-
-
 def append(inputs: Union[Any, List[Any]]) -> List[Any]:
     """ Merge provided input(s) in a single list.
     """
@@ -263,7 +228,6 @@ def append(inputs: Union[Any, List[Any]]) -> List[Any]:
         else:
             result.append(input)
 
-    logger.info(f"Returning appended result: {result}")
     return result
 
 

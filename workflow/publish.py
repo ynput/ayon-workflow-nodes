@@ -4,17 +4,22 @@ import os
 
 from typing import Optional, Union, List
 
+import ayon_api
+
+import pyblish.api
+import pyblish.util
+
+from ayon_core.pipeline import install_ayon_plugins
+from ayon_core.pipeline.create import get_product_name
+from ayon_core.pipeline.publish import publish_plugins_discover
+
 from ayon_workflow.datatypes import (
     FolderItem,
-    FrameRange,
-    MediaType,
     PublishInput,
-    RepresentationItem,
     TaskItem,
     VersionItem,
 )
 from ayon_workflow._utils import remap_input
-from ayon_workflow.plugins.workflow._runtime_requirements import get_ayon_api
 
 
 def publish_content(
@@ -25,13 +30,6 @@ def publish_content(
         variant: str = "Main",
         comment: str = "",
     ) -> VersionItem:
-    import pyblish.api
-    import pyblish.util
-    from ayon_core.pipeline import install_ayon_plugins
-    from ayon_core.pipeline.create import get_product_name
-    from ayon_core.pipeline.publish import publish_plugins_discover
-
-    ayon_api = get_ayon_api()
 
     # Make public ayon api behave as other user
     # - this works only if public ayon api is using service user
@@ -133,20 +131,4 @@ def publish_content(
         version_id=data.get("id"),
         product_id=data.get("productId"),
         version=data.get("version"),
-    )
-
-
-def prepare_representation(
-    input_media: Union[str, MediaType],
-    name: Optional[str] = None,
-    frame_range: Optional[FrameRange] = None,
-    custom_tags: Optional[List[str]] = None,
-    tags: Optional[List[str]] = None,
-) -> RepresentationItem:
-    return RepresentationItem(
-        input_media=input_media,
-        name=name,
-        frame_range=frame_range,
-        custom_tags=custom_tags,
-        tags=tags,
     )
