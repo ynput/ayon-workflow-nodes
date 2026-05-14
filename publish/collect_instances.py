@@ -5,7 +5,6 @@ import pyblish.api
 
 from ayon_core.pipeline import KnownPublishError
 
-
 from ayon_workflow.datatypes import (
     ImageSequence,
     Video,
