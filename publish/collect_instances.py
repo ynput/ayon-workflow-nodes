@@ -7,7 +7,6 @@ from ayon_core.pipeline import KnownPublishError
 
 
 from ayon_workflow.plugins.workflow import (
-    Image,
     ImageSequence,
     RepresentationItem,
     Video,
@@ -22,12 +21,12 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
 
     @staticmethod
     def _get_paths(
-        file_entry: Union[str, Image, ImageSequence, Video]
+        file_entry: Union[str, ImageSequence, Video]
     ) -> Union[str, List[str]]:
         if isinstance(file_entry, str):
             return file_entry
 
-        if isinstance(file_entry, (Image, Video)):
+        if isinstance(file_entry, Video):
             return file_entry.path
 
         if isinstance(file_entry, ImageSequence):

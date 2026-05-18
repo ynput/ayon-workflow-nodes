@@ -17,7 +17,6 @@ from ayon_workflow.datatypes import (
     ContextItem,
     FolderItem,
     FrameRange,
-    Image,
     ImageSequence,
     ProjectItem,
     TaskItem,
@@ -217,14 +216,6 @@ def prepare_video(
         path=os.path.join(directory, basename),
         frame_range=frame_range,
     )
-
-
-def prepare_image(path: str) -> Image:
-    directory = os.path.dirname(path)
-    basename = os.path.basename(path)
-
-    directory = _check_parent_directory(directory)
-    return Image(path=os.path.join(directory, basename))
 
 
 def append(inputs: Union[Any, List[Any]]) -> List[Any]:

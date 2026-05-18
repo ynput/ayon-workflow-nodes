@@ -5,7 +5,6 @@ This should be as simple as possible to avoid import errors.
 from typing import Any, Dict, Union, List, Optional
 from ayon_workflow.datatypes import (
     MediaType,
-    Image,
     ImageSequence,
     Video,
     ContextItem,
@@ -134,30 +133,6 @@ def get_plugins():
                 {
                     "name": "task_context",
                     "type": TaskItem,
-                }
-            ],
-        },
-        {
-            "name": "Image",
-            "description": "Define an Image path (existing or not).",
-            "version": __version__,
-            "inputs": [
-                {
-                    "name": "path",
-                    "description": "The path to the image.",
-                    "type": str,
-                    "default": "img.png",
-                    "widget": {
-                        "name": "filepath",
-                        "select": "file",
-                        "caption": "Select an image file.",
-                    },
-                },
-            ],
-            "outputs": [
-                {
-                    "name": "image",
-                    "type": Image,
                 }
             ],
         },
@@ -663,7 +638,6 @@ def get_plugin_function(name):
         "Context": essentials.get_ayon_context,
         "TaskContext": essentials.get_task_context,
         "Video": essentials.prepare_video,
-        "Image": essentials.prepare_image,
         "ImageSequence": essentials.prepare_image_sequence,
         "MergeSequence": essentials.merge_sequences,
         "Append": essentials.append,

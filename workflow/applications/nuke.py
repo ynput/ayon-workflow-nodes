@@ -94,7 +94,7 @@ def run_nuke_render(
     if write_node_name:
         app_args = ["-X", write_node_name]
 
-    if getattr(output_media, "frame_range", None):
+    if output_media.frame_range:
         frame_range = frame_range or output_media.frame_range
 
     if frame_range:
@@ -163,7 +163,7 @@ def run_nuke_render(
             if not os.path.exists(path):
                 raise RuntimeError(f"Expected frame {path} does not exists.")
     else:
-        if not os.path.exists(remapped_output_media.path):  # video/image
+        if not os.path.exists(remapped_output_media.path):  # video
             raise RuntimeError(
                 f"Expected media {remapped_output_media.path} does not exist."
             )
