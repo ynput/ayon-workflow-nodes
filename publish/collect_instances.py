@@ -8,6 +8,7 @@ from ayon_core.pipeline import KnownPublishError
 
 from ayon_workflow.plugins.workflow import (
     ImageSequence,
+    RepresentationItem,
     Video,
 )
 
@@ -79,7 +80,13 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                 "representations": [],
             }
             for file_group in instance_to_collect["file_groups"]:
-                paths = self._get_paths(file_group)
+
+                # consolidate all inputs as RepresentationItem
+                if not isinstance(file_group, RepresentationItem):
+                    file_group = RepresentationItem(input_media=file_group)
+
+                paths = self._get_paths(file_group.input_media)
+                repre_dict = file_group.to_repre_dict()
 
                 # Get representation extension.
                 path = paths[0] if isinstance(paths, list) else paths
@@ -96,14 +103,8 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                     "ext": ext,
                     "files": files,
                     "stagingDir": os.path.dirname(path),
+                    **repre_dict,
                 }
-
-                # Add frame range if explicitely provided.
-                if getattr(file_group, "frame_range", None):
-                    repre.update({
-                        "frameStart": file_group.frame_range.first_frame,
-                        "frameEnd": file_group.frame_range.last_frame,
-                    })
 
                 instance_data["representations"].append(repre)
 

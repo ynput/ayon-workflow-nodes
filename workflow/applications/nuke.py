@@ -165,7 +165,7 @@ def run_nuke_render(
     else:
         if not os.path.exists(remapped_output_media.path):  # video
             raise RuntimeError(
-                f"Expected video {remapped_output_media.path} does not exists."
+                f"Expected media {remapped_output_media.path} does not exist."
             )
 
     return output_media
