@@ -519,7 +519,7 @@ def get_plugins():
                 },
                 {
                     "name": "data",
-                    "description": "The representation data.",
+                    "description": "The raw representation dict data.",
                     "type": Optional[Dict[str, Any]],
                 },
                 {
