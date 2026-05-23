@@ -131,6 +131,7 @@ def run_application(
         application_variant=app_application_variant
     )
 
+    import pdb ; pdb.set_trace()
     context_kwargs = {
         "project_name": context.project_name,
         "app_args": app_args or [],
@@ -169,6 +170,14 @@ def run_application(
         **context_kwargs,
     )
     launch_context.run_prelaunch_hooks()
+
+    # If the executable path from settings
+    # does not exist, raise an error.
+    if not launch_context.executable:
+        raise RuntimeError(
+            "Invalid executable path for "
+            f"{application_group_name}"
+        )
 
     log_file = log_file or os.devnull
 
