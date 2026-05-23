@@ -131,7 +131,6 @@ def run_application(
         application_variant=app_application_variant
     )
 
-    import pdb ; pdb.set_trace()
     context_kwargs = {
         "project_name": context.project_name,
         "app_args": app_args or [],
