@@ -168,15 +168,15 @@ def run_application(
         app.full_name,
         **context_kwargs,
     )
-    launch_context.run_prelaunch_hooks()
-
     # If the executable path from settings
     # does not exist, raise an error.
     if not launch_context.executable:
         raise RuntimeError(
-            "Invalid executable path for "
+            f"Invalid executable paths {app.executables} for "
             f"{application_group_name}"
         )
+
+    launch_context.run_prelaunch_hooks()
 
     log_file = log_file or os.devnull
 
