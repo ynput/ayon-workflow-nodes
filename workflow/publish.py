@@ -23,7 +23,7 @@ from ayon_workflow.datatypes import (
     TaskItem,
     VersionItem,
 )
-from ayon_workflow._utils import remap_input
+from ayon_workflow.utils import remap_input
 
 
 def publish_content(
