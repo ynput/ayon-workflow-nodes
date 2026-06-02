@@ -10,7 +10,7 @@ from ayon_workflow.datatypes import (
     ImageSequence,
     FrameRange,
 )
-from ayon_workflow._utils import remap_input
+from ayon_workflow.utils import remap_input
 
 from . import _base
 

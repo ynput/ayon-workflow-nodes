@@ -9,7 +9,7 @@ from ayon_workflow.datatypes import (
     ContextItem,
     FrameRange,
 )
-from ayon_workflow._utils import remap_input
+from ayon_workflow.utils import remap_input
 
 from . import _base
 

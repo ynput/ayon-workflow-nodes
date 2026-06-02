@@ -15,7 +15,7 @@ from ayon_applications import ApplicationManager, Application, LaunchTypes
 from ayon_core.pipeline import tempdir
 
 from ayon_workflow.datatypes import ContextItem, TaskItem
-from ayon_workflow._utils import remap_input
+from ayon_workflow.utils import remap_input
 
 
 log = logging.getLogger(__name__)
