@@ -108,6 +108,7 @@ def publish_content(
         {
             "product_name": product_name,
             "product_type": product_type,
+            "product_base_type": product_base_type,
             "variant": variant,
             "file_groups": in_data
         }
