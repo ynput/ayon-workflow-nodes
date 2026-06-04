@@ -466,6 +466,11 @@ def get_plugins():
                     "type": str,
                 },
                 {
+                    "name": "product_base_type",
+                    "description": "The publish base product type.",
+                    "type": Optional[str],
+                },
+                {
                     "name": "username",
                     "description": "The username to use while publishing.",
                     "type": str,
@@ -482,6 +487,12 @@ def get_plugins():
                     "type": str,
                     "default": "",
                     "widget": {"name": "text"},
+                },
+                {
+                    "name": "host_name",
+                    "description": "The associated host name.",
+                    "type": str,
+                    "default": "workflow",
                 },
             ],
             "outputs": [

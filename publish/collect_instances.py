@@ -49,6 +49,7 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
         mandatory_keys = {
             "product_name",
             "product_type",
+            "product_base_type",
             "variant",
             "file_groups",
         }
@@ -63,14 +64,15 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                     f" Missing mandatory keys: {mandatory_keys}."
                 )
 
-            product_base_type = instance_to_collect["product_type"]
+            product_type = instance_to_collect["product_type"]
+            product_base_type = instance_to_collect["product_base_type"]
             instance_data = {
                 "publish": True,
                 "active": True,
                 "label": instance_to_collect["product_name"],
                 "name": instance_to_collect["product_name"],
                 "productName": instance_to_collect["product_name"],
-                "productType": product_base_type,
+                "productType": product_type,
                 "productBaseType": product_base_type,
                 "family": product_base_type,
                 "families": [product_base_type],

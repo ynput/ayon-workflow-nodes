@@ -30,9 +30,11 @@ def publish_content(
         input_paths: Union[PublishInput, List[PublishInput]],
         context: Union[FolderItem, TaskItem],
         product_type: str,
+        product_base_type: Optional[str] = None,
         username: Optional[str] = None,
         variant: str = "Main",
         comment: str = "",
+        host_name: str = "workflow",
     ) -> VersionItem:
 
     # Make public ayon api behave as other user
@@ -79,13 +81,14 @@ def publish_content(
                 f" Got: '{task_entity['taskType']}'."
             )
 
+    product_base_type = product_base_type or product_type
     product_name = get_product_name(
         project_name=project_name,
         folder_entity=folder_entity,
         task_entity=task_entity,
-        product_base_type=product_type,
+        product_base_type=product_base_type,
         product_type=product_type,
-        host_name="workflow",
+        host_name=host_name,
         variant=variant,
     )
 
@@ -105,6 +108,7 @@ def publish_content(
         {
             "product_name": product_name,
             "product_type": product_type,
+            "product_base_type": product_base_type,
             "variant": variant,
             "file_groups": in_data
         }
