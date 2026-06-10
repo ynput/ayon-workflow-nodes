@@ -2,7 +2,7 @@
 This should be as simple as possible to avoid import errors.
 """
 
-from typing import Any, Union, List
+from typing import Any, Dict, Union, List, Optional
 from ayon_workflow.datatypes import (
     MediaType,
     ImageSequence,
@@ -13,6 +13,7 @@ from ayon_workflow.datatypes import (
     TaskItem,
     FrameRange,
     VersionItem,
+    RepresentationItem,
 )
 
 __version__ = "0.0.1"
@@ -148,7 +149,7 @@ def get_plugins():
                     "widget": {
                         "name": "filepath",
                         "select": "file",
-                        "caption": "Select a directory",
+                        "caption": "Select a video file.",
                     },
                 },
                 {
@@ -465,6 +466,11 @@ def get_plugins():
                     "type": str,
                 },
                 {
+                    "name": "product_base_type",
+                    "description": "The publish base product type.",
+                    "type": Optional[str],
+                },
+                {
                     "name": "username",
                     "description": "The username to use while publishing.",
                     "type": str,
@@ -482,11 +488,69 @@ def get_plugins():
                     "default": "",
                     "widget": {"name": "text"},
                 },
+                {
+                    "name": "host_name",
+                    "description": "The associated host name.",
+                    "type": str,
+                    "default": "workflow",
+                },
             ],
             "outputs": [
                 {
                     "name": "published_version",
                     "type": VersionItem,
+                }
+            ],
+        },
+        {
+            "name": "Representation",
+            "description": "Prepare a representation for publishing.",
+            "version": __version__,
+            "inputs": [
+                {
+                    "name": "input_media",
+                    "description": "The content to be published.",
+                    "type": Union[str, MediaType, List[Union[str, MediaType]]],
+                    "allow_multi_connection": True,
+                    "widget": {
+                        "name": "filepath",
+                        "caption": "Select a content",
+                        "filter": "All Files (*.*)",
+                    },
+                },
+                {
+                    "name": "name",
+                    "description": "The representation name",
+                    "type": Optional[str],
+                },
+                {
+                    "name": "frame_range",
+                    "description": "The representation frame range.",
+                    "type": Optional[FrameRange],
+                },
+                {
+                    "name": "data",
+                    "description": "The raw representation dict data.",
+                    "type": Optional[Dict[str, Any]],
+                },
+                {
+                    "name": "custom_tags",
+                    "description": "The representation custom tags.",
+                    "type": Optional[List[str]],
+                },
+                {
+                    "name": "tags",
+                    "description": "The representation tags.",
+                    "type": Optional[List[str]],
+                },
+            ],
+            "outputs": [
+                {
+                    "name": "output_representation",
+                    "type": Union[
+                        RepresentationItem,
+                        List[RepresentationItem],
+                    ],
                 }
             ],
         },
@@ -582,7 +646,6 @@ def get_plugin_function(name):
     func_mapping = {
         # Others
         "NoOp": essentials.pass_through,
-        "Publish": publish.publish_content,
         "Context": essentials.get_ayon_context,
         "TaskContext": essentials.get_task_context,
         "Video": essentials.prepare_video,
@@ -593,6 +656,9 @@ def get_plugin_function(name):
         "NukeRender": nuke.run_nuke_render,
         "BlenderRender": blender_render.run_blender_render,
         "BlenderWorkfile": blender_workfile.run_blender_workfile,
+        # Publish
+        "Publish": publish.publish_content,
+        "Representation": publish.prepare_representations,
     }
 
     return func_mapping.get(name)

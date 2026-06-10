@@ -1,8 +1,9 @@
 """ Publish features.
 """
+import copy
 import os
 
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Dict, Any
 
 import ayon_api
 
@@ -15,20 +16,25 @@ from ayon_core.pipeline.publish import publish_plugins_discover
 
 from ayon_workflow.datatypes import (
     FolderItem,
+    FrameRange,
+    MediaType,
     PublishInput,
+    RepresentationItem,
     TaskItem,
     VersionItem,
 )
-from ayon_workflow._utils import remap_input
+from ayon_workflow.utils import remap_input
 
 
 def publish_content(
         input_paths: Union[PublishInput, List[PublishInput]],
         context: Union[FolderItem, TaskItem],
         product_type: str,
+        product_base_type: Optional[str] = None,
         username: Optional[str] = None,
         variant: str = "Main",
         comment: str = "",
+        host_name: str = "workflow",
     ) -> VersionItem:
 
     # Make public ayon api behave as other user
@@ -75,13 +81,14 @@ def publish_content(
                 f" Got: '{task_entity['taskType']}'."
             )
 
+    product_base_type = product_base_type or product_type
     product_name = get_product_name(
         project_name=project_name,
         folder_entity=folder_entity,
         task_entity=task_entity,
-        product_base_type=product_type,
+        product_base_type=product_base_type,
         product_type=product_type,
-        host_name="workflow",
+        host_name=host_name,
         variant=variant,
     )
 
@@ -101,6 +108,7 @@ def publish_content(
         {
             "product_name": product_name,
             "product_type": product_type,
+            "product_base_type": product_base_type,
             "variant": variant,
             "file_groups": in_data
         }
@@ -132,3 +140,37 @@ def publish_content(
         product_id=data.get("productId"),
         version=data.get("version"),
     )
+
+
+def prepare_representations(
+    input_media: Union[str, MediaType, List[Union[str, MediaType]]],
+    name: Optional[str] = None,
+    frame_range: Optional[FrameRange] = None,
+    data: Optional[Dict[str, Any]] = None,
+    custom_tags: Optional[List[str]] = None,
+    tags: Optional[List[str]] = None,
+) -> Union[RepresentationItem, List[RepresentationItem]]:
+    # single entry, return it as representation.
+    if not isinstance(input_media, list):
+        return RepresentationItem(
+            input_media=input_media,
+            name=name,
+            frame_range=frame_range,
+            data=data,
+            custom_tags=custom_tags,
+            tags=tags,
+        )
+
+    # multiple entries, return a list of representations replicating
+    # the same data, frame_range, custom_tags, tags for each entry.
+    return [
+        RepresentationItem(
+            input_media=media,
+            name=name,
+            frame_range=frame_range,
+            data=copy.deepcopy(data),
+            custom_tags=copy.deepcopy(custom_tags),
+            tags=copy.deepcopy(tags),
+        )
+        for media in input_media
+    ]

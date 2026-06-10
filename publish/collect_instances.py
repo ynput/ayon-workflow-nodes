@@ -7,6 +7,7 @@ from ayon_core.pipeline import KnownPublishError
 
 from ayon_workflow.datatypes import (
     ImageSequence,
+    RepresentationItem,
     Video,
 )
 
@@ -47,6 +48,7 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
         mandatory_keys = {
             "product_name",
             "product_type",
+            "product_base_type",
             "variant",
             "file_groups",
         }
@@ -61,14 +63,15 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                     f" Missing mandatory keys: {mandatory_keys}."
                 )
 
-            product_base_type = instance_to_collect["product_type"]
+            product_type = instance_to_collect["product_type"]
+            product_base_type = instance_to_collect["product_base_type"]
             instance_data = {
                 "publish": True,
                 "active": True,
                 "label": instance_to_collect["product_name"],
                 "name": instance_to_collect["product_name"],
                 "productName": instance_to_collect["product_name"],
-                "productType": product_base_type,
+                "productType": product_type,
                 "productBaseType": product_base_type,
                 "family": product_base_type,
                 "families": [product_base_type],
@@ -78,7 +81,13 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                 "representations": [],
             }
             for file_group in instance_to_collect["file_groups"]:
-                paths = self._get_paths(file_group)
+
+                # consolidate all inputs as RepresentationItem
+                if not isinstance(file_group, RepresentationItem):
+                    file_group = RepresentationItem(input_media=file_group)
+
+                paths = self._get_paths(file_group.input_media)
+                repre_dict = file_group.to_repre_dict()
 
                 # Get representation extension.
                 path = paths[0] if isinstance(paths, list) else paths
@@ -95,14 +104,8 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                     "ext": ext,
                     "files": files,
                     "stagingDir": os.path.dirname(path),
+                    **repre_dict,
                 }
-
-                # Add frame range if explicitely provided.
-                if getattr(file_group, "frame_range", None):
-                    repre.update({
-                        "frameStart": file_group.frame_range.first_frame,
-                        "frameEnd": file_group.frame_range.last_frame,
-                    })
 
                 instance_data["representations"].append(repre)
 
