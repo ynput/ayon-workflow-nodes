@@ -500,6 +500,12 @@ def get_plugins():
                     "type": Dict[str, Any],
                     "default": {},
                 },
+                {
+                    "name": "instance_data",
+                    "description": "Optional instance data.",
+                    "type": Dict[str, Any],
+                    "default": {},
+                }
             ],
             "outputs": [
                 {

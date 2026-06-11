@@ -104,7 +104,7 @@ def _build_workflow(
     )
     publish_nuke_node["product_type"] = "render"
     publish_nuke_node["variant"] = "Nuke"
-    publish_nuke_node["context_data"] = {
+    publish_nuke_node["instance_data"] = {
         "frameStart": FRAME_RANGE.first_frame,
         "frameEnd": FRAME_RANGE.last_frame,
     }

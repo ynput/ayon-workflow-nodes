@@ -36,6 +36,7 @@ def publish_content(
         comment: str = "",
         host_name: str = "workflow",
         context_data: Optional[Dict[str, Any]] = None,
+        instance_data: Optional[Dict[str, Any]] = None,
     ) -> VersionItem:
 
     # Make public ayon api behave as other user
@@ -111,7 +112,8 @@ def publish_content(
             "product_type": product_type,
             "product_base_type": product_base_type,
             "variant": variant,
-            "file_groups": in_data
+            "file_groups": in_data,
+            "instance_data": instance_data or {},
         }
     ]
 

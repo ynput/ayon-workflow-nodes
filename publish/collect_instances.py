@@ -81,24 +81,12 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                 "variant": instance_to_collect["variant"],
                 "representations": [],
             }
-
-            # Report frame range and fps values from context.data
-            for key in (
-                "frameStart",
-                "frameEnd",
-                "fps",
-                "handleStart",
-                "handleEnd",
-                "pixelAspect",
-                "resolutionWidth",
-                "resolutionHeight",
-            ):
-                if key in context.data:
-                    instance_data[key] = context.data[key]
-                    self.log.debug(
-                        f"Reported {key}: {instance_data[key]} "
-                        "from context data."
-                    )
+            if isinstance(instance_to_collect.get("instance_data"), dict):
+                self.log.debug(
+                    "Updating instance data from provided data: "
+                    f"{instance_to_collect['instance_data']}"
+                )
+                instance_data.update(instance_to_collect["instance_data"])
 
             # Collect instances from file groups
             for file_group in instance_to_collect["file_groups"]:
