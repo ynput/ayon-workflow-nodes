@@ -10,6 +10,7 @@ from ._utils import check_parent_directory
 class VideoNode(WorkflowNode):
     """Define a video path (existing or not)."""
 
+    name = "Video"
     version = "0.0.1"
     inputs = {
         "path": {

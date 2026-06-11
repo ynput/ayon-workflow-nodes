@@ -7,8 +7,9 @@ Requirement:
 """
 import os
 import pprint
+import logging
 
-from ayon_workflow.plugins.workflow import FrameRange
+from ayon_workflow.datatypes import FrameRange
 from ayon_workflow.plugin_system import register_plugins
 from ayon_workflow import workflow_editor, workflow_execution
 
@@ -17,6 +18,8 @@ FRAME_RANGE = FrameRange(
     first_frame=1,
     last_frame=5,
 )
+
+logging.basicConfig(level=logging.INFO)
 
 
 def _build_workflow(

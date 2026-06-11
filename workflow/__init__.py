@@ -10,11 +10,11 @@ def get_plugins() -> list[WorkflowNode]:
 
     from .essentials.append import Append
     from .essentials.context import Context
-    from .essentials.image_sequence import ImageSequence
+    from .essentials.image_sequence import ImageSequenceNode
     from .essentials.merge_sequence import MergeSequence
     from .essentials.no_op import NoOp
     from .essentials.task_context import TaskContext
-    from .essentials.video import Video
+    from .essentials.video import VideoNode
 
     from .publish.publish import Publish
     from .publish.representation import Representation
@@ -30,8 +30,8 @@ def get_plugins() -> list[WorkflowNode]:
         Append,
         Context,
         TaskContext,
-        Video,
-        ImageSequence,
+        VideoNode,
+        ImageSequenceNode,
         MergeSequence,
         NukeRender,
         BlenderRender,
