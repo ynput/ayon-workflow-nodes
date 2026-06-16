@@ -1,61 +1,75 @@
 from typing import List
-from ayon_workflow.plugin_system.interface import WorkflowNode
+from ayon_workflow.plugin_system import (
+    InputAttribute,
+    WorkflowTaskNode,
+)
 
 
-class UITest(WorkflowNode):
+class UITest(WorkflowTaskNode):
     """Shows all supported widgets for testing"""
 
     version = "0.0.1"
-    inputs = {
-        "string": {
-            "description": "whatever",
-        },
-        "filepath": {
-            "description": "whatever",
-            "widget": {
+    inputs = [
+        InputAttribute(
+            name="string",
+            description="whatever",
+        ),
+        InputAttribute(
+            name="filepath",
+            description="whatever",
+            widget={
                 "name": "filepath",
             },
-        },
-        "text": {
-            "description": "whatever",
-            "widget": {
+        ),
+        InputAttribute(
+            name="text",
+            description="whatever",
+            widget={
                 "name": "text",
             },
-        },
-        "choice": {
-            "description": "whatever",
-            "widget": {
+        ),
+        InputAttribute(
+            name="choice",
+            description="whatever",
+            widget={
                 "name": "choice",
                 "options": ["GET", "POST", "PUT", "DELETE", "PATCH"],
             },
-        },
-        "bool": {
-            "description": "A binary choice",
-        },
-        "int": {
-            "description": "whatever",
-        },
-        "enum": {
-            "description": "whatever",
-            "widget": {
+        ),
+        InputAttribute(
+            name="bool",
+            description="A binary choice",
+        ),
+        InputAttribute(
+            name="int",
+            description="whatever",
+        ),
+        InputAttribute(
+            name="enum",
+            description="whatever",
+            widget={
                 "name": "enum",
                 "fields": ["do this", "do that", "have a break"],
             },
-        },
-        "float": {
-            "description": "whatever",
-        },
-        "string_array": {
-            "description": "whatever",
-        },
-        "float_array": {
-            "description": "whatever",
-        },
-        "int_array": {
-            "description": "whatever",
-        },
-    }
-    outputs = {}
+        ),
+        InputAttribute(
+            name="float",
+            description="whatever",
+        ),
+        InputAttribute(
+            name="string_array",
+            description="whatever",
+        ),
+        InputAttribute(
+            name="float_array",
+            description="whatever",
+        ),
+        InputAttribute(
+            name="int_array",
+            description="whatever",
+        ),
+    ]
+    outputs = []
 
     def execute(
         self,

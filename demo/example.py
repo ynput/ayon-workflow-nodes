@@ -12,7 +12,7 @@ from ayon_workflow import workflow_execution
 from ayon_workflow.plugin_system import register_plugins
 
 
-register_plugins.register_plugins()
+register_plugins()
 
 # Debugging logs
 logging.basicConfig()
@@ -99,7 +99,7 @@ if project_bundle_name:
 if is_staging_enabled():
     args.extend(["--use-staging"])
 
-subprocess.run(
+process =subprocess.run(
     args,
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,

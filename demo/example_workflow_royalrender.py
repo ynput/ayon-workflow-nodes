@@ -13,7 +13,7 @@ from ayon_workflow import workflow_editor
 from ayon_workflow.plugins.workflow import FrameRange
 from ayon_workflow.plugin_system import register_plugins
 
-register_plugins.register_plugins()
+register_plugins()
 
 
 FRAME_RANGE = FrameRange(

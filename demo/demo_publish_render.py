@@ -27,7 +27,7 @@ def _build_workflow(
         folder_path: str,
     ) -> workflow_editor.Workflow:
     # Discover all available node definitions
-    register_plugins.register_plugins()
+    register_plugins()
 
     workflow = workflow_editor.Workflow(name="Demo")
     graph = workflow.execution_graph
