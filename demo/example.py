@@ -99,7 +99,7 @@ if project_bundle_name:
 if is_staging_enabled():
     args.extend(["--use-staging"])
 
-process =subprocess.run(
+subprocess.run(
     args,
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,
