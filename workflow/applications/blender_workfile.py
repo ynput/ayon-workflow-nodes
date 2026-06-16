@@ -4,57 +4,70 @@ from typing import Optional
 
 from ayon_workflow.datatypes import ContextItem
 from ayon_workflow.utils import remap_input
-from ayon_workflow.plugin_system.interface import WorkflowNode
+from ayon_workflow.plugin_system import (
+    InputAttribute,
+    OutputAttribute,
+    WorkflowTaskNode,
+)
 
 from . import _base
 
 
-class BlenderWorkfile(WorkflowNode):
+class BlenderWorkfile(WorkflowTaskNode):
     """ Edit a Blender workfile from a script.
     """
     version = "0.0.1"
-    inputs = {
-        "context": {
-            "description": "The workfile context.",
-        },
-        "blender_script_path": {
-            "description": "The path to the Blender script.",
-            "widget": {
+    inputs = [
+        InputAttribute(
+            name="context",
+            description="The workfile context.",
+        ),
+        InputAttribute(
+            name="blender_script_path",
+            description="The path to the Blender script.",
+            widget={
                 "name": "filepath",
                 "caption": "Select a Blender scene file",
                 "filter": "Blender Scene (*.blend)",
             },
-        },
-        "input_resource_path": {
-            "description": "A path to an input resource",
-            "widget": {"name": "filepath"},
-        },
-        "output_workfile": {
-            "description": "The output workfile",
-        },
-        "python_script_path": {
-            "description": "The path to a python script.",
-            "widget": {
+        ),
+        InputAttribute(
+            name="input_resource_path",
+            description="A path to an input resource",
+            widget={"name": "filepath"},
+        ),
+        InputAttribute(
+            name="output_workfile",
+            description="The output workfile",
+        ),
+        InputAttribute(
+            name="python_script_path",
+            description="The path to a python script.",
+            widget={
                 "name": "filepath",
                 "caption": "Select a Python file",
                 "filter": "Python Script (*.py)",
             },
-        },
-        "blender_application_variant": {
-            "description": "An application variant to use.",
-        },
-        "log_file": {
-            "description": "Path to output logs.",
-        },
-        "restrict_to_task": {
-            "description": "Raises if context is not a Task.",
-        },
-    }
-    outputs = {
-        "blend_workfile": {
-            "description": "The output workfile",
-        },
-    }
+        ),
+        InputAttribute(
+            name="blender_application_variant",
+            description="An application variant to use.",
+        ),
+        InputAttribute(
+            name="log_file",
+            description="Path to output logs.",
+        ),
+        InputAttribute(
+            name="restrict_to_task",
+            description="Raises if context is not a Task.",
+        ),
+    ]
+    outputs = [
+        OutputAttribute(
+            name="blend_workfile",
+            description="The output workfile",
+        ),
+    ]
 
     def execute(
         self,

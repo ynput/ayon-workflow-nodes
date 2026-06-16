@@ -1,23 +1,28 @@
 from typing import List, Union
 from ayon_workflow.datatypes import FrameRange, ImageSequence
-from ayon_workflow.plugin_system.interface import WorkflowNode
+from ayon_workflow.plugin_system import (
+    InputAttribute,
+    OutputAttribute,
+    WorkflowTaskNode,
+)
 
-
-class MergeSequence(WorkflowNode):
+class MergeSequence(WorkflowTaskNode):
     """Merge multiple image sequence together."""
 
     version = "0.0.1"
-    inputs = {
-        "image_sequences": {
-            "description": "Any image sequence(s).",
-            "allow_multi_connection": True,
-        }
-    }
-    outputs = {
-        "merged_sequence": {
-            "description": "The merged image sequence.",
-        }
-    }
+    inputs = [
+        InputAttribute(
+            name="image_sequences",
+            description="Any image sequence(s).",
+            allow_multi_connection=True,
+        )
+    ]
+    outputs = [
+        OutputAttribute(
+            name="merged_sequence",
+            description="The merged image sequence.",
+        )
+    ]
 
     def execute(
         self, image_sequences: Union[ImageSequence, List[ImageSequence]]

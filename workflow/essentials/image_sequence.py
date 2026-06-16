@@ -1,44 +1,54 @@
 from typing import Optional
 
 from ayon_workflow.datatypes import FrameRange, ImageSequence
-from ayon_workflow.plugin_system.interface import WorkflowNode
+from ayon_workflow.plugin_system import (
+    InputAttribute,
+    OutputAttribute,
+    WorkflowTaskNode,
+)
 
 from ._utils import check_parent_directory
 
 
-class ImageSequenceNode(WorkflowNode):
+class ImageSequenceNode(WorkflowTaskNode):
     """Define an image sequence path (existing or not)."""
 
     name = "ImageSequence"
     version = "0.0.1"
-    inputs = {
-        "directory": {
-            "description": "The path to the parent directory.",
-            "widget": {
+    inputs = [
+        InputAttribute(
+            name="directory",
+            description="The path to the parent directory.",
+            widget={
                 "name": "filepath",
                 "select": "directory",
                 "caption": "Select a directory",
             },
-        },
-        "head": {
-            "description": "The head of the sequence e.g. `img.`."
-        },
-        "tail": {
-            "description": "The tail of the sequence e.g. `.jpg`."
-        },
-        "frame_range": {
-            "description": "An optional frame_range."
-        },
-        "padding": {
-            "description": "An optional frame range padding."
-        },
-    }
+        ),
+        InputAttribute(
+            name="head",
+            description="The head of the sequence e.g. `img.`."
+        ),
+        InputAttribute(
+            name="tail",
+            description="The tail of the sequence e.g. `.jpg`."
+        ),
+        InputAttribute(
+            name="frame_range",
+            description="An optional frame_range."
+        ),
+        InputAttribute(
+            name="padding",
+            description="An optional frame range padding."
+        ),
+    ]
 
-    outputs = {
-        "image_sequence": {
-            "description": "The resolved image sequence.",
-        }
-    }
+    outputs = [
+        OutputAttribute(
+            name="image_sequence",
+            description="The resolved image sequence.",
+        )
+    ]
 
     def execute(
         self,

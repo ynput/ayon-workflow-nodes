@@ -3,34 +3,43 @@ from typing import Optional
 import ayon_api
 
 from ayon_workflow.datatypes import TaskItem
-from ayon_workflow.plugin_system.interface import WorkflowNode
+from ayon_workflow.plugin_system import (
+    InputAttribute,
+    OutputAttribute,
+    WorkflowTaskNode,
+)
 
 from .context import Context
 
 
-class TaskContext(WorkflowNode):
+class TaskContext(WorkflowTaskNode):
     """Gather a valid AYON task context."""
 
     version = "0.0.1"
-    inputs = {
-        "project_name": {
-            "description": "The project name",
-        },
-        "task_id": {
-            "description": "An optional task id.",
-        },
-        "task_path": {
-            "description": "An optional task path.",
-        },
-        "ensure_exists": {
-            "description": "Assert context existence.",
-        },
-    }
-    outputs = {
-        "task_context": {
-            "description": "The task context as a TaskItem.",
-        }
-    }
+    inputs = [
+        InputAttribute(
+            name="project_name",
+            description="The project name",
+        ),
+        InputAttribute(
+            name="task_id",
+            description="An optional task id.",
+        ),
+        InputAttribute(
+            name="task_path",
+            description="An optional task path.",
+        ),
+        InputAttribute(
+            name="ensure_exists",
+            description="Assert context existence.",
+        ),
+    ]
+    outputs = [
+        OutputAttribute(
+            name="task_context",
+            description="The task context as a TaskItem.",
+        )
+    ]
 
     def execute(
         self,

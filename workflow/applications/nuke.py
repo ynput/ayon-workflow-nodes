@@ -11,7 +11,11 @@ from ayon_workflow.datatypes import (
     FrameRange,
 )
 from ayon_workflow.utils import remap_input
-from ayon_workflow.plugin_system.interface import WorkflowNode
+from ayon_workflow.plugin_system import (
+    InputAttribute,
+    OutputAttribute,
+    WorkflowTaskNode,
+)
 
 from . import _base
 
@@ -73,60 +77,72 @@ nuke.scriptSaveAs(output, overwrite=1)
     ])
 
 
-class NukeRender(WorkflowNode):
+class NukeRender(WorkflowTaskNode):
     """ Renders a Nuke scene.
     """
     version = "0.0.1"
-    inputs = {
-        "context": {
-            "description": "The render context.",
-        },
-        "nuke_script_path": {
-            "description": "The path to the Nuke script.",
-            "widget": {
+    inputs = [
+        InputAttribute(
+            name="context",
+            description="The render context.",
+        ),
+        InputAttribute(
+            name="nuke_script_path",
+            description="The path to the Nuke script.",
+            widget={
                 "name": "filepath",
                 "caption": "Select a Nuke scene file",
                 "filter": "Nuke Scene (*.nk)",
             },
-        },
-        "input_media": {
-            "description": "The input media",
-        },
-        "output_media": {
-            "description": "The output media",
-        },
-        "python_script_path": {
-            "description": "The path to a python script.",
-            "widget": {
+        ),
+        InputAttribute(
+            name="input_media",
+            description="The input media",
+        ),
+        InputAttribute(
+            name="output_media",
+            description="The output media",
+        ),
+        InputAttribute(
+            name="python_script_path",
+            description="The path to a python script.",
+            widget={
                 "name": "filepath",
                 "caption": "Select a Python file",
                 "filter": "Python Script (*.py)",
             },
-        },
-        "frame_range": {
-            "description": "Restrictive frame range.",
-        },
-        "read_node_name": {
-            "description": "Explicit a Read node to use.",
-        },
-        "write_node_name": {
-            "description": "Explicit a Write node to use.",
-        },
-        "nuke_application_variant": {
-            "description": "An application variant to use.",
-        },
-        "log_file": {
-            "description": "Path to output logs.",
-        },
-        "restrict_to_task": {
-            "description": "Raises if context is not a Task.",
-        },
-    }
-    outputs = {
-        "rendered_media": {
-            "description": "The rendered media output.",
-        },
-    }
+        ),
+        InputAttribute(
+            name="frame_range",
+            description="Restrictive frame range.",
+        ),
+        InputAttribute(
+            name="read_node_name",
+            description="Explicit a Read node to use.",
+        ),
+        InputAttribute(
+            name="write_node_name",
+            description="Explicit a Write node to use.",
+        ),
+        InputAttribute(
+            name="nuke_application_variant",
+            description="An application variant to use.",
+        ),
+        InputAttribute(
+            name="log_file",
+            description="Path to output logs.",
+        ),
+        InputAttribute(
+            name="restrict_to_task",
+            description="Raises if context is not a Task.",
+        ),
+    ]
+    outputs = [
+        OutputAttribute(
+            name="rendered_media",
+            description="The rendered media output.",
+        ),
+    ]
 
     def execute(
         self,

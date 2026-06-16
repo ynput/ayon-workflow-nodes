@@ -6,44 +6,55 @@ from ayon_workflow.datatypes import (
     MediaType,
     RepresentationItem,
 )
-from ayon_workflow.plugin_system.interface import WorkflowNode
+from ayon_workflow.plugin_system import (
+    InputAttribute,
+    OutputAttribute,
+    WorkflowTaskNode,
+)
 
 
-class Representation(WorkflowNode):
+class Representation(WorkflowTaskNode):
     """Prepare a representation for publishing."""
 
     version = "0.0.1"
-    inputs = {
-        "input_media": {
-            "description": "The content to be published.",
-            "allow_multi_connection": True,
-            "widget": {
+    inputs = [
+        InputAttribute(
+            name="input_media",
+            description="The content to be published.",
+            allow_multi_connection=True,
+            widget={
                 "name": "filepath",
                 "caption": "Select a content",
                 "filter": "All Files (*.*)",
             },
-        },
-        "name": {
-            "description": "The representation name",
-        },
-        "frame_range": {
-            "description": "The representation frame range.",
-        },
-        "data": {
-            "description": "The raw representation dict data.",
-        },
-        "custom_tags": {
-            "description": "The representation custom tags.",
-        },
-        "tags": {
-            "description": "The representation tags.",
-        },
-    }
-    outputs = {
-        "output_representation": {
-            "description": "A representation ready to be published.",
-        }
-    }
+        ),
+        InputAttribute(
+            name="name",
+            description="The representation name",
+        ),
+        InputAttribute(
+            name="frame_range",
+            description="The representation frame range.",
+        ),
+        InputAttribute(
+            name="data",
+            description="The raw representation dict data.",
+        ),
+        InputAttribute(
+            name="custom_tags",
+            description="The representation custom tags.",
+        ),
+        InputAttribute(
+            name="tags",
+            description="The representation tags.",
+        ),
+    ]
+    outputs = [
+        OutputAttribute(
+            name="output_representation",
+            description="A representation ready to be published.",
+        ),
+    ]
 
     def execute(
         self,

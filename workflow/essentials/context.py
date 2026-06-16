@@ -3,40 +3,51 @@ from typing import Optional
 import ayon_api
 
 from ayon_workflow.datatypes import ContextItem, ProjectItem
-from ayon_workflow.plugin_system.interface import WorkflowNode
+from ayon_workflow.plugin_system import (
+    InputAttribute,
+    OutputAttribute,
+    WorkflowTaskNode,
+)
 
 from ._utils import get_folder_item, get_task_item
 
 
-class Context(WorkflowNode):
+class Context(WorkflowTaskNode):
     """Gather a valid AYON context item."""
 
     version = "0.0.1"
-    inputs = {
-        "project_name": {
-            "description": "The project name",
-        },
-        "folder_id": {
-            "description": "An optional folder ID.",
-        },
-        "folder_path": {
-            "description": "An optional folder path.",
-        },
-        "task_name": {
-            "description": "An optional task name.",
-        },
-        "task_type": {
-            "description": "An optional task type.",
-        },
-        "ensure_exists": {
-            "description": "Assert context existence.",
-        },
-    }
-    outputs = {
-        "context": {
-            "description": "The resolved context.",
-        }
-    }
+    inputs = [
+        InputAttribute(
+            name="project_name",
+            description="The project name",
+        ),
+        InputAttribute(
+            name="folder_id",
+            description="An optional folder ID.",
+        ),
+        InputAttribute(
+            name="folder_path",
+            description="An optional folder path.",
+        ),
+        InputAttribute(
+            name="task_name",
+            description="An optional task name.",
+        ),
+        InputAttribute(
+            name="task_type",
+            description="An optional task type.",
+        ),
+        InputAttribute(
+            name="ensure_exists",
+            description="Assert context existence.",
+        ),
+    ]
+    outputs = [
+        OutputAttribute(
+            name="context",
+            description="The resolved context.",
+        )
+    ]
 
     def execute(
         self,

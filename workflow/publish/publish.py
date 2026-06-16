@@ -18,46 +18,59 @@ from ayon_workflow.datatypes import (
     VersionItem,
 )
 from ayon_workflow.utils import remap_input
-from ayon_workflow.plugin_system.interface import WorkflowNode
+from ayon_workflow.plugin_system import (
+    InputAttribute,
+    OutputAttribute,
+    WorkflowTaskNode,
+)
 
 
-class Publish(WorkflowNode):
+class Publish(WorkflowTaskNode):
     """Publish file(s) or a media."""
 
     version = "0.0.1"
-    inputs = {
-        "input_paths": {
-            "description": "The content to be published.",
-            "allow_multi_connection": True,
-        },
-        "context": {
-            "description": "The publish context",
-        },
-        "product_type": {
-            "description": "The publish product type.",
-        },
-        "product_base_type": {
-            "description": "The publish base product type.",
-        },
-        "username": {
-            "description": "The username to use while publishing.",
-        },
-        "variant": {
-            "description": "The publish product variant.",
-        },
-        "comment": {
-            "description": "The publish comment.",
-            "widget": {"name": "text"},
-        },
-        "host_name": {
-            "description": "The associated host name.",
-        },
-    }
-    outputs = {
-        "published_version": {
-            "description": "The published version.",
-        },
-    }
+    inputs = [
+        InputAttribute(
+            name="input_paths",
+            description="The content to be published.",
+            allow_multi_connection=True,
+        ),
+        InputAttribute(
+            name="context",
+            description="The publish context",
+        ),
+        InputAttribute(
+            name="product_type",
+            description="The publish product type.",
+        ),
+        InputAttribute(
+            name="product_base_type",
+            description="The publish base product type.",
+        ),
+        InputAttribute(
+            name="username",
+            description="The username to use while publishing.",
+        ),
+        InputAttribute(
+            name="variant",
+            description="The publish product variant.",
+        ),
+        InputAttribute(
+            name="comment",
+            description="The publish comment.",
+            widget={"name": "text"},
+        ),
+        InputAttribute(
+            name="host_name",
+            description="The associated host name.",
+        ),
+    ]
+    outputs = [
+        OutputAttribute(
+            name="published_version",
+            description="The published version.",
+        ),
+    ]
 
     def execute(
         self,

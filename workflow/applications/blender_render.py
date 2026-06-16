@@ -9,9 +9,12 @@ from ayon_workflow.datatypes import (
     ContextItem,
     FrameRange,
 )
-
 from ayon_workflow.utils import remap_input
-from ayon_workflow.plugin_system.interface import WorkflowNode
+from ayon_workflow.plugin_system import (
+    InputAttribute,
+    OutputAttribute,
+    WorkflowTaskNode,
+)
 
 from . import _base
 
@@ -84,55 +87,67 @@ bpy.ops.render.render(animation=True)
 """
 
 
-class BlenderRender(WorkflowNode):
+class BlenderRender(WorkflowTaskNode):
     """ Renders a Blender scene using a given script and input resource.
     """
     version = "0.0.1"
-    inputs = {
-        "context": {
-            "description": "The render context.",
-        },
-        "blender_script_path": {
-            "description": "The path to the Blender script.",
-            "widget": {
+    inputs = [
+        InputAttribute(
+            name="context",
+            description="The render context.",
+        ),
+        InputAttribute(
+            name="blender_script_path",
+            description="The path to the Blender script.",
+            widget={
                 "name": "filepath",
                 "caption": "Select a Blender scene file",
                 "filter": "Blender Scene (*.blend)",
             },
-        },
-        "input_resource_path": {
-            "description": "A path to an input resource",
-            "widget": {"name": "filepath"},
-        },
-        "output_media": {
-            "description": "The output media",
-        },
-        "python_script_path": {
-            "description": "The path to a python script.",
-            "widget": {
+        ),
+        InputAttribute(
+            name="input_resource_path",
+            description="A path to an input resource",
+            widget={
+                "name": "filepath",
+            },
+        ),
+        InputAttribute(
+            name="output_media",
+            description="The output media",
+        ),
+        InputAttribute(
+            name="python_script_path",
+            description="The path to a python script.",
+            widget={
                 "name": "filepath",
                 "caption": "Select a Python file",
                 "filter": "Python Script (*.py)",
             },
-        },
-        "frame_range": {
-            "description": "Restrictive frame range.",
-        },
-        "blender_application_variant": {
-            "description": "An application variant to use.",
-        },
-        "log_file": {
-            "description": "Path to output logs.",
-        },
-        "restrict_to_task": {
-            "description": "Raises if context is not a Task.",
-        },
-    }
-    outputs = {
-        "rendered_media": {
-            "description": "The rendered media output.",
-        },
-    }
+        ),
+        InputAttribute(
+            name="frame_range",
+            description="Restrictive frame range.",
+        ),
+        InputAttribute(
+            name="blender_application_variant",
+            description="An application variant to use.",
+        ),
+        InputAttribute(
+            name="log_file",
+            description="Path to output logs.",
+        ),
+        InputAttribute(
+            name="restrict_to_task",
+            description="Raises if context is not a Task.",
+        ),
+    ]
+    outputs = [
+        OutputAttribute(
+            name="rendered_media",
+            description="The rendered media output.",
+        ),
+    ]
 
     def execute(
         self,
