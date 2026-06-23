@@ -104,6 +104,10 @@ def _build_workflow(
     )
     publish_nuke_node["product_type"] = "render"
     publish_nuke_node["variant"] = "Nuke"
+    publish_nuke_node["instance_data"] = {
+        "frameStart": FRAME_RANGE.first_frame,
+        "frameEnd": FRAME_RANGE.last_frame,
+    }
 
     # Connections
     context_node.connect(
@@ -171,4 +175,7 @@ def run_demo(
 
 
 if __name__ == "__main__":
-    run_demo("TODO", "TODO")
+    run_demo(
+        "TODO",  # project name
+        "TODO",  # folderPath to a folder with a Generic/Generic task
+    )

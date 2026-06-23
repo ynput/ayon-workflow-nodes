@@ -494,6 +494,18 @@ def get_plugins():
                     "type": str,
                     "default": "workflow",
                 },
+                {
+                    "name": "context_data",
+                    "description": "Optional context data.",
+                    "type": Dict[str, Any],
+                    "default": {},
+                },
+                {
+                    "name": "instance_data",
+                    "description": "Optional instance data.",
+                    "type": Dict[str, Any],
+                    "default": {},
+                }
             ],
             "outputs": [
                 {

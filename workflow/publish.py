@@ -35,6 +35,8 @@ def publish_content(
         variant: str = "Main",
         comment: str = "",
         host_name: str = "workflow",
+        context_data: Optional[Dict[str, Any]] = None,
+        instance_data: Optional[Dict[str, Any]] = None,
     ) -> VersionItem:
 
     # Make public ayon api behave as other user
@@ -110,7 +112,8 @@ def publish_content(
             "product_type": product_type,
             "product_base_type": product_base_type,
             "variant": variant,
-            "file_groups": in_data
+            "file_groups": in_data,
+            "instance_data": instance_data or {},
         }
     ]
 
@@ -119,6 +122,9 @@ def publish_content(
 
     if isinstance(context, TaskItem):
         pyblish_context.data["taskName"] = context.task_name
+
+    if context_data:
+        pyblish_context.data.update(context_data)
 
     pyblish.api.register_host("workflow")
 
