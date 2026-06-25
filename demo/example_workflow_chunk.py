@@ -12,10 +12,10 @@ from ayon_workflow.workflow_execution.from_backend import (
     chunk_img_sequence,
     job_description,
 )
-from ayon_workflow.plugin_system import register_plugins
+from ayon_workflow.plugin_system import register_all_plugins
 
 
-register_plugins()
+register_all_plugins()
 
 # Debugging logs
 logging.basicConfig()

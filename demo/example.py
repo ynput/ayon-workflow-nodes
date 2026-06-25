@@ -9,10 +9,10 @@ from ayon_core.lib import is_staging_enabled
 
 from ayon_workflow import workflow_editor
 from ayon_workflow import workflow_execution
-from ayon_workflow.plugin_system import register_plugins
+from ayon_workflow.plugin_system import register_all_plugins
 
 
-register_plugins()
+register_all_plugins()
 
 # Debugging logs
 logging.basicConfig()

@@ -64,6 +64,14 @@ class Publish(WorkflowTaskNode):
             name="host_name",
             description="The associated host name.",
         ),
+        InputAttribute(
+            name="context_data",
+            description="Optional context data.",
+        ),
+        InputAttribute(
+            name="instance_data",
+            description="Optional instance data.",
+        ),
     ]
     outputs = [
         OutputAttribute(

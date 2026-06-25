@@ -10,7 +10,7 @@ import pprint
 import logging
 
 from ayon_workflow.datatypes import FrameRange
-from ayon_workflow.plugin_system import register_plugins
+from ayon_workflow.plugin_system import register_all_plugins
 from ayon_workflow import workflow_editor, workflow_execution
 
 AYON_WORKFLOW_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -27,7 +27,7 @@ def _build_workflow(
         folder_path: str,
     ) -> workflow_editor.Workflow:
     # Discover all available node definitions
-    register_plugins()
+    register_all_plugins()
 
     workflow = workflow_editor.Workflow(name="Demo")
     graph = workflow.execution_graph
