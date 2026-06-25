@@ -7,10 +7,10 @@ from ayon_workflow.workflow_execution import(
     execute_workflow,
     WorkflowExecutionError
 )
-from ayon_workflow.plugin_system import register_plugins
+from ayon_workflow.plugin_system import register_all_plugins
 
 
-register_plugins.register_plugins()
+register_all_plugins()
 
 # Debugging logs
 logging.basicConfig()
