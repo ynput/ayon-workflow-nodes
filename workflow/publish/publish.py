@@ -1,5 +1,5 @@
 import os
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Dict, Any
 
 import pyblish.api
 import pyblish.util
@@ -82,6 +82,8 @@ class Publish(WorkflowTaskNode):
         variant: str = "Main",
         comment: str = "",
         host_name: str = "workflow",
+        context_data: Optional[Dict[str, Any]] = None,
+        instance_data: Optional[Dict[str, Any]] = None,
     ) -> VersionItem:
         # Make public ayon api behave as other user.
         # this works only if public ayon api is using service user
@@ -160,6 +162,7 @@ class Publish(WorkflowTaskNode):
                 "product_base_type": product_base_type,
                 "variant": variant,
                 "file_groups": in_data,
+                "instance_data": instance_data or {},
             }
         ]
 
@@ -168,6 +171,9 @@ class Publish(WorkflowTaskNode):
 
         if isinstance(context, TaskItem):
             pyblish_context.data["taskName"] = context.task_name
+
+        if context_data:
+            pyblish_context.data.update(context_data)
 
         pyblish.api.register_host("workflow")
 

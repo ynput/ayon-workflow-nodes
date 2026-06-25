@@ -80,6 +80,14 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
                 "variant": instance_to_collect["variant"],
                 "representations": [],
             }
+            if isinstance(instance_to_collect.get("instance_data"), dict):
+                self.log.debug(
+                    "Updating instance data from provided data: "
+                    f"{instance_to_collect['instance_data']}"
+                )
+                instance_data.update(instance_to_collect["instance_data"])
+
+            # Collect instances from file groups
             for file_group in instance_to_collect["file_groups"]:
 
                 # consolidate all inputs as RepresentationItem
@@ -111,3 +119,6 @@ class CollectFromProvidedFiles(pyblish.api.ContextPlugin):
 
             instance = context.create_instance(instance_data["productName"])
             instance.data.update(instance_data)
+            self.log.debug(
+                f"Collected instance: {instance_data['productName']}"
+            )
