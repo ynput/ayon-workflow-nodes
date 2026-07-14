@@ -1,6 +1,6 @@
 """ Event-based input nodes.
 """
-from entity_version_created import EntityVersionCreated
+from .entity_version_created import EntityVersionCreated
 
 
 __all__ = [
