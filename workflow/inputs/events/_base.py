@@ -22,7 +22,6 @@ class EventTrigger(WorkflowInputTaskNode):
         InputAttribute(
             name="event_id",
             description="An input data to be injected as-is.",
-            default=None,
         )
     ]
 
@@ -46,7 +45,7 @@ class EventTrigger(WorkflowInputTaskNode):
             rebind=rebind,
         )
 
-    def execute(self, event_id: Optional[str]) -> Dict[str, Any]:
+    def execute(self, event_id: Optional[str] = None) -> Dict[str, Any]:
         """ Return the event data.
         """
         if event_id is None:

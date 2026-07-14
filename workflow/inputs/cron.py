@@ -21,7 +21,7 @@ class Cron(WorkflowInputTaskNode):
     outputs = []
 
     def execute(self, cron_expression: str) -> Any:
-        """ Return the input data as-is.
+        """ Validate the cron expression.
         """
         if not croniter.is_valid(cron_expression, strict=True):
             raise ValueError(
