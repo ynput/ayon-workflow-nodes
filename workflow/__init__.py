@@ -8,6 +8,10 @@ def get_plugins() -> list[WorkflowNode]:
     Returns a list of workflow nodes available in this plugin.
     """
 
+    from .applications.nuke import NukeRender
+    from .applications.blender_render import BlenderRender
+    from .applications.blender_workfile import BlenderWorkfile
+
     from .essentials.append import Append
     from .essentials.context import Context
     from .essentials.image_sequence import ImageSequenceNode
@@ -16,12 +20,10 @@ def get_plugins() -> list[WorkflowNode]:
     from .essentials.task_context import TaskContext
     from .essentials.video import VideoNode
 
+    from .inputs.generic import GenericInput
+
     from .publish.publish import Publish
     from .publish.representation import Representation
-
-    from .applications.nuke import NukeRender
-    from .applications.blender_render import BlenderRender
-    from .applications.blender_workfile import BlenderWorkfile
 
     from .ui_test import UITest
 
@@ -39,6 +41,7 @@ def get_plugins() -> list[WorkflowNode]:
         Publish,
         Representation,
         UITest,
+        GenericInput,
     ]
 
 
