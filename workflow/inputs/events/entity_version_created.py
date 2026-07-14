@@ -39,7 +39,7 @@ class EntityVersionCreated(EventTrigger):
         return (
             ContextItem(
                 project_name=event_data["project"],
-                folder_id=event_data["folder_id"],
+                # TODO: return folder associated instead of version item
             ),
             VersionItem(
                 version_id=event_data["summary"]["entityId"],
