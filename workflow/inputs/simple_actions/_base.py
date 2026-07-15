@@ -13,11 +13,11 @@ from ayon_workflow.plugin_system import (
 log = logging.getLogger(__name__)
 
 
-class EventTrigger(WorkflowInputTaskNode):
-    """A base class for event trigger node."""
+class SimpleActionTrigger(WorkflowInputTaskNode):
+    """A base class to trigger from simple action."""
 
     version = "0.0.1"
-    event_type: Optional[str] = None
+    scope_context: Optional[str] = None
     inputs = [
         InputAttribute(
             name="event_id",
@@ -32,10 +32,11 @@ class EventTrigger(WorkflowInputTaskNode):
         inject: Optional[dict[str, Any]] = None,
         rebind: Optional[dict[str, str]] = None,
     ):
-        if self.event_type is None:
+        if self.scope_context is None:
             log.warning(
-                f"Event trigger class {self.__class__.__name__} does not "
-                "define event type. It is required for the event processor."
+                f"Simple action trigger class {self.__class__.__name__} does "
+                "not define a scope context. It is required for the event "
+                "processor."
             )
 
         super().__init__(
