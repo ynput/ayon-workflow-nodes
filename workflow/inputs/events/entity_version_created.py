@@ -7,7 +7,7 @@ from ayon_workflow.datatypes import (
 from ayon_workflow.plugin_system import (
     OutputAttribute,
 )
-from ._base import EventTrigger
+from .base import EventTrigger
 
 
 class EntityVersionCreated(EventTrigger):
@@ -27,8 +27,8 @@ class EntityVersionCreated(EventTrigger):
     ]
 
     def execute(
-            self,
-            event_id: Optional[str] = None
+        self,
+        event_id: Optional[str] = None
     ) -> Tuple[Optional[ContextItem], Optional[VersionItem]]:
         """ Return the context and version item associated to the event.
         """

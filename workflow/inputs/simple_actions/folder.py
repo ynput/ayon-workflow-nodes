@@ -6,7 +6,7 @@ from ayon_workflow.datatypes import (
 from ayon_workflow.plugin_system import (
     OutputAttribute,
 )
-from ._base import SimpleActionTrigger
+from .base import SimpleActionTrigger
 
 
 class ActionFromFolder(SimpleActionTrigger):
@@ -22,8 +22,8 @@ class ActionFromFolder(SimpleActionTrigger):
     ]
 
     def execute(
-            self,
-            event_id: Optional[str] = None
+        self,
+        event_id: Optional[str] = None
     ) -> Optional[ContextItem]:
         """ Return the context item associated to the simple action.
         """
@@ -33,5 +33,6 @@ class ActionFromFolder(SimpleActionTrigger):
         event_data = super().execute(event_id)
         return ContextItem(
             project_name=event_data["project"],
-            #folder_id=
+            # TODO: fill up folderId from provided event_id
+            #folder_id=...
         )
