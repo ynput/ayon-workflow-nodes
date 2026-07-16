@@ -23,7 +23,7 @@ class Cron(WorkflowInputTaskNode):
     def execute(self, cron_expression: str) -> Any:
         """ Validate the cron expression.
         """
-        if not croniter.is_valid(cron_expression, strict=True):
+        if not croniter.croniter.is_valid(cron_expression, strict=True):
             raise ValueError(
                 f"Invalid cron expression: {cron_expression}"
             )

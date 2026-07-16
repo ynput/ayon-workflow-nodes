@@ -1,7 +1,10 @@
 from typing import Optional, Tuple
 
+import ayon_api
+
 from ayon_workflow.datatypes import (
     ContextItem,
+    ProjectItem,
     VersionItem,
 )
 from ayon_workflow.plugin_system import (
@@ -36,14 +39,19 @@ class EntityVersionCreated(EventTrigger):
             return None, None
 
         event_data = super().execute(event_id)
+        version_data = ayon_api.get_version_by_id(
+            event_data["project"],
+            event_data["summary"]["entityId"],
+        )
+
         return (
-            ContextItem(
+            ProjectItem(
                 project_name=event_data["project"],
-                # TODO: return folder associated instead of version item
+                # return folder associated to the product ?
             ),
             VersionItem(
                 version_id=event_data["summary"]["entityId"],
                 product_id=event_data["summary"]["parentId"],
-                version=None
+                version=version_data["version"],
             )
         )
