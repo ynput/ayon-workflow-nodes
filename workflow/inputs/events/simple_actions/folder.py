@@ -6,14 +6,17 @@ from ayon_workflow.datatypes import (
 from ayon_workflow.plugin_system import (
     OutputAttribute,
 )
-from .base import SimpleActionTrigger
+from ..base import EventTrigger
 
 
-class ActionFromFolder(SimpleActionTrigger):
+class ActionFromFolder(EventTrigger):
     """Trigger node: on simple action from folder."""
 
     version = "0.0.1"
-    scope_context = "Folder"
+    event_type = [
+        "workflow.from_simple_action.local",
+        "workflow.from_simple_action.remote",
+    ]
     outputs = [
         OutputAttribute(
             name="event_context",

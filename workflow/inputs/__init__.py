@@ -1,9 +1,8 @@
 """ Input nodes.
 """
 from .cron import Cron
-from .events import EventTrigger, EntityVersionCreated
+from .events import EventTrigger, EntityVersionCreated, ActionFromFolder
 from .generic import GenericInput
-from .simple_actions import SimpleActionTrigger, ActionFromFolder
 
 
 __all__ = [
@@ -12,5 +11,4 @@ __all__ = [
     "EventTrigger",
     "EntityVersionCreated",
     "GenericInput",
-    "SimpleActionTrigger",
 ]
