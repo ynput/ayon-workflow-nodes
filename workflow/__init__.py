@@ -21,9 +21,8 @@ def get_plugins() -> list[WorkflowNode]:
     from .essentials.video import VideoNode
 
     from .inputs.cron import Cron
-    from .inputs.events import EntityVersionCreated
+    from .inputs.events import EntityVersionCreated, ActionFromFolder
     from .inputs.generic import GenericInput
-    from .inputs.simple_actions import ActionFromFolder
 
     from .publish.publish import Publish
     from .publish.representation import Representation

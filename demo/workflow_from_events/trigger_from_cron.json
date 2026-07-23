@@ -1,0 +1,62 @@
+{
+  "name": "CronWorkflow",
+  "description": "Test trigger from cron.",
+  "execution_graph": {
+    "name": "Untitled Graph",
+    "description": "",
+    "all_nodes": [
+      {
+        "plugin_ref": {
+          "name": "Cron",
+          "version": "0.0.1"
+        },
+        "name": "Cron1",
+        "label": "Cron1",
+        "static_values": {
+          "cron_expression": "*/1 * * * *"
+        },
+        "input_connections": {
+          "cron_expression": null
+        },
+        "ui": {
+          "position": [
+            500.25,
+            464.5
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "NoOp",
+          "version": "0.0.1"
+        },
+        "name": "NoOp1",
+        "label": "NoOp1",
+        "static_values": {
+          "input_data": "Do nothing here"
+        },
+        "input_connections": {
+          "input_data": null
+        },
+        "ui": {
+          "position": [
+            162.375,
+            429
+          ],
+          "color": null,
+          "size": null
+        }
+      }
+    ],
+    "ui": {
+      "viewport_framing": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1
+      }
+    }
+  },
+  "dispatch_graphs": []
+}

@@ -4,10 +4,12 @@ from ayon_workflow.datatypes import (
     ContextItem,
 )
 from ayon_workflow.plugin_system import (
+    InputAttribute,
     OutputAttribute,
 )
-from ..base import EventTrigger
 
+from ayon_workflow.plugins.workflow.essentials import _utils
+from ..base import EventTrigger
 
 class ActionFromFolder(EventTrigger):
     """Trigger node: on simple action from folder."""
@@ -16,6 +18,16 @@ class ActionFromFolder(EventTrigger):
     event_type = [
         "workflow.from_simple_action.local",
         "workflow.from_simple_action.remote",
+    ]
+    inputs = [
+        InputAttribute(
+            name="project_name",
+            description="The project name.",
+        ),
+        InputAttribute(
+            name="entity_id",
+            description="The entity ID.",
+        ),
     ]
     outputs = [
         OutputAttribute(
@@ -26,16 +38,18 @@ class ActionFromFolder(EventTrigger):
 
     def execute(
         self,
-        event_id: Optional[str] = None
+        project_name: Optional[str] = None,
+        entity_id: Optional[str] = None
     ) -> Optional[ContextItem]:
         """ Return the context item associated to the simple action.
         """
-        if event_id is None:
+        if (
+            project_name is None
+            or entity_id is None
+        ):
             return None
 
-        event_data = super().execute(event_id)
-        return ContextItem(
-            project_name=event_data["project"],
-            # TODO: fill up folderId from provided event_id
-            #folder_id=...
+        return _utils.get_folder_item(
+            project_name,
+            folder_id=entity_id,
         )
