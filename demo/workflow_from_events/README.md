@@ -14,9 +14,9 @@
 }
 ```
 2. This register this 3 workflows from the directory:
-* `trigger_from_cron`: Autmatically triggered from cron expression every minute.
-* `trigger_from_version_created_event`: Triggered from external event when a new version is created.
-* `trigger_from_simple_action`: Triggered from the `SimpleActionWorkflow` simple action defined in settings (locally or remotely).
+    * `trigger_from_cron`: Autmatically triggered from cron expression every minute.
+    * `trigger_from_version_created_event`: Triggered from external event when a new version is created.
+    * `trigger_from_simple_action`: Triggered from the `SimpleActionWorkflow` simple action defined in settings (locally or remotely).
 3. Run the processor through ayon launcher: `$AYON_EXECUTABLE --use-dev --verbose info .\client\ayon_workflow\event_processor.py`
 4. Results:
     * Ensure the cron workflow is triggered on its own every minutes.
