@@ -20,8 +20,6 @@ def get_plugins() -> list[WorkflowNode]:
     from .essentials.task_context import TaskContext
     from .essentials.video import VideoNode
 
-    from .inputs.generic import GenericInput
-
     from .publish.publish import Publish
     from .publish.representation import Representation
 
@@ -41,7 +39,6 @@ def get_plugins() -> list[WorkflowNode]:
         Publish,
         Representation,
         UITest,
-        GenericInput,
     ]
 
 
