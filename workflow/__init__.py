@@ -22,7 +22,6 @@ def get_plugins() -> list[WorkflowNode]:
 
     from .inputs.cron import Cron
     from .inputs.events import EntityVersionCreated, ActionFromFolder
-    from .inputs.generic import GenericInput
 
     from .publish.publish import Publish
     from .publish.representation import Representation
@@ -43,7 +42,6 @@ def get_plugins() -> list[WorkflowNode]:
         Publish,
         Representation,
         UITest,
-        GenericInput,
         EntityVersionCreated,
         Cron,
         ActionFromFolder,
