@@ -3,15 +3,10 @@
 from ayon_workflow.plugin_system.interface import WorkflowNode
 
 
-def get_plugins() -> list[WorkflowNode]:
+def get_server_plugins() -> list[WorkflowNode]:
     """
-    Returns a list of workflow nodes available in this plugin.
+    Returns a list of light workflow nodes available in this plugin.
     """
-
-    from .applications.nuke import NukeRender
-    from .applications.blender_render import BlenderRender
-    from .applications.blender_workfile import BlenderWorkfile
-
     from .essentials.append import Append
     from .essentials.context import Context
     from .essentials.image_sequence import ImageSequenceNode
@@ -22,11 +17,7 @@ def get_plugins() -> list[WorkflowNode]:
 
     from .inputs.cron import Cron
     from .inputs.events import EntityVersionCreated, ActionFromFolder
-
-    from .publish.publish import Publish
     from .publish.representation import Representation
-
-    from .ui_test import UITest
 
     return [
         NoOp,
@@ -36,15 +27,32 @@ def get_plugins() -> list[WorkflowNode]:
         VideoNode,
         ImageSequenceNode,
         MergeSequence,
+        Representation,
+        EntityVersionCreated,
+        Cron,
+        ActionFromFolder,
+    ]
+
+
+def get_plugins() -> list[WorkflowNode]:
+    """
+    Returns a list of workflow nodes available in this plugin.
+    """
+
+    from .applications.nuke import NukeRender
+    from .applications.blender_render import BlenderRender
+    from .applications.blender_workfile import BlenderWorkfile
+
+    from .publish.publish import Publish
+
+    from .ui_test import UITest
+
+    return get_server_plugins() + [
         NukeRender,
         BlenderRender,
         BlenderWorkfile,
         Publish,
-        Representation,
         UITest,
-        EntityVersionCreated,
-        Cron,
-        ActionFromFolder,
     ]
 
 
