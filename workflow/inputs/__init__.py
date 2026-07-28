@@ -2,7 +2,6 @@
 """
 from .cron import Cron
 from .events import EventTrigger, EntityVersionCreated, ActionFromFolder
-from .generic import GenericInput
 
 
 __all__ = [
@@ -10,5 +9,4 @@ __all__ = [
     "Cron",
     "EventTrigger",
     "EntityVersionCreated",
-    "GenericInput",
 ]
