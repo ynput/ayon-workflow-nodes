@@ -53,14 +53,15 @@ class Guard(WorkflowTaskNode):
             result = bool(condition)
 
         if not result:
-            # Stop the execution of current engine.
+            # flag all remaining atoms from current flow as IGNORED.
             if _engine is not None:
+                _set_engine_atoms_as_ignored(_engine)
                 _engine.suspend()
 
-            # Execution is run from a backend,
-            # flag all remaining atoms as IGNORED.
+            # If execution is run from a backend, flag all
+            # remaining atoms from other flows as IGNORED.
             if _backend_directory and _main_flow_id:
-                _set_atoms_in_backend_as_ignored(
+                _set_other_atoms_in_backend_as_ignored(
                     _backend_directory,
                     _main_flow_id
                 )
@@ -68,7 +69,17 @@ class Guard(WorkflowTaskNode):
         return input_data
 
 
-def _set_atoms_in_backend_as_ignored(
+
+def _set_engine_atoms_as_ignored(engine):
+    atom_names = list(engine.storage._atom_name_to_uuid.keys())
+    atom_states = engine.storage.get_atoms_states(atom_names)
+    for name, (state, _) in atom_states.items():
+        if state == states.PENDING:
+            engine.storage.set_atom_state(name, states.IGNORE)
+            engine.storage.set_atom_intention(name, states.IGNORE)
+
+
+def _set_other_atoms_in_backend_as_ignored(
     backend_directory: str,
     main_flow_id: str,
 ):
