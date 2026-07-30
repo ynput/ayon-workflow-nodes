@@ -91,7 +91,10 @@ def _set_other_atoms_in_backend_as_ignored(
     with contextlib.closing(backend.get_connection()) as conn:
         logbook = conn.get_logbook(dir_backend.LOGBOOK_NAME)
         main_flow_details = logbook.find(main_flow_id)
-        for atom_detail in conn.get_atoms_for_flow(main_flow_details.uuid):
+        if main_flow_details is None:
+            raise RuntimeError(
+                f"Cannot find main flow '{main_flow_id}' in backend directory: {backend_directory}"
+            )
             if atom_detail.state != states.PENDING:
                 continue
 
