@@ -71,7 +71,7 @@ class Guard(WorkflowTaskNode):
 
 
 def _set_engine_atoms_as_ignored(engine):
-    atom_names = list(engine.storage._atom_name_to_uuid.keys())
+    atom_names = [atom.name for atom in engine._flow]
     atom_states = engine.storage.get_atoms_states(atom_names)
     for name, (state, _) in atom_states.items():
         if state == states.PENDING:
