@@ -93,8 +93,11 @@ def _set_other_atoms_in_backend_as_ignored(
         main_flow_details = logbook.find(main_flow_id)
         if main_flow_details is None:
             raise RuntimeError(
-                f"Cannot find main flow '{main_flow_id}' in backend directory: {backend_directory}"
+                f"Cannot find main flow {main_flow_id} "
+                f"in backend directory: {backend_directory}"
             )
+
+        for atom_detail in conn.get_atoms_for_flow(main_flow_details.uuid):
             if atom_detail.state != states.PENDING:
                 continue
 
