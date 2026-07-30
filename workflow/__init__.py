@@ -12,6 +12,8 @@ def get_plugins() -> list[WorkflowNode]:
     from .applications.blender_render import BlenderRender
     from .applications.blender_workfile import BlenderWorkfile
 
+    from .conditions.guard import Guard
+
     from .essentials.append import Append
     from .essentials.context import Context
     from .essentials.image_sequence import ImageSequenceNode
@@ -29,6 +31,7 @@ def get_plugins() -> list[WorkflowNode]:
         NoOp,
         Append,
         Context,
+        Guard,
         TaskContext,
         VideoNode,
         ImageSequenceNode,
