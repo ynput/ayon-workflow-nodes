@@ -21,7 +21,11 @@ def get_plugins() -> list[WorkflowNode]:
     from .essentials.video import VideoNode
 
     from .inputs.cron import OnSchedule
-    from .inputs.events import OnVersionCreated, OnActionFromFolder
+    from .inputs.events import (
+        OnVersionCreated,
+        OnActionFromFolder,
+        OnActionFromVersion,
+    )
 
     from .publish.publish import Publish
     from .publish.representation import Representation
@@ -44,6 +48,7 @@ def get_plugins() -> list[WorkflowNode]:
         UITest,
         OnVersionCreated,
         OnActionFromFolder,
+        OnActionFromVersion,
         OnSchedule,
     ]
 

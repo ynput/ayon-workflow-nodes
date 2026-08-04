@@ -5,8 +5,8 @@
     {
       "enabled": true,
       "local": true,
-      "workflow_name": "SimpleActionWorkflow",
-      "label": "My custom Workflow trigger",
+      "workflow_name": "SimpleActionWorkflowFolder",
+      "label": "My custom Folder trigger",
       "input_entity": "Folder"
     }
   ],
