@@ -1,8 +1,8 @@
 """ Simple actions input nodes.
 """
-from .folder import ActionFromFolder
+from .folder import OnActionFromFolder
 
 
 __all__ = [
-    "ActionFromFolder",
+    "OnActionFromFolder",
 ]

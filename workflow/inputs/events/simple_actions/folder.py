@@ -11,7 +11,7 @@ from ayon_workflow.plugin_system import (
 from ayon_workflow.plugins.workflow.essentials import _utils
 from ..base import EventTrigger
 
-class ActionFromFolder(EventTrigger):
+class OnActionFromFolder(EventTrigger):
     """Trigger node: on simple action from folder."""
 
     version = "0.0.1"

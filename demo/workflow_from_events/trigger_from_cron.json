@@ -7,7 +7,7 @@
     "all_nodes": [
       {
         "plugin_ref": {
-          "name": "Cron",
+          "name": "OnSchedule",
           "version": "0.0.1"
         },
         "name": "Cron1",

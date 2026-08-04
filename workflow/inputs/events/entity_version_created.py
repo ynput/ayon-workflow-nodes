@@ -13,7 +13,7 @@ from ayon_workflow.plugin_system import (
 from .base import EventTrigger
 
 
-class EntityVersionCreated(EventTrigger):
+class OnVersionCreated(EventTrigger):
     """Trigger node: on new version created."""
 
     version = "0.0.1"

@@ -7,7 +7,7 @@
     "all_nodes": [
       {
         "plugin_ref": {
-          "name": "ActionFromFolder",
+          "name": "OnActionFromFolder",
           "version": "0.0.1"
         },
         "name": "ActionFromFolder1",

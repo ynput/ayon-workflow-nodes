@@ -8,8 +8,8 @@ from ayon_workflow.plugin_system import (
 )
 
 
-class Cron(WorkflowInputTaskNode):
-    """A cron trigger input node."""
+class OnSchedule(WorkflowInputTaskNode):
+    """A cron-based trigger input node."""
 
     version = "0.0.1"
     inputs = [
