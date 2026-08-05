@@ -1,0 +1,61 @@
+{
+  "name": "SimpleActionWorkflowFolder",
+  "description": "Test trigger from simple action event (Folder scope).",
+  "execution_graph": {
+    "name": "SimpleActionWorkflowFolder",
+    "description": "Test trigger from simple action event (Folder scope).",
+    "all_nodes": [
+      {
+        "plugin_ref": {
+          "name": "OnActionFromFolder",
+          "version": "0.0.1"
+        },
+        "name": "ActionFromFolder1",
+        "label": "ActionFromFolder1",
+        "static_values": {},
+        "input_connections": {
+          "event_id": null
+        },
+        "ui": {
+          "position": [
+            -50.25,
+            269
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "NoOp",
+          "version": "0.0.1"
+        },
+        "name": "NoOp1",
+        "label": "NoOp1",
+        "static_values": {},
+        "input_connections": {
+          "input_data": {
+            "origin_node_name": "ActionFromFolder1",
+            "origin_node_output": "event_context"
+          }
+        },
+        "ui": {
+          "position": [
+            577.875,
+            250.5
+          ],
+          "color": null,
+          "size": null
+        }
+      }
+    ],
+    "ui": {
+      "viewport_framing": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1
+      }
+    }
+  },
+  "dispatch_graphs": []
+}
