@@ -3,6 +3,7 @@ from typing import Any, Union, Optional
 import contextlib
 
 from taskflow import states
+from taskflow.engines.action_engine import engine
 
 from ayon_workflow.plugin_system import (
     InputAttribute,
@@ -32,7 +33,7 @@ class Guard(WorkflowTaskNode):
     ]
     outputs = [
         OutputAttribute(
-            name="result",
+            name="output_data",
             description="The result of the guard.",
         )
     ]
@@ -40,15 +41,19 @@ class Guard(WorkflowTaskNode):
     def execute(
             self,
             input_data: Any,
-            condition: Union[bool, str, None] = None,
-            _engine = None,
+            condition: Union[bool, str, None] = True,
+            _engine: Optional[engine.ActionEngine] = None,
             _backend_directory: Optional[str] = None,
             _main_flow_id: Optional[str] = None,
     ) -> Any:
         if condition is None:
             result = bool(input_data)
         elif isinstance(condition, str):
-            result = eval(condition)
+            result = bool(eval(
+                condition,
+                {"__builtins__": {}},
+                {"input_data": input_data},
+            ))
         else:
             result = bool(condition)
 
@@ -67,7 +72,6 @@ class Guard(WorkflowTaskNode):
                 )
 
         return input_data
-
 
 
 def _set_engine_atoms_as_ignored(engine):
