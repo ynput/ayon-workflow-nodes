@@ -54,7 +54,7 @@ class Branch(WorkflowTaskNode):
     def execute(
             self,
             input_data: Any,
-            condition: Union[bool, str, None] = True,
+            condition: Union[bool, str, None] = None,
             _engine: Optional[engine.ActionEngine] = None,
             _backend_directory: Optional[str] = None,
             _main_flow_id: Optional[str] = None,
