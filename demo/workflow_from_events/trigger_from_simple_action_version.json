@@ -1,27 +1,25 @@
 {
-  "name": "CronWorkflow",
-  "description": "Test trigger from cron.",
+  "name": "SimpleActionWorkflowVersion",
+  "description": "Test trigger from simple action event (Version scope).",
   "execution_graph": {
-    "name": "Untitled Graph",
-    "description": "",
+    "name": "SimpleActionWorkflowVersion",
+    "description": "Test trigger from simple action event (Version scope).",
     "all_nodes": [
       {
         "plugin_ref": {
-          "name": "OnSchedule",
+          "name": "OnActionFromVersion",
           "version": "0.0.1"
         },
-        "name": "Cron1",
-        "label": "Cron1",
-        "static_values": {
-          "cron_expression": "*/1 * * * *"
-        },
+        "name": "ActionFromFolder1",
+        "label": "ActionFromFolder1",
+        "static_values": {},
         "input_connections": {
-          "cron_expression": null
+          "event_id": null
         },
         "ui": {
           "position": [
-            500.25,
-            464.5
+            -50.25,
+            269
           ],
           "color": null,
           "size": null
@@ -34,16 +32,17 @@
         },
         "name": "NoOp1",
         "label": "NoOp1",
-        "static_values": {
-          "input_data": "Do nothing here"
-        },
+        "static_values": {},
         "input_connections": {
-          "input_data": null
+          "input_data": {
+            "origin_node_name": "ActionFromFolder1",
+            "origin_node_output": "event_context"
+          }
         },
         "ui": {
           "position": [
-            162.375,
-            429
+            577.875,
+            250.5
           ],
           "color": null,
           "size": null

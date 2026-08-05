@@ -7,7 +7,7 @@
     "all_nodes": [
       {
         "plugin_ref": {
-          "name": "EntityVersionCreated",
+          "name": "OnVersionCreated",
           "version": "0.0.1"
         },
         "name": "EntityVersionCreated1",

@@ -1,12 +1,18 @@
 """ Input nodes.
 """
-from .cron import Cron
-from .events import EventTrigger, EntityVersionCreated, ActionFromFolder
+from .cron import OnSchedule
+from .events import (
+    EventTrigger,
+    OnVersionCreated,
+    OnActionFromFolder,
+    OnActionFromVersion,
+)
 
 
 __all__ = [
-    "ActionFromFolder",
-    "Cron",
+    "OnActionFromFolder",
+    "OnActionFromVersion",
+    "OnSchedule",
     "EventTrigger",
-    "EntityVersionCreated",
+    "OnVersionCreated",
 ]

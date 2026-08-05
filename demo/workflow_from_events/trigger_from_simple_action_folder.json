@@ -1,13 +1,13 @@
 {
-  "name": "SimpleActionWorkflow",
+  "name": "SimpleActionWorkflowFolder",
   "description": "Test trigger from simple action event (Folder scope).",
   "execution_graph": {
-    "name": "SimpleActionWorkflow",
+    "name": "SimpleActionWorkflowFolder",
     "description": "Test trigger from simple action event (Folder scope).",
     "all_nodes": [
       {
         "plugin_ref": {
-          "name": "ActionFromFolder",
+          "name": "OnActionFromFolder",
           "version": "0.0.1"
         },
         "name": "ActionFromFolder1",
