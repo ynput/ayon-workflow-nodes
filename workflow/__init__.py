@@ -20,6 +20,13 @@ def get_plugins() -> list[WorkflowNode]:
     from .essentials.task_context import TaskContext
     from .essentials.video import VideoNode
 
+    from .inputs.cron import OnSchedule
+    from .inputs.events import (
+        OnVersionCreated,
+        OnActionFromFolder,
+        OnActionFromVersion,
+    )
+
     from .publish.publish import Publish
     from .publish.representation import Representation
 
@@ -39,6 +46,10 @@ def get_plugins() -> list[WorkflowNode]:
         Publish,
         Representation,
         UITest,
+        OnVersionCreated,
+        OnActionFromFolder,
+        OnActionFromVersion,
+        OnSchedule,
     ]
 
 
