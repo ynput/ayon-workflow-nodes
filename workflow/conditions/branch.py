@@ -46,10 +46,10 @@ class Branch(WorkflowConditionTaskNode):
             _main_flow_id: Optional[str] = None,
     ) -> Tuple[Any, Any]:
         if self.evaluate_condition(condition, input_data=input_data):
-            ignored_output = list(self.provides)[1]
+            ignored_output = "on_False"
             result = input_data, None
         else:
-            ignored_output = list(self.provides)[0]
+            ignored_output = "on_True"
             result = None, input_data
 
         # Ignore downstream task(s) connected to ignored output.
