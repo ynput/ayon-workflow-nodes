@@ -4,13 +4,12 @@ from taskflow.engines.action_engine import engine
 
 from ayon_workflow.plugin_system import (
     InputAttribute,
-    OutputAttribute,
-    WorkflowTaskNode,
+    ConditionOutputAttribute,
+    WorkflowConditionTaskNode,
 )
-from ayon_workflow.plugins.workflow.conditions import _utils
 
 
-class Guard(WorkflowTaskNode):
+class Guard(WorkflowConditionTaskNode):
     """Stop properly a workflow based on a condition."""
 
     version = "0.0.1"
@@ -28,32 +27,28 @@ class Guard(WorkflowTaskNode):
         ),
     ]
     outputs = [
-        OutputAttribute(
+        ConditionOutputAttribute(
             name="output_data",
-            description="The result of the guard.",
+            description="The result of the guard when condition is met.",
         )
     ]
 
     def execute(
             self,
             input_data: Any,
-            condition: Union[bool, str, None] = None,
+            condition: Union[bool, str, None] = True,
             _engine: Optional[engine.ActionEngine] = None,
             _backend_directory: Optional[str] = None,
             _main_flow_id: Optional[str] = None,
     ) -> Any:
-        if not _utils.evaluate_condition(condition, input_data):
-            # flag all remaining atoms from current flow as IGNORED.
-            if _engine is not None:
-                _utils.ignore_pending_atoms_in_engine(_engine)
-                _engine.suspend()
+        result = self.evaluate_condition(condition, input_data=input_data)
 
-            # If execution is run from a backend, flag all
-            # remaining atoms from other flows as IGNORED.
-            if _backend_directory and _main_flow_id:
-                _utils.ignore_pending_atoms_in_backend(
-                    _backend_directory,
-                    _main_flow_id
-                )
+        # Skip all pending task if condition is not met.
+        if not result:
+            self.skip_output(
+                _engine=_engine,
+                _backend_directory=_backend_directory,
+                _main_flow_id=_main_flow_id,
+            )
 
         return input_data
