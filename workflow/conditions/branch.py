@@ -22,7 +22,9 @@ class Branch(WorkflowConditionTaskNode):
             name="condition",
             description=(
                 "The condition to evaluate. "
-                "Defaults to bool(input_data)."
+                "Defaults to bool(input_data). "
+                "If a string is provided, it is evaluated as a Python "
+                "expression against `input_data` (trusted workflows only)."
             ),
         ),
     ]
