@@ -81,7 +81,7 @@ def check_python_script_path(
     """
     remap_script_path = remap_input(
         python_script_path,
-        project_name,
+        project_name=project_name,
     )
 
     if not os.path.exists(remap_script_path):

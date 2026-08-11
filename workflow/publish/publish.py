@@ -153,7 +153,7 @@ class Publish(WorkflowTaskNode):
 
         if isinstance(input_paths, list):
             in_data = [
-                remap_input(input_path, project_name)
+                remap_input(input_path, project_name=project_name)
                 for input_path in input_paths
             ]
         else:

@@ -164,7 +164,7 @@ class BlenderRender(WorkflowTaskNode):
         # Construct render command line args.
         blender_script_path = remap_input(
             blender_script_path,
-            context.project_name,
+            project_name=context.project_name,
         )
 
         if python_script_path:
@@ -208,7 +208,10 @@ class BlenderRender(WorkflowTaskNode):
                 ]
             )
 
-        remapped_output_media = remap_input(output_media, context.project_name)
+        remapped_output_media = remap_input(
+            output_media,
+            project_name=context.project_name,
+        )
         app_args.extend(
             [
                 "--output_path",
@@ -222,7 +225,7 @@ class BlenderRender(WorkflowTaskNode):
         if input_resource_path:
             input_resource_path = remap_input(
                 input_resource_path,
-                context.project_name,
+                project_name=context.project_name,
             )
             app_args.extend(
                 [
@@ -241,7 +244,7 @@ class BlenderRender(WorkflowTaskNode):
 
             log_file = remap_input(
                 log_file,
-                context.project_name,
+                project_name=context.project_name,
             )
 
         # Start application.
