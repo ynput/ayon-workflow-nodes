@@ -14,7 +14,8 @@
         "label": "ActionFromFolder1",
         "static_values": {},
         "input_connections": {
-          "event_id": null
+          "project_name": null,
+          "entity_id": null
         },
         "ui": {
           "position": [
@@ -57,5 +58,37 @@
       }
     }
   },
-  "dispatch_graphs": []
+  "dispatch_graphs": [
+    {
+      "name": "Dispatch Graph",
+      "description": "",
+      "default_task_cls": "DeadlineThinkbox",
+      "ui": {
+        "viewport_framing": null
+      },
+      "all_nodes": [
+        {
+          "name": "DeadlineThinkbox1",
+          "label": "DeadlineThinkbox1",
+          "class_name": "DeadlineThinkbox",
+          "node_names": [
+            "NoOp1"
+          ],
+          "ui": {
+            "color": null,
+            "position": [
+              545.875,
+              194.5
+            ],
+            "size": [
+              287,
+              154
+            ]
+          },
+          "metadata": {},
+          "job_name": "TestJob"
+        }
+      ]
+    }
+  ]
 }

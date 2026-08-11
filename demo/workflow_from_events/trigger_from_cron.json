@@ -2,8 +2,8 @@
   "name": "CronWorkflow",
   "description": "Test trigger from cron.",
   "execution_graph": {
-    "name": "Untitled Graph",
-    "description": "",
+    "name": "CronWorkflow",
+    "description": "Test trigger from cron.",
     "all_nodes": [
       {
         "plugin_ref": {
@@ -20,8 +20,8 @@
         },
         "ui": {
           "position": [
-            500.25,
-            464.5
+            453.432,
+            667.3779999999999
           ],
           "color": null,
           "size": null
@@ -58,5 +58,37 @@
       }
     }
   },
-  "dispatch_graphs": []
+  "dispatch_graphs": [
+    {
+      "name": "Thinkbox",
+      "description": "",
+      "default_task_cls": "DeadlineThinkbox",
+      "ui": {
+        "viewport_framing": null
+      },
+      "all_nodes": [
+        {
+          "name": "DeadlineThinkbox1",
+          "label": "DeadlineThinkbox1",
+          "class_name": "DeadlineThinkbox",
+          "node_names": [
+            "NoOp1"
+          ],
+          "ui": {
+            "color": null,
+            "position": [
+              130.375,
+              373
+            ],
+            "size": [
+              577.875,
+              168.5
+            ]
+          },
+          "metadata": {},
+          "job_name": "TestCron"
+        }
+      ]
+    }
+  ]
 }
