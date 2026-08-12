@@ -9,7 +9,7 @@ from ayon_workflow.plugin_system import (
 )
 
 
-class Branch(WorkflowConditionTaskNode):
+class If(WorkflowConditionTaskNode):
     """Branch workflow execution based on a condition."""
 
     version = "0.0.1"

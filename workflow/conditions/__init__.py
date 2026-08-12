@@ -1,8 +1,8 @@
 from .guard import Guard
-from .branch import Branch
+from .branch import If
 
 
 __all__ = [
     "Guard",
-    "Branch",
+    "If",
 ]
