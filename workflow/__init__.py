@@ -12,7 +12,7 @@ def get_plugins() -> list[WorkflowNode]:
     from .applications.blender_render import BlenderRender
     from .applications.blender_workfile import BlenderWorkfile
 
-    from .conditions import Guard, If
+    from .conditions import If
 
     from .essentials.append import Append
     from .essentials.context import Context
@@ -39,7 +39,6 @@ def get_plugins() -> list[WorkflowNode]:
         Append,
         If,
         Context,
-        Guard,
         TaskContext,
         VideoNode,
         ImageSequenceNode,
