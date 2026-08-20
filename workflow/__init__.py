@@ -12,6 +12,7 @@ def get_plugins(
     """
     Returns a list of workflow nodes available in this plugin.
     """
+    from .conditions import If
 
     from .essentials.append import Append
     from .essentials.context import Context
@@ -33,6 +34,7 @@ def get_plugins(
     nodes = [
         NoOp,
         Append,
+        If,
         Context,
         TaskContext,
         VideoNode,
