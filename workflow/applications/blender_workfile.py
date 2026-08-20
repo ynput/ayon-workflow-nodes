@@ -82,17 +82,17 @@ class BlenderWorkfile(WorkflowTaskNode):
     ) -> str:
         blender_script_path = remap_input(
             blender_script_path,
-            context.project_name,
+            project_name=context.project_name,
         )
 
         output_workfile = remap_input(
             output_workfile,
-            context.project_name,
+            project_name=context.project_name,
         )
 
         python_script_path = remap_input(
             python_script_path,
-            context.project_name,
+            project_name=context.project_name,
         )
 
         app_args = [
@@ -110,7 +110,7 @@ class BlenderWorkfile(WorkflowTaskNode):
         if input_resource_path:
             input_resource_path = remap_input(
                 input_resource_path,
-                context.project_name,
+                project_name=context.project_name,
             )
             app_args.extend(
                 [
@@ -122,7 +122,7 @@ class BlenderWorkfile(WorkflowTaskNode):
         if log_file:
             log_file = remap_input(
                 log_file,
-                context.project_name,
+                project_name=context.project_name,
             )
 
         # Start application.

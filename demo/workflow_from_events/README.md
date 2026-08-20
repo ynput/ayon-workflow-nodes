@@ -1,4 +1,5 @@
-1. Register this directory within the addon settings:
+1. Load and upload the workflows from this directory as new registered workflows (this is done through the web-editor-> File menu)
+2. Define a new simple action that is enabled on Folder
 ```
 {
   "simple_actions": [
@@ -10,15 +11,12 @@
       "input_entity": "Folder"
     }
   ],
-  "workflow_directory": "C:\\path\\to\\ayon-workflow\\client\\ayon_workflow\\demo\\workflow_from_events"
 }
 ```
-2. This register this 3 workflows from the directory, those can be reviewed through the web-editor:
-    * `trigger_from_cron`: Autmatically triggered from cron expression every minute.
-    * `trigger_from_version_created_event`: Triggered from external event when a new version is created.
-    * `trigger_from_simple_action`: Triggered from the `SimpleActionWorkflow` simple action defined in settings (locally or remotely).
-3. Prepare a service user and set it token id in the `AYON_WORKFLOW_API_KEY` environment variable.
-4. Run the processor through AYON launcher: `$AYON_EXECUTABLE --use-dev --verbose info .\client\ayon_workflow\event_processor.py`
+3a. Run the processor through AYON launcher: `$AYON_EXECUTABLE --use-dev event-processor`
+3b. 1. Build the docker image locally through `Makefile`
+    2. Start the service from ASH service
+
 5. Results:
     * Ensure the cron workflow is triggered on its own every minutes.
     * Ensure the simple action workflow is triggered when the simple action is triggered and not local.

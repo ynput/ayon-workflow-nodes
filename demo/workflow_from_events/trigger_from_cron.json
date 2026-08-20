@@ -1,62 +1,116 @@
 {
-  "name": "CronWorkflow",
-  "description": "Test trigger from cron.",
-  "execution_graph": {
-    "name": "Untitled Graph",
-    "description": "",
-    "all_nodes": [
-      {
-        "plugin_ref": {
-          "name": "OnSchedule",
-          "version": "0.0.1"
-        },
-        "name": "Cron1",
-        "label": "Cron1",
-        "static_values": {
-          "cron_expression": "*/1 * * * *"
-        },
-        "input_connections": {
-          "cron_expression": null
-        },
+    "__type__": "ayon_workflow.workflow_editor.workflow.Workflow",
+    "name": "CronWorkflow",
+    "description": "Test trigger from cron.",
+    "execution_graph": {
+        "__type__": "ayon_workflow.workflow_editor.graph.Graph",
+        "name": "CronWorkflow",
+        "description": "Test trigger from cron.",
+        "all_nodes": [
+            {
+                "__type__": "ayon_workflow.workflow_editor.node.Node",
+                "plugin_ref": {
+                    "__type__": "ayon_workflow.workflow_editor.node.PluginRef",
+                    "name": "OnSchedule",
+                    "version": "0.0.1"
+                },
+                "name": "Cron1",
+                "label": "Cron1",
+                "static_values": {
+                    "cron_expression": "*/1 * * * *"
+                },
+                "input_connections": {
+                    "cron_expression": null
+                },
+                "ui": {
+                    "position": [
+                        453.432,
+                        667.3779999999999
+                    ],
+                    "color": null,
+                    "size": null
+                },
+                "metadata": {}
+            },
+            {
+                "__type__": "ayon_workflow.workflow_editor.node.Node",
+                "plugin_ref": {
+                    "__type__": "ayon_workflow.workflow_editor.node.PluginRef",
+                    "name": "NoOp",
+                    "version": "0.0.1"
+                },
+                "name": "NoOp1",
+                "label": "NoOp1",
+                "static_values": {
+                    "input_data": "Do nothing here"
+                },
+                "input_connections": {
+                    "input_data": null
+                },
+                "ui": {
+                    "position": [
+                        162.375,
+                        429
+                    ],
+                    "color": null,
+                    "size": null
+                },
+                "metadata": {}
+            }
+        ],
         "ui": {
-          "position": [
-            500.25,
-            464.5
-          ],
-          "color": null,
-          "size": null
+            "viewport_framing": {
+                "x": 0,
+                "y": 0,
+                "zoom": 1
+            }
+        },
+        "metadata": {}
+    },
+    "dispatch_graphs": [
+        {
+            "__type__": "ayon_workflow.workflow_editor.graph.DispatchGraph",
+            "name": "Thinkbox",
+            "description": "",
+            "all_nodes": [
+                {
+                    "__type__": "ayon_workflow.workflow_editor.dispatch_node.DeadlineThinkbox",
+                    "name": "DeadlineThinkbox1",
+                    "label": "DeadlineThinkbox1",
+                    "class_name": "DeadlineThinkbox",
+                    "node_names": [
+                        "NoOp1"
+                    ],
+                    "task_chunk": null,
+                    "ui": {
+                        "color": null,
+                        "position": [
+                            130.375,
+                            373
+                        ],
+                        "size": [
+                            577.875,
+                            168.5
+                        ]
+                    },
+                    "metadata": {},
+                    "job_name": "TestCron",
+                    "priority": null,
+                    "pool": null,
+                    "group": null,
+                    "limit_groups": [],
+                    "override_task_failure": false,
+                    "task_failure_detection": 0,
+                    "username": null,
+                    "comment": null
+                }
+            ],
+            "ui": {
+                "viewport_framing": null
+            },
+            "metadata": {},
+            "default_task_cls": "DeadlineThinkbox"
         }
-      },
-      {
-        "plugin_ref": {
-          "name": "NoOp",
-          "version": "0.0.1"
-        },
-        "name": "NoOp1",
-        "label": "NoOp1",
-        "static_values": {
-          "input_data": "Do nothing here"
-        },
-        "input_connections": {
-          "input_data": null
-        },
-        "ui": {
-          "position": [
-            162.375,
-            429
-          ],
-          "color": null,
-          "size": null
-        }
-      }
     ],
-    "ui": {
-      "viewport_framing": {
-        "x": 0,
-        "y": 0,
-        "zoom": 1
-      }
-    }
-  },
-  "dispatch_graphs": []
+    "metadata": null
 }
