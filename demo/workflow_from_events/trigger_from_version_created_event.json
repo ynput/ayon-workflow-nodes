@@ -24,8 +24,8 @@
                 },
                 "ui": {
                     "position": [
-                        -688.625,
-                        752
+                        -1008.125,
+                        656.5
                     ],
                     "color": null,
                     "size": null
@@ -40,8 +40,45 @@
                     "version": "0.0.1"
                 },
                 "name": "NoOp1",
-                "label": "NoOp1",
+                "label": "Receive Context",
                 "static_values": {
+                    "input_data": null
+                },
+                "input_connections": {
+                    "input_data": [
+                        {
+                            "__type__": "ayon_workflow.workflow_editor.node.NodeConnection",
+                            "origin_node_name": "EntityVersionCreated1",
+                            "origin_node_output": "event_context"
+                        },
+                        {
+                            "__type__": "ayon_workflow.workflow_editor.node.NodeConnection",
+                            "origin_node_name": "If1",
+                            "origin_node_output": "on_True"
+                        }
+                    ]
+                },
+                "ui": {
+                    "position": [
+                        -292.5,
+                        563.5
+                    ],
+                    "color": null,
+                    "size": null
+                },
+                "metadata": {}
+            },
+            {
+                "__type__": "ayon_workflow.workflow_editor.node.Node",
+                "plugin_ref": {
+                    "__type__": "ayon_workflow.workflow_editor.node.PluginRef",
+                    "name": "If",
+                    "version": "0.0.1"
+                },
+                "name": "If1",
+                "label": "restrict to \"Demo\" project",
+                "static_values": {
+                    "condition": "input_data.project_name == \"Demo\"",
                     "input_data": null
                 },
                 "input_connections": {
@@ -49,12 +86,13 @@
                         "__type__": "ayon_workflow.workflow_editor.node.NodeConnection",
                         "origin_node_name": "EntityVersionCreated1",
                         "origin_node_output": "event_context"
-                    }
+                    },
+                    "condition": null
                 },
                 "ui": {
                     "position": [
-                        -236.5,
-                        674.5
+                        -636.9375,
+                        782.25
                     ],
                     "color": null,
                     "size": null
@@ -89,12 +127,12 @@
                     "ui": {
                         "color": null,
                         "position": [
-                            -268.5,
-                            618.5
+                            -355.9375,
+                            488
                         ],
                         "size": [
-                            287,
-                            153
+                            589,
+                            325
                         ]
                     },
                     "metadata": {},
