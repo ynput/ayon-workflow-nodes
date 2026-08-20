@@ -193,17 +193,23 @@ class NukeRender(WorkflowTaskNode):
         if nuke_script_path:
             nuke_script_path = remap_input(
                 nuke_script_path,
-                context.project_name,
+                project_name=context.project_name,
             )
             app_args.append(nuke_script_path)
         if input_media:
-            input_media = remap_input(input_media, context.project_name)
+            input_media = remap_input(
+                input_media,
+                project_name=context.project_name,
+            )
             app_args.append(input_media.format())
 
         # TODO: make output_media optional and
         # identify media from resulting stdout instead.
         # assert the output_media exists
-        remapped_output_media = remap_input(output_media, context.project_name)
+        remapped_output_media = remap_input(
+            output_media,
+            project_name=context.project_name,
+        )
         app_args.append(remapped_output_media.format())
 
         if log_file:
@@ -216,7 +222,7 @@ class NukeRender(WorkflowTaskNode):
 
             log_file = remap_input(
                 log_file,
-                context.project_name,
+                project_name=context.project_name,
             )
 
         # Start application.

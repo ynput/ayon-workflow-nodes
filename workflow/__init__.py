@@ -1,17 +1,17 @@
 """ Node collection for the workflow plugin.
 """
-from ayon_workflow.plugin_system.interface import WorkflowNode
+from ayon_workflow.plugin_system import (
+    WorkflowNode,
+    ExecutionScope,
+)
 
 
-def get_plugins() -> list[WorkflowNode]:
+def get_plugins(
+        execution_scope: ExecutionScope = ExecutionScope.WORKSTATION
+    ) -> list[WorkflowNode]:
     """
     Returns a list of workflow nodes available in this plugin.
     """
-
-    from .applications.nuke import NukeRender
-    from .applications.blender_render import BlenderRender
-    from .applications.blender_workfile import BlenderWorkfile
-
     from .conditions import If
 
     from .essentials.append import Append
@@ -29,12 +29,9 @@ def get_plugins() -> list[WorkflowNode]:
         OnActionFromVersion,
     )
 
-    from .publish.publish import Publish
-    from .publish.representation import Representation
-
     from .ui_test import UITest
 
-    return [
+    nodes = [
         NoOp,
         Append,
         If,
@@ -43,17 +40,33 @@ def get_plugins() -> list[WorkflowNode]:
         VideoNode,
         ImageSequenceNode,
         MergeSequence,
-        NukeRender,
-        BlenderRender,
-        BlenderWorkfile,
-        Publish,
-        Representation,
         UITest,
         OnVersionCreated,
         OnActionFromFolder,
         OnActionFromVersion,
         OnSchedule,
     ]
+
+    if execution_scope == ExecutionScope.WORKSTATION:
+
+        from .applications.nuke import NukeRender
+        from .applications.blender_render import BlenderRender
+        from .applications.blender_workfile import BlenderWorkfile
+
+        from .publish.publish import Publish
+        from .publish.representation import Representation
+
+        nodes.extend(
+            [
+                NukeRender,
+                BlenderRender,
+                BlenderWorkfile,
+                Publish,
+                Representation,
+            ]
+        )
+
+    return nodes
 
 
 __all__ = ["get_plugins"]

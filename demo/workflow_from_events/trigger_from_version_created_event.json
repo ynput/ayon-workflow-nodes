@@ -1,61 +1,120 @@
 {
-  "name": "VersionCreatedWorkflow",
-  "description": "Test trigger from new version created event.",
-  "execution_graph": {
-    "name": "Untitled Graph",
-    "description": "",
-    "all_nodes": [
-      {
-        "plugin_ref": {
-          "name": "OnVersionCreated",
-          "version": "0.0.1"
-        },
-        "name": "EntityVersionCreated1",
-        "label": "EntityVersionCreated1",
-        "static_values": {},
-        "input_connections": {
-          "event_id": null
-        },
+    "__type__": "ayon_workflow.workflow_editor.workflow.Workflow",
+    "name": "VersionCreatedWorkflow",
+    "description": "Test trigger from new version created event.",
+    "execution_graph": {
+        "__type__": "ayon_workflow.workflow_editor.graph.Graph",
+        "name": "VersionCreatedWorkflow",
+        "description": "Test trigger from new version created event.",
+        "all_nodes": [
+            {
+                "__type__": "ayon_workflow.workflow_editor.node.Node",
+                "plugin_ref": {
+                    "__type__": "ayon_workflow.workflow_editor.node.PluginRef",
+                    "name": "OnVersionCreated",
+                    "version": "0.0.1"
+                },
+                "name": "EntityVersionCreated1",
+                "label": "EntityVersionCreated1",
+                "static_values": {
+                    "event_id": null
+                },
+                "input_connections": {
+                    "event_id": null
+                },
+                "ui": {
+                    "position": [
+                        -688.625,
+                        752
+                    ],
+                    "color": null,
+                    "size": null
+                },
+                "metadata": {}
+            },
+            {
+                "__type__": "ayon_workflow.workflow_editor.node.Node",
+                "plugin_ref": {
+                    "__type__": "ayon_workflow.workflow_editor.node.PluginRef",
+                    "name": "NoOp",
+                    "version": "0.0.1"
+                },
+                "name": "NoOp1",
+                "label": "NoOp1",
+                "static_values": {
+                    "input_data": null
+                },
+                "input_connections": {
+                    "input_data": {
+                        "__type__": "ayon_workflow.workflow_editor.node.NodeConnection",
+                        "origin_node_name": "EntityVersionCreated1",
+                        "origin_node_output": "event_context"
+                    }
+                },
+                "ui": {
+                    "position": [
+                        -236.5,
+                        674.5
+                    ],
+                    "color": null,
+                    "size": null
+                },
+                "metadata": {}
+            }
+        ],
         "ui": {
-          "position": [
-            -688.625,
-            752
-          ],
-          "color": null,
-          "size": null
-        }
-      },
-      {
-        "plugin_ref": {
-          "name": "NoOp",
-          "version": "0.0.1"
+            "viewport_framing": {
+                "x": 0,
+                "y": 0,
+                "zoom": 1
+            }
         },
-        "name": "NoOp1",
-        "label": "NoOp1",
-        "static_values": {},
-        "input_connections": {
-          "input_data": {
-            "origin_node_name": "EntityVersionCreated1",
-            "origin_node_output": "event_context"
-          }
-        },
-        "ui": {
-          "position": [
-            -236.5,
-            674.5
-          ],
-          "color": null,
-          "size": null
+        "metadata": {}
+    },
+    "dispatch_graphs": [
+        {
+            "__type__": "ayon_workflow.workflow_editor.graph.DispatchGraph",
+            "name": "Dispatch Graph",
+            "description": "",
+            "all_nodes": [
+                {
+                    "__type__": "ayon_workflow.workflow_editor.dispatch_node.DeadlineThinkbox",
+                    "name": "DeadlineThinkbox1",
+                    "label": "DeadlineThinkbox1",
+                    "class_name": "DeadlineThinkbox",
+                    "node_names": [
+                        "NoOp1"
+                    ],
+                    "task_chunk": null,
+                    "ui": {
+                        "color": null,
+                        "position": [
+                            -268.5,
+                            618.5
+                        ],
+                        "size": [
+                            287,
+                            153
+                        ]
+                    },
+                    "metadata": {},
+                    "job_name": "VersionCreated",
+                    "priority": null,
+                    "pool": null,
+                    "group": null,
+                    "limit_groups": [],
+                    "override_task_failure": false,
+                    "task_failure_detection": 0,
+                    "username": null,
+                    "comment": null
+                }
+            ],
+            "ui": {
+                "viewport_framing": null
+            },
+            "metadata": {},
+            "default_task_cls": "DeadlineThinkbox"
         }
-      }
     ],
-    "ui": {
-      "viewport_framing": {
-        "x": 0,
-        "y": 0,
-        "zoom": 1
-      }
-    }
-  },
-  "dispatch_graphs": []
+    "metadata": null
 }
