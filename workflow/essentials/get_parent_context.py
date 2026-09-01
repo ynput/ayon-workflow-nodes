@@ -32,8 +32,11 @@ class GetParentContext(WorkflowTaskNode):
 
     def execute(
         self,
-        context: Union[FolderItem, TaskItem],
+        context: ContextItem,
     ) -> ContextItem:
+        if isinstance(context, ProjectItem):
+            return context
+
         if isinstance(context, TaskItem):
             return FolderItem(
                 project_name=context.project_name,
@@ -41,7 +44,7 @@ class GetParentContext(WorkflowTaskNode):
                 folder_name=context.folder_name,
                 folder_id=context.folder_id,
                 _parent=context.parent,
-           )
+            )
 
         if context.parent:
             return context.parent
