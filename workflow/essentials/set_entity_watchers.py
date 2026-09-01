@@ -25,7 +25,11 @@ class SetEntityWatchers(WorkflowTaskNode):
         InputAttribute(
             name="watchers",
             description="A list of watchers to set.",
-        )
+        ),
+        InputAttribute(
+            name="replace",
+            description="Whether to replace existing watchers.",
+        ),
     ]
     outputs = [
         OutputAttribute(
@@ -38,6 +42,7 @@ class SetEntityWatchers(WorkflowTaskNode):
         self,
         input_context: Union[FolderItem, TaskItem],
         watchers: Union[str, list[str]],
+        replace: bool = False,
     ) -> Union[FolderItem, TaskItem]:
         if isinstance(watchers, str):
             watchers = [watchers]
@@ -49,6 +54,14 @@ class SetEntityWatchers(WorkflowTaskNode):
         else:
             entity_type = "folder"
             entity_id = input_context.folder_id
+
+        if not replace:
+            existing_watchers = ayon_api.get_entity_watchers(
+                input_context.project_name,
+                entity_id,
+                entity_type,
+            )
+            watchers = existing_watchers + watchers
 
         ayon_api.set_entity_watchers(
             input_context.project_name,
