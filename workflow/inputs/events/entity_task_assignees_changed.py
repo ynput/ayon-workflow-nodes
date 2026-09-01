@@ -22,7 +22,7 @@ class OnTaskAssigneesChanged(EventTrigger):
         ),
         OutputAttribute(
             name="event_assignees",
-            description="The output event task assginees.",
+            description="The output event task assignees.",
         )
     ]
 
