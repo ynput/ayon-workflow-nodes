@@ -34,6 +34,7 @@ def get_task_item(
 
         attrs = asdict(folder_item)
         attrs["_parent"] = folder_item.parent
+        attrs["task_id"] = task_dict["id"]
         attrs["task_name"] = task_name
         attrs["task_type"] = task_dict.get("taskType")
         return TaskItem(**attrs)

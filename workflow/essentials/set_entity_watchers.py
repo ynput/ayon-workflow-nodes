@@ -42,13 +42,17 @@ class SetEntityWatchers(WorkflowTaskNode):
         if isinstance(watchers, str):
             watchers = [watchers]
 
-        entity_type = (
-            "task" if isinstance(input_context, TaskItem)
-            else "folder"
-        )
+
+        if isinstance(input_context, TaskItem):
+            entity_type = "task"
+            entity_id = input_context.task_id
+        else:
+            entity_type = "folder"
+            entity_id = input_context.folder_id
+
         ayon_api.set_entity_watchers(
             input_context.project_name,
-            input_context.folder_id,
+            entity_id,
             entity_type,
             watchers,
         )

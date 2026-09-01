@@ -1,4 +1,3 @@
-from typing import Union
 
 from ayon_workflow.datatypes import (
     ContextItem,
@@ -34,9 +33,6 @@ class GetParentContext(WorkflowTaskNode):
         self,
         context: ContextItem,
     ) -> ContextItem:
-        if isinstance(context, ProjectItem):
-            return context
-
         if isinstance(context, TaskItem):
             return FolderItem(
                 project_name=context.project_name,
