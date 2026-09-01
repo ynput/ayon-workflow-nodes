@@ -69,10 +69,11 @@
                     "version": "0.0.1"
                 },
                 "name": "SetEntityWatchers1",
-                "label": "Set Task assignees as Watcher",
+                "label": "Edit Watchers",
                 "static_values": {
                     "input_context": null,
-                    "watchers": null
+                    "watchers": null,
+                    "replace": false
                 },
                 "input_connections": {
                     "input_context": {
@@ -84,12 +85,13 @@
                         "__type__": "ayon_workflow.workflow_editor.node.NodeConnection",
                         "origin_node_name": "OnTaskAssigneesChanged1",
                         "origin_node_output": "event_assignees"
-                    }
+                    },
+                    "replace": null
                 },
                 "ui": {
                     "position": [
-                        636.4921875,
-                        573.5
+                        707.9921875,
+                        551
                     ],
                     "color": null,
                     "size": null
