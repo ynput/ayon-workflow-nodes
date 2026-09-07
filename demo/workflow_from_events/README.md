@@ -1,5 +1,5 @@
 1. Open the web editor.
-2. Load and upload the some example workflows from this directory
+2. Load and upload some example workflows from this directory.
 3. Add them as new registered workflows (this is done through the web-editor-> File menu)
 4. Specific to `trigger_from_simple_action_folder`, define a new simple action that is enabled on Folder in the `ayon_workflow` settings `ayon+settings://workflow/simple_actions`.
 This should connect the registered workflow `trigger_from_simple_action_folder` to a simple action "My custom Folder trigger" available on folder entities.
