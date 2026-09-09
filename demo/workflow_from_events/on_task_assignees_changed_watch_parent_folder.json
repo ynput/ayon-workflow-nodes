@@ -68,12 +68,12 @@
                     "name": "SetEntityWatchers",
                     "version": "0.0.1"
                 },
-                "name": "SetEntityWatchers1",
+                "name": "SetEntityWatchers2",
                 "label": "Edit Watchers",
                 "static_values": {
                     "input_context": null,
                     "watchers": null,
-                    "replace": false
+                    "edit_mode": "add"
                 },
                 "input_connections": {
                     "input_context": {
@@ -86,12 +86,12 @@
                         "origin_node_name": "OnTaskAssigneesChanged1",
                         "origin_node_output": "event_assignees"
                     },
-                    "replace": null
+                    "edit_mode": null
                 },
                 "ui": {
                     "position": [
-                        707.9921875,
-                        551
+                        700.2626426126468,
+                        514.7716144693804
                     ],
                     "color": null,
                     "size": null
