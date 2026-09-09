@@ -3,8 +3,7 @@ from typing import Union
 import ayon_api
 
 from ayon_workflow.datatypes import (
-    FolderItem,
-    TaskItem,
+    Entity,
 )
 from ayon_workflow.plugin_system import (
     InputAttribute,
@@ -21,8 +20,8 @@ class SetEntityWatchers(WorkflowTaskNode):
     version = "0.0.1"
     inputs = [
         InputAttribute(
-            name="input_context",
-            description="An AYON context item.",
+            name="input_entity",
+            description="An AYON entity.",
         ),
         InputAttribute(
             name="watchers",
@@ -39,17 +38,17 @@ class SetEntityWatchers(WorkflowTaskNode):
     ]
     outputs = [
         OutputAttribute(
-            name="edited_context",
-            description="The context with watchers set.",
+            name="edited_entity",
+            description="The entity with watchers set.",
         )
     ]
 
     def execute(
         self,
-        input_context: Union[FolderItem, TaskItem],
+        input_entity: Entity,
         watchers: Union[str, list[str]],
         edit_mode: str = "add",
-    ) -> Union[FolderItem, TaskItem]:
+    ) -> Entity:
         if isinstance(watchers, str):
             watchers = [watchers]
 
@@ -59,18 +58,11 @@ class SetEntityWatchers(WorkflowTaskNode):
                 f"must be one of {self.EDIT_MODES}"
             )
 
-        if isinstance(input_context, TaskItem):
-            entity_type = "task"
-            entity_id = input_context.task_id
-        else:
-            entity_type = "folder"
-            entity_id = input_context.folder_id
-
         if edit_mode in ("add", "remove", "toggle"):
             existing_watchers = ayon_api.get_entity_watchers(
-                input_context.project_name,
-                entity_id,
-                entity_type,
+                input_entity.project_name,
+                input_entity.id,
+                input_entity.entity_type,
             )
 
             if edit_mode == "remove":
@@ -90,10 +82,10 @@ class SetEntityWatchers(WorkflowTaskNode):
                 watchers = list(set(existing_watchers + watchers))
 
         ayon_api.set_entity_watchers(
-            input_context.project_name,
-            entity_id,
-            entity_type,
+            input_entity.project_name,
+            input_entity.id,
+            input_entity.entity_type,
             watchers,
         )
 
-        return input_context
+        return input_entity
