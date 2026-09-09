@@ -2,6 +2,7 @@
 """
 from .base import EventTrigger
 from .entity_version_created import OnVersionCreated
+from .entity_task_assignees_changed import OnTaskAssigneesChanged
 from .simple_actions import OnActionFromFolder, OnActionFromVersion
 
 
@@ -10,4 +11,5 @@ __all__ = [
     "OnActionFromVersion",
     "EventTrigger",
     "OnVersionCreated",
+    "OnTaskAssigneesChanged",
 ]

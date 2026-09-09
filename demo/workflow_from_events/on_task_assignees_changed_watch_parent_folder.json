@@ -1,0 +1,113 @@
+{
+    "__type__": "ayon_workflow.workflow_editor.workflow.Workflow",
+    "name": "Set task assignees as parent folder watchers",
+    "description": "React to entity.task.assignees_changed event and add them as parent folder watchers.",
+    "execution_graph": {
+        "__type__": "ayon_workflow.workflow_editor.graph.Graph",
+        "name": "Set task assignees as parent folder watchers",
+        "description": "React to entity.task.assignees_changed event and add them as parent folder watchers.",
+        "all_nodes": [
+            {
+                "__type__": "ayon_workflow.workflow_editor.node.Node",
+                "plugin_ref": {
+                    "__type__": "ayon_workflow.workflow_editor.node.PluginRef",
+                    "name": "OnTaskAssigneesChanged",
+                    "version": "0.0.1"
+                },
+                "name": "OnTaskAssigneesChanged1",
+                "label": "OnTaskAssigneesChanged",
+                "static_values": {
+                    "event_id": null
+                },
+                "input_connections": {
+                    "event_id": null
+                },
+                "ui": {
+                    "position": [
+                        -94.72009801610571,
+                        624.0247798811507
+                    ],
+                    "color": null,
+                    "size": null
+                },
+                "metadata": {}
+            },
+            {
+                "__type__": "ayon_workflow.workflow_editor.node.Node",
+                "plugin_ref": {
+                    "__type__": "ayon_workflow.workflow_editor.node.PluginRef",
+                    "name": "GetParentContext",
+                    "version": "0.0.1"
+                },
+                "name": "GetParentContext1",
+                "label": "Get parent Folder",
+                "static_values": {
+                    "context": null
+                },
+                "input_connections": {
+                    "context": {
+                        "__type__": "ayon_workflow.workflow_editor.node.NodeConnection",
+                        "origin_node_name": "OnTaskAssigneesChanged1",
+                        "origin_node_output": "event_context"
+                    }
+                },
+                "ui": {
+                    "position": [
+                        350.9921875,
+                        407
+                    ],
+                    "color": null,
+                    "size": null
+                },
+                "metadata": {}
+            },
+            {
+                "__type__": "ayon_workflow.workflow_editor.node.Node",
+                "plugin_ref": {
+                    "__type__": "ayon_workflow.workflow_editor.node.PluginRef",
+                    "name": "SetEntityWatchers",
+                    "version": "0.0.1"
+                },
+                "name": "SetEntityWatchers1",
+                "label": "Edit Watchers",
+                "static_values": {
+                    "input_entity": null,
+                    "watchers": null,
+                    "edit_mode": "add"
+                },
+                "input_connections": {
+                    "input_entity": {
+                        "__type__": "ayon_workflow.workflow_editor.node.NodeConnection",
+                        "origin_node_name": "GetParentContext1",
+                        "origin_node_output": "parent_context"
+                    },
+                    "watchers": {
+                        "__type__": "ayon_workflow.workflow_editor.node.NodeConnection",
+                        "origin_node_name": "OnTaskAssigneesChanged1",
+                        "origin_node_output": "event_assignees"
+                    },
+                    "edit_mode": null
+                },
+                "ui": {
+                    "position": [
+                        708.0795620528244,
+                        559.5900458911381
+                    ],
+                    "color": null,
+                    "size": null
+                },
+                "metadata": {}
+            }
+        ],
+        "ui": {
+            "viewport_framing": {
+                "x": 0,
+                "y": 0,
+                "zoom": 1
+            }
+        },
+        "metadata": {}
+    },
+    "dispatch_graphs": [],
+    "metadata": null
+}
