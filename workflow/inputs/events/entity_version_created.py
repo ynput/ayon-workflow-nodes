@@ -5,6 +5,7 @@ import ayon_api
 from ayon_workflow.datatypes import (
     FolderItem,
     VersionItem,
+    ProductItem,
 )
 from ayon_workflow.plugin_system import (
     OutputAttribute,
@@ -57,7 +58,10 @@ class OnVersionCreated(EventTrigger):
             folder_item,
             VersionItem(
                 version_id=event_data["summary"]["entityId"],
-                product_id=event_data["summary"]["parentId"],
+                product=ProductItem(
+                    product_id=product_data["id"],
+                    folder=folder_item,
+                ),
                 version=version_data["version"],
             )
         )

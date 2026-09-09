@@ -13,6 +13,7 @@ from ayon_core.pipeline.publish import publish_plugins_discover
 
 from ayon_workflow.datatypes import (
     FolderItem,
+    ProductItem,
     PublishInput,
     TaskItem,
     VersionItem,
@@ -200,6 +201,9 @@ class Publish(WorkflowTaskNode):
         data = instance.data.get("versionEntity")
         return VersionItem(
             version_id=data.get("id"),
-            product_id=data.get("productId"),
+            product=ProductItem(
+                product_id=data.get("productId"),
+                folder=context,
+            ),
             version=data.get("version"),
         )
