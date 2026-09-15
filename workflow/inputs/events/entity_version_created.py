@@ -19,7 +19,7 @@ class OnVersionCreated(EventTrigger):
     """Trigger node: on new version created."""
 
     version = "0.0.1"
-    event_type = "entity.version.created"
+    event_topic = "entity.version.created"
     outputs = [
         OutputAttribute(
             name="event_context",

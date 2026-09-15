@@ -17,7 +17,7 @@ class EventTrigger(WorkflowInputTaskNode):
     """A base class for event trigger node."""
 
     version = "0.0.1"
-    event_type: Union[str, List[str], None] = None
+    event_topic: Union[str, List[str], None] = None
     inputs = [
         InputAttribute(
             name="event_id",
@@ -32,10 +32,10 @@ class EventTrigger(WorkflowInputTaskNode):
         inject: Optional[dict[str, Any]] = None,
         rebind: Optional[dict[str, str]] = None,
     ):
-        if not self.event_type:
+        if not self.event_topic:
             log.warning(
                 f"Event trigger class {self.__class__.__name__} does not "
-                "define event type. It is required for the event processor."
+                "define event topic. It is required for the event processor."
             )
 
         super().__init__(
