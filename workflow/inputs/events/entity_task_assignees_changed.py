@@ -14,7 +14,7 @@ class OnTaskAssigneesChanged(EventTrigger):
     """Trigger node: on task assignees changed."""
 
     version = "0.0.1"
-    event_type = "entity.task.assignees_changed"
+    event_topic = "entity.task.assignees_changed"
     outputs = [
         OutputAttribute(
             name="event_context",

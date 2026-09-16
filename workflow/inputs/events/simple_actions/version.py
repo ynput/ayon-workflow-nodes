@@ -19,7 +19,7 @@ class OnActionFromVersion(EventTrigger):
     """Trigger node: on simple action from version."""
 
     version = "0.0.1"
-    event_type = [
+    event_topic = [
         "workflow.from_simple_action.local",
         "workflow.from_simple_action.remote",
     ]
