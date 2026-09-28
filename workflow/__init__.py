@@ -30,14 +30,15 @@ def _check_compatibility():
         )
 
 
+_check_compatibility()
+
+
 def get_plugins(
         execution_scope: ExecutionScope = ExecutionScope.WORKSTATION
     ) -> list[WorkflowNode]:
     """
     Returns a list of workflow nodes available in this plugin.
     """
-    _check_compatibility()
-
     from .conditions import If
 
     from .essentials.append import Append
