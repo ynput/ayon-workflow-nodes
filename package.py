@@ -6,5 +6,5 @@ version = "0.1.0"
 
 # Required `ayon_workflow` (core) package version.
 ayon_compatible_addons = {
-    "workflow": ">=99.0.1",
+    "workflow": ">=0.0.1",
 }
