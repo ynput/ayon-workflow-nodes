@@ -1,66 +1,79 @@
 # AYON Workflow Nodes
-
-Vanilla node plugin library for [`ayon-workflow`](https://github.com/ynput/ayon-workflow),
-AYON's node-based automation addon.
-
-> [!WARNING]
-> This repo only contains **node definitions** (Python plugin classes). The
-> graph editor, execution engine and CLI live in `ayon-workflow` itself —
-> this package is loaded *by* it and has no standalone use.
-
-
-## Layout
-
+ 
+The official node library for the [AYON Workflow addon](https://help.ayon.app/en/help/collections/6014460-workflow).
+ 
+This repository contains the nodes that ship with the AYON Workflow addon, from
+generic utilities and branching logic to event triggers, DCC integrations
+(Blender, Nuke), and publishing.
+ 
+> [!IMPORTANT]
+> **`ayon-workflow-nodes` is not a standalone package.** It is part of the
+> official AYON Workflow addon release and only contains the node definitions
+> (Python plugin classes) that ship with the addon.
+>
+> These nodes are open-sourced so the community can contribute fixes and
+> improvements, and so there's a set of real, working examples to learn from
+> when writing your own nodes.
+>
+> This repository is not meant to be forked to add custom workflow nodes.
+> Keep custom nodes in your own repository and register them with the Workflow
+> addon, either through `AYON_WORKFLOW_ADDITIONAL_PLUGIN_PATH` or by packaging
+> them in your own AYON addon, as described in
+> [Extending Workflow Nodes (Custom Plugins)](https://docs.ayon.dev/docs/dev_addon_workflow#extending-workflow-nodes-custom-plugins).
+ 
+## Repository Layout
+ 
 ```
-demo/                     # standalone scripts building/running workflows
+demo/                        # example workflows, ready to open or run
 workflow/
-├── __init__.py       # get_plugins() entrypoint discovered by ayon-workflow
-├── essentials/        # generic utility nodes
-├── conditions/         # branching nodes
-├── inputs/             # trigger / input nodes (cron, AYON events, simple actions)
-├── applications/       # DCC integrations (Blender, Nuke)
-└── publish/            # publishing nodes
+  ├── __init__.py            # get_plugins() entrypoint, discovered by the Workflow addon
+  ├── essentials/            # generic utility nodes
+  ├── conditions/            # branching nodes
+  ├── inputs/                # trigger and input nodes (cron, AYON events, simple actions)
+  ├── applications/          # DCC integrations (Blender, Nuke)
+  └── publish/               # publishing nodes
 publish/
-└── collect_instances.py  # pyblish plugin used by the Publish node
+  └── collect_instances.py   # pyblish plugin used by the Publish node
 ```
-
-## Usage
-
-Nodes are consumed through `ayon-workflow`, not imported directly.
-Once both packages are installed:
-
-```python
-from ayon_workflow.plugin_system import register_all_plugins
-from ayon_workflow.workflow_editor import Workflow
-from ayon_workflow.workflow_execution import execute_workflow
-
-register_all_plugins()  # discovers get_plugins() from every installed addon
-
-workflow = Workflow(name="my_workflow")
-node = workflow.execution_graph.create_node("NoOp")
-node["input_data"] = "hello world"
-
-print(execute_workflow(workflow))
-```
-
-## Workflow Examples
-
-See [`demo/`](demo/) for more complete, runnable examples:
-Run one via the AYON executable, or paste its content into the AYON Console.
-
-```
-$AYON_EXECUTABLE run demo/example.py
-```
-
-See [`demo/workflow_from_events/`](demo/workflow_from_events/) for
-workflows triggered by a cron schedule, an AYON event, or a simple action
-instead of run manually.
-
-## Adding Nodes
-
-See [`docs/node_authoring.md`](docs/node_authoring.md) for the node plugin
-API and authoring rules.
-
-> [!NOTE]
-> We recommend you do not fork this repository to add your own nodes, but
-> create your own dedicated addon instead.
+ 
+## Running the Demo Workflows
+ 
+The [`demo/`](demo/) folder holds the example workflows that are distributed
+with the addon, so you can grab them here instead of digging through your local
+addon folder.
+ 
+**Open in the editor.** Launch the Workflow editor from the AYON tray and load a
+demo workflow file via `File > Load...` to inspect, tweak, and run it
+interactively. For detailed steps, see
+[Workflow Editor: Your First Workflows](https://help.ayon.app/en/help/articles/8963758-workflow-editor-your-first-workflows).
+ 
+**Run from the command line.** For more details, see
+[Command-Line Interface (CLI) Execution](https://docs.ayon.dev/docs/dev_addon_workflow#command-line-interface-cli-execution).
+ 
+- Windows:
+    ```
+    ./ayon_console.exe addon workflow execute --workflow-path /path/to/workflow.json
+    ```
+- Linux and macOS:
+    ```
+    ayon addon workflow execute --workflow-path /path/to/workflow.json
+    ```
+ 
+**Event-triggered workflows.** For workflows that start on their own, from a
+cron schedule, an AYON event, or a simple action, see
+[`demo/workflow_from_events/`](demo/workflow_from_events/). For detailed steps
+on setting them up, see
+[Workflows & Automations](https://help.ayon.app/en/help/articles/1804107-workflows-and-automations).
+ 
+## Contributing
+ 
+Fixes and improvements to the official nodes are welcome. See
+[`docs/node_authoring.md`](docs/node_authoring.md) for the node plugin API and
+authoring rules.
+ 
+## Further Reading
+ 
+- [Workflow user guides](https://help.ayon.app/en/help/collections/6014460-workflow)
+- [Workflow developer docs](https://docs.ayon.dev/docs/dev_addon_workflow)
+- [Event-triggered workflows](https://docs.ayon.dev/docs/dev_addon_workflow_event)
+- [Workflow addon API reference](https://docs.ayon.dev/ayon-workflow-docs/latest/)

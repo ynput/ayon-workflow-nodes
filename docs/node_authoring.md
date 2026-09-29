@@ -1,85 +1,41 @@
 # Node Authoring Guide
 
-How to write a workflow node (a "plugin") for `ayon-workflow`, using the API
-this repo's nodes are built on. Applies to nodes in this repo and to custom
-nodes exposed by other AYON addons. Every claim below is grounded in this
-repo's own source — file paths are given so it can be verified/extended
-directly.
+This guide explains how to implement a workflow node (a "plugin") for the AYON
+Workflow addon, following the conventions used by the official nodes in this
+repository. Code excerpts come from this repository's source, with file paths
+so you can check the full implementation.
 
-## Contents
+If you're writing custom nodes for your studio, keep them in your own
+repository rather than here. The conventions below apply to them the same way.
+For how to register them with the Workflow addon, and for complete example
+modules, see
+[Extending Workflow Nodes (Custom Plugins)](https://docs.ayon.dev/docs/dev_addon_workflow#extending-workflow-nodes-custom-plugins).
 
-- [Add a node in 5 steps](#add-a-node-in-5-steps)
-- [1. Discovery](#1-discovery)
-- [2. Choosing a base class](#2-choosing-a-base-class)
-- [3. Minimal node template](#3-minimal-node-template)
-- [4. Authoring rules](#4-authoring-rules)
-- [5. Inputs and outputs](#5-inputs-and-outputs)
-- [6. Multiple outputs](#6-multiple-outputs)
-- [7. Input / trigger nodes](#7-input--trigger-nodes)
-- [8. Condition nodes (branching)](#8-condition-nodes-branching)
-- [9. Cross-platform paths](#9-cross-platform-paths)
-- [10. Revert logic](#10-revert-logic)
-- [11. AYON datatypes](#11-ayon-datatypes)
-- [12. Testing locally](#12-testing-locally)
-- [Self-check before finishing](#self-check-before-finishing)
+## Your first node
 
-## Add a node in 5 steps
+A node is a Python class. The Workflow addon reads it to build the node in the
+editor and to run it: the docstring becomes the node's description, `inputs`
+and `outputs` become its ports, and the `execute()` method does the work. The
+type hints and defaults in the `execute()` signature define the node's inputs
+and outputs: each input's type, editor widget, and default value, and the
+type of each output.
 
-1. Pick the sub-package: `essentials/`, `applications/`, `inputs/`,
-   `conditions/`, `publish/` — or create a new one.
-2. Create `workflow/<sub-package>/<node_name>.py` and subclass the base
-   class picked in [§2](#2-choosing-a-base-class).
-3. Implement `execute()` (and `revert_execute()` if the node has a side
-   effect, [§10](#10-revert-logic)).
-4. Import the class and append it to the list returned by `get_plugins()`
-   in [`workflow/__init__.py`](../workflow/__init__.py) — only inside the
-   `ExecutionScope.WORKSTATION` branch if the node needs a local/
-   interactive environment ([§1](#1-discovery)).
-5. Run the [self-check](#self-check-before-finishing) before considering
-   the node done.
+**Where to put it.** Nodes are grouped by category under
+[`workflow/`](../workflow/):
 
-## 1. Discovery
+| Folder | Contents |
+| --- | --- |
+| `essentials/` | Generic utility nodes |
+| `conditions/` | Branching nodes |
+| `inputs/` | Trigger and input nodes (cron, AYON events, simple actions) |
+| `applications/` | DCC integrations (Blender, Nuke) |
+| `publish/` | Publishing nodes |
 
-A package exposes nodes via a `get_plugins()` function. In this repo:
-[`workflow/__init__.py`](../workflow/__init__.py)
+Create `workflow/<category>/<node_name>.py` in the category that fits, and add
+a new category folder only if none does.
 
-```python
-from ayon_workflow.plugin_system import WorkflowNode, ExecutionScope
-
-def get_plugins(
-    execution_scope: ExecutionScope = ExecutionScope.WORKSTATION,
-) -> list[WorkflowNode]:
-    from .essentials.append import Append
-    nodes = [Append, ...]
-    if execution_scope == ExecutionScope.WORKSTATION:
-        # Needs a local/interactive environment: DCC, publish, local disk.
-        from .publish.publish import Publish
-        nodes.append(Publish)
-    return nodes
-```
-
-- MUST be added to the list returned by `get_plugins()` to be discoverable.
-- MUST only be gated behind `ExecutionScope.WORKSTATION` if it needs a
-  local app/display/production disk access. Default: scope-agnostic.
-- A third-party addon follows the same contract: expose `get_plugins()`
-  from a discoverable module; `ayon-workflow`'s plugin discovery picks it
-  up automatically.
-
-## 2. Choosing a base class
-
-All base classes are imported from `ayon_workflow.plugin_system` and
-subclass `WorkflowNode`. Pick one:
-
-- Node has **no required upstream input** — it's an entry point (cron,
-  AYON event, ...) → **`WorkflowInputTaskNode`**
-  (see `OnSchedule`, `EventTrigger`).
-- Node exposes **multiple mutually-exclusive outputs** and only one branch
-  should continue downstream → **`WorkflowConditionTaskNode`**
-  (see `If`).
-- Anything else (an input/inputs in, an output/outputs out) →
-  **`WorkflowTaskNode`**. This covers most nodes (see `Append`).
-
-## 3. Minimal node template
+**Write the class.** Most nodes subclass `WorkflowTaskNode`. Here's a complete
+one:
 
 ```python
 from typing import Any, List, Union
@@ -92,15 +48,15 @@ from ayon_workflow.plugin_system import (
 
 
 class Append(WorkflowTaskNode):
-    """Group or Append inputs as a list."""     # -> node description in the editor
+    """Group or Append inputs as a list."""
 
-    version = "0.0.1"                            # required, semver-like
+    version = "0.0.1"
 
     inputs = [
         InputAttribute(
-            name="inputs",                        # must match an execute() param name
+            name="inputs",
             description="Any input(s).",
-            allow_multi_connection=True,           # accepts several incoming connections
+            allow_multi_connection=True,
         )
     ]
     outputs = [
@@ -113,31 +69,66 @@ class Append(WorkflowTaskNode):
             result.extend(input) if isinstance(input, list) else result.append(input)
         return result
 ```
+
 Source: [`workflow/essentials/append.py`](../workflow/essentials/append.py)
 
-## 4. Authoring rules
+Keep the docstring to a single, accurate sentence, since it's what users see
+in the editor. Set `version` to a semver-like string and bump it on breaking
+changes. To show a different node type name in the editor, set `name`; for
+example, `VideoNode` sets `name = "Video"`.
 
-| # | Rule |
-| --- | --- |
-| 1 | `version` MUST be set and semver-like (`"0.0.1"`). Bump it on any breaking change. |
-| 2 | `execute()` parameter names MUST exactly match `inputs[].name` — binding is by name. |
-| 3 | Every `execute()` parameter and the return value MUST be type-hinted. Types drive the editor's widgets; there is no separate schema. |
-| 4 | Default values MUST live in the `execute()` signature (`text: str = "default"`). NEVER set a default on `InputAttribute`. |
-| 5 | The class docstring MUST be a single, accurate sentence — it becomes the node's description in the editor. |
-| 6 | Optional: set `name = "..."` to override the node type name shown in the editor (see `VideoNode.name = "Video"`). |
-| 7 | Multiple return values MUST be returned as a `tuple`, in the same order as `outputs`. |
-| 8 | File-path inputs MUST be resolved with `remap_input()` before use ([§9](#9-cross-platform-paths)). Return/forward the original rootless path — NEVER the resolved absolute one. |
-| 9 | Side effects that need cleanup MUST implement `revert_execute()` ([§10](#10-revert-logic)). |
-| 10 | Prefer `ayon_workflow.datatypes` objects over ad-hoc dicts for structured data crossing node boundaries. |
+**Register it.** The Workflow addon only knows about nodes returned by
+`get_plugins()` in [`workflow/__init__.py`](../workflow/__init__.py). Import
+your class there and add it to the list:
 
-## 5. Inputs and outputs
+```python
+def get_plugins(
+    execution_scope: ExecutionScope = ExecutionScope.WORKSTATION,
+) -> list[WorkflowNode]:
+    from .essentials.append import Append
+    nodes = [Append, ...]
+    ...
+    return nodes
+```
+
+Some nodes are only added in certain execution scopes. See
+[Execution scope](#execution-scope) for when that applies.
+
+**Run it.** Open the AYON Console from the AYON tray, then build and run a
+small workflow around your node:
+
+```python
+from ayon_workflow.plugin_system import register_all_plugins
+from ayon_workflow.workflow_editor import Workflow
+from ayon_workflow.workflow_execution import execute_workflow
+
+register_all_plugins()  # discovers get_plugins() from every source
+
+workflow = Workflow(name="test_workflow")
+node = workflow.execution_graph.create_node("Append")
+node["inputs"] = ["hello", ["world", "!"]]
+
+print(execute_workflow(workflow))
+```
+
+Then check it in the Workflow editor too: launch the editor from the AYON tray,
+add your node to a graph, and confirm its description, ports, and widgets look
+right. For longer walkthroughs, see [`demo/example.py`](../demo/example.py),
+which covers connecting nodes, JSON serialization, and CLI execution.
+
+## Inputs and outputs
+
+**Inputs.** Each input is an `InputAttribute`, bound by name to an `execute()`
+parameter, so the names must match exactly. Every parameter needs a type hint,
+which also decides the default editor widget. Put default values in the
+`execute()` signature (`text: str = "default"`), not on the `InputAttribute`.
 
 ```python
 InputAttribute(
-    name="input_text",              # required, matches execute() param
+    name="input_text",              # matches an execute() parameter name
     description="Input text to process.",
-    allow_multi_connection=False,   # True = accepts a list of connections, see Append
-    widget={                        # optional, controls the editor widget
+    allow_multi_connection=False,   # True accepts several connections as a list (see Append)
+    widget={                        # optional; controls the editor widget
         "name": "filepath",
         "select": "file",           # or "directory"
         "caption": "Select a file.",
@@ -146,12 +137,14 @@ InputAttribute(
 )
 ```
 
-Widget `name` values seen in this repo (default inferred from the type hint
-if `widget={}`): `filepath`, `text` (multi-line), `choice` (fixed
-`options`), `enum` (`fields`). Full palette:
-[`workflow/ui_test.py`](../workflow/ui_test.py).
+If `widget` is omitted or `{}`, the widget is inferred from the type hint.
+Widget `name` values used in this repository are `filepath`, `text`
+(multi-line), `choice` (fixed `options`), and `enum` (`fields`). For the full
+set, see [`workflow/ui_test.py`](../workflow/ui_test.py).
 
-## 6. Multiple outputs
+**Outputs.** Each output is an `OutputAttribute`, and the return value of
+`execute()` needs a type hint. For one output, return the value directly. For
+several, return a `tuple` in the same order as `outputs`:
 
 ```python
 outputs = [
@@ -160,31 +153,94 @@ outputs = [
 ]
 
 def execute(self, text1: str, text2: str) -> tuple[str, float]:
-    return f"{text1}{text2}", 1.0   # tuple order must match `outputs` order
+    return f"{text1}{text2}", 1.0   # order matches `outputs`
 ```
-Real example: [`OnVersionCreated.execute`](../workflow/inputs/events/entity_version_created.py)
-returns `Tuple[Optional[FolderItem], Optional[VersionItem]]`.
 
-## 7. Input / trigger nodes
+For a real example, see
+[`OnVersionCreated.execute`](../workflow/inputs/events/entity_version_created.py),
+which returns `Tuple[Optional[FolderItem], Optional[VersionItem]]`.
 
-Derive from `WorkflowInputTaskNode`. Event-based triggers share
-[`EventTrigger`](../workflow/inputs/events/base.py):
+**Data types.** Type hints can use built-in Python types (`str`, `int`,
+`float`, and so on) and the types in `ayon_workflow.datatypes`. For structured
+data passed between nodes, use the `ayon_workflow.datatypes` types instead of
+ad-hoc dicts (such as recreating `FrameRange` as
+`{"first_frame": 1001, "last_frame": 1100}`), so the editor and other nodes
+know what the data is.
+
+| Type | Purpose |
+| --- | --- |
+| `Entity` | Base class for AYON entities, with an id, project, and entity type. |
+| `ContextItem` | An AYON context, either a `ProjectItem`, a `FolderItem`, or a `TaskItem`. |
+| `ProjectItem` | An AYON project context: project name. |
+| `FolderItem` | An AYON folder entity: project name, and the folder's name, type, path, and id. |
+| `TaskItem` | An AYON task entity: project name, the parent folder's name, type, path, and id, and the task's name, type, and id. |
+| `ProductItem` | An AYON product entity: project name and product id. |
+| `VersionItem` | An AYON version entity: project name, product id, and version id or number. |
+| `FrameRange` | A frame range: `first_frame`, `last_frame`, `step`. |
+| `ImageSequence` | An image sequence: `directory`, `head`, `tail`, `padding`, `frame_range`. |
+| `Video` | A video file: `path`, `frame_range`. |
+| `MediaType` | A media input, either an `ImageSequence` or a `Video`. |
+| `RepresentationItem` | A representation to be published. |
+| `PublishInput` | A publishing payload, either a `str`, a `MediaType`, or a `RepresentationItem`. |
+
+## Paths and cleanup
+
+**Cross-platform paths.** A workflow can be built on one OS and run on
+another, for example on a Windows workstation and then a Linux farm node, so
+paths are passed between nodes as rootless paths like
+`{root[work]}/to/a/file.ext`. Resolve a path input with `remap_input()` before
+using it, but return or forward the original rootless path, so the next node
+can resolve it on its own machine.
+
+**Reverting execution.** If a downstream node fails, the execution engine
+calls `revert_execute()` on nodes that already ran, with the same arguments as
+`execute()`. Implement it for any side effect that should be undone, such as
+creating files, calling external APIs, or submitting to the farm.
+
+This example shows both. Note that `revert_execute()` remaps the path too:
 
 ```python
-class EventTrigger(WorkflowInputTaskNode):
-    version = "0.0.1"
-    event_topic: Union[str, List[str], None] = None   # AYON event topic(s)
-    inputs = [InputAttribute(name="event_id", description="The id of the event to inject.")]
+import os
 
-    def execute(self, event_id: Optional[str] = None) -> Dict[str, Any]:
-        if event_id is None:
-            return {}
-        return ayon_api.get_event(event_id)
+from ayon_workflow.datatypes import ContextItem
+from ayon_workflow.utils import remap_input
+
+def execute(self, context: ContextItem, file_path: str, content: str = "") -> str:
+    remapped_path = remap_input(file_path, context.project_name)
+    with open(remapped_path, "w") as f:
+        f.write(content)
+    return file_path  # the rootless path, not remapped_path
+
+def revert_execute(self, context: ContextItem, file_path: str, content: str = ""):
+    remapped_path = remap_input(file_path, context.project_name)
+    if os.path.exists(remapped_path):
+        os.remove(remapped_path)
 ```
 
-A concrete trigger sets `event_topic` (string or list of topics) and
-overrides `execute()`, calling `super().execute()` to fetch the raw event
-then shaping it into typed outputs:
+No node in this repository overrides `revert_execute()` yet, so this snippet is
+illustrative. For a runnable demo of a failing workflow that triggers a
+revert, see [`demo/example_revert.py`](../demo/example_revert.py). For the full
+path-remapping pattern, including subprocesses and log streaming, see
+[`workflow/applications/_base.py`](../workflow/applications/_base.py) and
+[`workflow/applications/nuke.py`](../workflow/applications/nuke.py).
+
+## Trigger and condition nodes
+
+Most nodes subclass `WorkflowTaskNode`, but two kinds of nodes use a
+different base class.
+
+**Trigger nodes** start event-triggered workflows and have no required
+upstream input. They derive from `WorkflowInputTaskNode`, usually through one
+of the two base triggers in this repository:
+
+- [`EventTrigger`](../workflow/inputs/events/base.py) reacts to an AYON event.
+  Create one node per event topic you want to handle.
+- [`OnSchedule`](../workflow/inputs/cron.py) runs on a cron schedule. It only
+  validates the cron expression; the Workflow addon handles the scheduling.
+
+A concrete event trigger sets `event_topic` (a string or a list of topics) and
+overrides `execute()`. It calls `super().execute()` to fetch the raw event,
+then shapes it into typed outputs:
 
 ```python
 class OnTaskAssigneesChanged(EventTrigger):
@@ -195,7 +251,9 @@ class OnTaskAssigneesChanged(EventTrigger):
         OutputAttribute(name="event_assignees", description="..."),
     ]
 
-    def execute(self, event_id: Optional[str] = None) -> Tuple[Optional[TaskItem], Optional[List[str]]]:
+    def execute(
+        self, event_id: Optional[str] = None
+    ) -> Tuple[Optional[TaskItem], Optional[List[str]]]:
         if event_id is None:
             return None, None
         event_data = super().execute(event_id)
@@ -203,17 +261,17 @@ class OnTaskAssigneesChanged(EventTrigger):
         return task_item, event_data["summary"]["value"]
 ```
 
-- `execute()` MUST degrade gracefully (`None`/empty outputs) when called
-  with `event_id=None` — that happens outside of an actual event run.
-- Non-event trigger example: [`OnSchedule`](../workflow/inputs/cron.py)
-  only validates the cron expression; scheduling itself is handled by
-  `ayon-workflow`.
+When the workflow runs outside an actual event, such as from the editor,
+`event_id` is `None`, so `execute()` must return `None` or empty outputs in
+that case. For well-known event topics, see the
+[AYON Event Viewer article](https://help.ayon.app/en/help/articles/2566382-ayon-event-viewer#e4bo4xwd0ei).
+For an `OnSchedule` subclass example, see
+[Reference: creating your own EventTrigger or OnSchedule input node](https://docs.ayon.dev/docs/dev_addon_workflow_event#reference-creating-your-own-eventtrigger-or-onschedule-input-node).
 
-## 8. Condition nodes (branching)
-
-Derive from `WorkflowConditionTaskNode`, use `ConditionOutputAttribute` for
-branch outputs, call `self.skip_output(...)` on the branch that must not
-run downstream:
+**Condition nodes** have several mutually exclusive outputs, where only one
+branch continues downstream. They derive from `WorkflowConditionTaskNode`,
+declare branches with `ConditionOutputAttribute`, and call
+`self.skip_output(...)` on the branch that must not run:
 
 ```python
 class If(WorkflowConditionTaskNode):
@@ -241,105 +299,65 @@ class If(WorkflowConditionTaskNode):
         )
         return result
 ```
+
 Source: [`workflow/conditions/branch.py`](../workflow/conditions/branch.py)
 
-`_engine` / `_backend_directory` / `_main_flow_id` are injected by the
-execution engine when present in the signature — only needed by nodes that
-must reach engine internals (e.g. `skip_output`); ordinary nodes NEVER
-declare them.
+The execution engine injects `_engine`, `_backend_directory`, and
+`_main_flow_id` when they appear in the signature. Only nodes that need engine
+internals, such as `skip_output()`, should declare them.
 
-## 9. Cross-platform paths
+## Execution scope
 
-File-path inputs MUST be resolved at execution time with `remap_input`;
-return the original rootless path so the next node (possibly on another
-OS) can resolve it itself:
+`get_plugins()` receives the execution scope it's being called for, so a node
+can be registered only where it can actually run:
 
 ```python
-from ayon_workflow.utils import remap_input
-
-def execute(self, context: ContextItem, file_path: str) -> str:
-    remapped_path = remap_input(file_path, context.project_name)
-    with open(remapped_path, "w") as f:
-        ...
-    return file_path  # not remapped_path
-```
-Full pattern (subprocess + log streaming) in
-[`workflow/applications/_base.py`](../workflow/applications/_base.py) and
-[`workflow/applications/nuke.py`](../workflow/applications/nuke.py).
-
-## 10. Revert logic
-
-Optional `revert_execute()` on `WorkflowTaskNode`, called by the execution
-engine to undo a node's side effect if a downstream node fails. Same
-parameters as `execute()`:
-
-```python
-def execute(self, file_path: str, content: str) -> str:
-    with open(file_path, "w") as f:
-        f.write(content)
-    return file_path
-
-def revert_execute(self, file_path: str, content: str):
-    if os.path.exists(file_path):
-        os.remove(file_path)
+def get_plugins(
+    execution_scope: ExecutionScope = ExecutionScope.WORKSTATION,
+) -> list[WorkflowNode]:
+    from .essentials.append import Append
+    # Available in every scope: ExecutionScope.SERVER and ExecutionScope.WORKSTATION.
+    nodes = [Append, ...]
+    if execution_scope == ExecutionScope.WORKSTATION:
+        # Added only for ExecutionScope.WORKSTATION: pipeline tools such as
+        # DCC and publish nodes.
+        from .publish.publish import Publish
+        nodes.append(Publish)
+    return nodes
 ```
 
-> No node currently in this repo overrides `revert_execute` — this snippet
-> is illustrative. Add one for any side effect (file creation, external
-> API call, farm submission) that should be undone on failure.
+By default, add nodes outside the `if` block, so they're available in every
+scope. Add a node inside the `ExecutionScope.WORKSTATION` block only if it
+needs a local, interactive environment: a DCC application, a display,
+publishing, or production storage. To see which official nodes are available
+in each scope, check `get_plugins()` in
+[`workflow/__init__.py`](../workflow/__init__.py).
 
-## 11. AYON datatypes
+For event-triggered workflows, the scope depends on how the event processor is
+run:
 
-Use `ayon_workflow.datatypes` objects in `execute()` type hints instead of
-raw dicts/strings, so the editor and other nodes understand the data:
+- **As an AYON service**, spawned from the Services page, it runs in
+  `ExecutionScope.SERVER`, so `WORKSTATION`-only nodes aren't available.
+- **Through the AYON launcher CLI**, it runs in `ExecutionScope.WORKSTATION`,
+  so all nodes are available.
 
-| Type | Purpose |
-| --- | --- |
-| `ContextItem` / `ProjectItem` / `FolderItem` / `TaskItem` | AYON context |
-| `Entity` | Base class for anything with id/project/entity type |
-| `FrameRange` | `first_frame`, `last_frame`, `step` |
-| `ImageSequence` | `directory`, `head`, `tail`, `padding`, `frame_range` |
-| `Video` | `path`, `frame_range` |
-| `ProductItem` / `VersionItem` / `RepresentationItem` / `PublishInput` | Publishing payloads |
+For both options, see
+[Run Event Processor Service](https://help.ayon.app/en/help/articles/0480584-configure-workflow-addon).
 
-## 12. Testing locally
+## Checklist
 
-Requires `ayon-workflow` installed/importable:
+Before considering a new or changed node done:
 
-```python
-from ayon_workflow.plugin_system import register_all_plugins
-from ayon_workflow.workflow_editor import Workflow
-from ayon_workflow.workflow_execution import execute_workflow
-
-register_all_plugins()
-workflow = Workflow(name="test_workflow")
-node = workflow.execution_graph.create_node("Append")
-node["inputs"] = ["hello", ["world", "!"]]
-print(execute_workflow(workflow))
-```
-Longer walkthroughs: [`demo/example.py`](../demo/example.py) (connect
-nodes, serialize to/from JSON, execute via CLI),
-[`demo/example_revert.py`](../demo/example_revert.py) (failing workflow
-triggers a revert).
-
-## Self-check before finishing
-
-Run through this before considering a new/changed node done:
-
-- [ ] `version` is set and semver-like.
+- [ ] The class docstring is a single, accurate sentence.
+- [ ] `version` is set, semver-like, and bumped on breaking changes.
 - [ ] Every `execute()` parameter name matches an `InputAttribute.name`.
 - [ ] Every `execute()` parameter and the return value are type-hinted.
-- [ ] No `default=` is passed to `InputAttribute` — defaults are in `execute()`.
-- [ ] The class docstring is a single, accurate sentence.
-- [ ] If `execute()` returns multiple values, they are a `tuple` in the
-      same order as `outputs`.
-- [ ] Any file-path input goes through `remap_input()` before use, and the
-      original rootless path is returned/forwarded, not the resolved one.
-- [ ] Any side effect (file, external API, farm submission) has a matching
-      `revert_execute()`.
-- [ ] The node class is imported and appended in `get_plugins()`
-      ([`workflow/__init__.py`](../workflow/__init__.py)), gated behind
-      `ExecutionScope.WORKSTATION` only if it needs a local/interactive
-      environment.
-- [ ] Structured data crossing node boundaries uses `ayon_workflow.datatypes`
-      types, not ad-hoc dicts.
+- [ ] Defaults are in the `execute()` signature. `default=` is NEVER passed to `InputAttribute`.
+- [ ] Multiple return values are a `tuple`, in the same order as `outputs`.
+- [ ] Structured data between nodes uses `ayon_workflow.datatypes` types, not ad-hoc dicts.
+- [ ] Path inputs go through `remap_input()`, and the original rootless path is returned.
+- [ ] Side effects (files, external APIs, farm submissions) have a matching `revert_execute()`.
+- [ ] Trigger nodes handle `event_id=None`.
+- [ ] Engine parameters (`_engine`, `_backend_directory`, `_main_flow_id`) are declared only when needed.
+- [ ] The node is in `get_plugins()`, gated behind `ExecutionScope.WORKSTATION` only if needed.
+- [ ] The node runs in the AYON Console and looks right in the Workflow editor.
