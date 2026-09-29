@@ -1,29 +1,59 @@
-1. Open the web editor.
-2. Load and upload some example workflows from this directory.
-3. Add them as new registered workflows (this is done through the web-editor-> File menu)
-4. Specific to `trigger_from_simple_action_folder`, define a new simple action that is enabled on Folder in the `ayon_workflow` settings `ayon+settings://workflow/simple_actions`.
-   This should connect the registered workflow `trigger_from_simple_action_folder` to a simple action "My custom Folder trigger" available on folder entities.
-```
-{
-  "simple_actions": [
-    {
-      "enabled": true,
-      "local": true,
-      "workflow_name": "SimpleActionWorkflowFolder",
-      "label": "My custom Folder trigger",
-      "input_entity": "Folder"
-    }
-  ],
-}
-```
-5a. (locally) Run the processor through AYON launcher: `$AYON_EXECUTABLE --use-dev event-processor`
-5b. (from ASH host)
-    1. Log in to the private `harbor.ynput.team` (credentials to be provided by an admin)
-    2. Pull the latest docker image from `harbor.ynput.team/services/ayon-workflow-event-processor`
-    3. Register the service from ASH service page on the AYON server
+# Event-Triggered Workflow Examples
 
-6. Results:
-    * Ensure the cron workflow is triggered on its own every minute.
-    * Ensure the simple action workflow is triggered when the simple action is triggered and not local.
-    * Ensure the simple action workflow is run locally when the simple action is triggered and local.
-    * Ensure the workflow from version created event is triggered when a new version is created.
+Example workflow graphs that show how to use the AYON Workflow addon for
+automations: running a workflow when an event occurs or on a schedule, or
+providing it as an action users can trigger on demand from the AYON web UI.
+
+The same examples ship with the Workflow addon under
+`ayon_workflow/demo/workflow_from_events/`.
+
+## Requirements
+
+- **Workflow addon service:** The Workflow addon service must be running on
+  your AYON server, since it picks up registered workflows and runs them when
+  their trigger fires. See
+  [Configure Workflow Addon](https://help.ayon.app/en/help/articles/0480584-configure-workflow-addon).
+- **Deadline:** All examples except
+  `on_task_assignees_changed_watch_parent_folder.json` dispatch their work to
+  Deadline Thinkbox, so they need a working Deadline setup to see a result. See
+  [Configure Deadline Addon](https://help.ayon.app/en/help/articles/5372986-configure-deadline-addon).
+
+## Examples
+
+| File | Trigger node | What it does |
+| --- | --- | --- |
+| `on_task_assignees_changed_watch_parent_folder.json` | `OnTaskAssigneesChanged` | Runs when assignees change on any task (`entity.task.assignees_changed`) and adds the new assignees as watchers on the task's parent folder (`GetParentContext` → `SetEntityWatchers`). Runs without farm dispatch. |
+| `trigger_from_version_created_event.json` | `OnVersionCreated` | Runs when a new version is created (`entity.version.created`). Uses an `If` node so it only continues for versions in the `Demo` project, then dispatches to Deadline. |
+| `trigger_from_cron.json` | `OnSchedule` (cron: `*/1 * * * *`) | Runs every minute and dispatches a `NoOp` task to Deadline. |
+| `trigger_from_simple_action_folder.json` | `OnActionFromFolder` | Runs from a custom action in the folder action menu and dispatches a `NoOp` task to Deadline. |
+| `trigger_from_simple_action_version.json` | `OnActionFromVersion` | Runs from a custom action in the version action menu and dispatches a `NoOp` task to Deadline. |
+
+## Using the Examples
+
+Every example follows the same two steps:
+
+1. **Load it.** In the Workflow editor, go to `File > Load...` and select the
+   example's `.json` file.
+2. **Register it.** Go to `File > Registered Workflows > Register Current Workflow...`
+   and give the workflow a name. From then on, the Workflow addon service runs
+   it whenever its trigger fires.
+
+The two simple action examples need one more step so the action appears in
+the web UI:
+
+3. **Add the action in settings.** Open the Workflow addon settings,
+   `ayon+settings://workflow/simple_actions/from_folder` or
+   `ayon+settings://workflow/simple_actions/from_version`. Add an entry with an
+   action label and your registered workflow's name, then enable the entry,
+   since new entries are disabled by default. The **Execute Locally** option
+   controls where the workflow runs: enabled, it runs through the AYON launcher
+   on the user's machine; disabled, it's handed to the Workflow addon service.
+
+For the full walkthrough, including how to test each example and what result
+to expect, see
+[Workflows & Automations](https://help.ayon.app/en/help/articles/1804107-workflows-and-automations).
+
+## Further Reading
+
+- [Event-triggered workflows dev docs](https://docs.ayon.dev/docs/dev_addon_workflow_event): how event-triggered workflows work under the hood
+- [Creating your own EventTrigger or OnSchedule input node](https://docs.ayon.dev/docs/dev_addon_workflow_event#reference-creating-your-own-eventtrigger-or-onschedule-input-node): react to event topics not covered by the built-in trigger nodes
