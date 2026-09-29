@@ -1,9 +1,36 @@
 """ Node collection for the workflow plugin.
 """
+import importlib.util
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version
+from pathlib import Path
+
 from ayon_workflow.plugin_system import (
     WorkflowNode,
     ExecutionScope,
 )
+from ayon_workflow.version import __version__ as core_version
+
+
+def _check_compatibility():
+    """ Detect incompatible `ayon_workflow` (core) version.
+    """
+    package_path = Path(__file__).resolve().parent.parent / "package.py"
+    spec = importlib.util.spec_from_file_location(
+        "ayon_workflow_nodes_package", package_path
+    )
+    package = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(package)
+
+    ayon_workflow_compatible = package.ayon_compatible_addons["workflow"]
+    if Version(core_version) not in SpecifierSet(ayon_workflow_compatible):
+        raise RuntimeError(
+            f"ayon-workflow-nodes-{package.version} requires ayon_workflow-"
+            f"{ayon_workflow_compatible}, but found {core_version}."
+        )
+
+
+_check_compatibility()
 
 
 def get_plugins(
@@ -73,6 +100,5 @@ def get_plugins(
         )
 
     return nodes
-
 
 __all__ = ["get_plugins"]
