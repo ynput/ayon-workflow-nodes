@@ -45,6 +45,20 @@ class EventTrigger(WorkflowInputTaskNode):
             rebind=rebind,
         )
 
+    @classmethod
+    def accepts_event(
+        cls,
+        event: Dict[str, Any],
+        values: Dict[str, Any],
+    ) -> bool:
+        """ Whether the workflow runs for this event, decided from the event
+        and the static values of the trigger node (its filters).
+
+        The event processor asks before it starts (and records) a run, so a
+        workflow can react to some events of a topic only.
+        """
+        return True
+
     def execute(self, event_id: Optional[str] = None) -> Dict[str, Any]:
         """ Return the event data.
         """
