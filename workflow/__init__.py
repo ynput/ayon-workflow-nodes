@@ -44,10 +44,12 @@ def get_plugins(
     from .essentials.append import Append
     from .essentials.context import Context
     from .essentials.get_parent_context import GetParentContext
+    from .essentials.get_version_task import GetVersionTask
     from .essentials.image_sequence import ImageSequenceNode
     from .essentials.merge_sequence import MergeSequence
     from .essentials.no_op import NoOp
     from .essentials.set_entity_watchers import SetEntityWatchers
+    from .essentials.set_status import SetStatus
     from .essentials.task_context import TaskContext
     from .essentials.video import VideoNode
 
@@ -68,11 +70,12 @@ def get_plugins(
         Context,
         TaskContext,
         GetParentContext,
+        GetVersionTask,
         VideoNode,
         ImageSequenceNode,
         MergeSequence,
         SetEntityWatchers,
-        UITest,
+        SetStatus,
         OnVersionCreated,
         OnTaskAssigneesChanged,
         OnActionFromFolder,
@@ -81,6 +84,8 @@ def get_plugins(
     ]
 
     if execution_scope == ExecutionScope.WORKSTATION:
+        # widget showcase for the desktop editor, not an automation step
+        nodes.append(UITest)
 
         from .applications.nuke import NukeRender
         from .applications.blender_render import BlenderRender
