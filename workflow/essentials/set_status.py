@@ -62,6 +62,8 @@ class SetStatus(WorkflowTaskNode):
                 "The status to set, one of the project statuses for this "
                 "entity type (not case sensitive)."
             ),
+            # editors can offer the project statuses
+            widget={"name": "status"},
         ),
     ]
     outputs = [
