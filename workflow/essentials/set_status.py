@@ -20,7 +20,7 @@ def _get_status_names(project_name: str, entity_type: str) -> list[str]:
         status["name"]
         for status in project.get("statuses") or []
         # no scope means every entity type
-        if not status.get("scope") or entity_type in status["scope"]
+        if status.get("scope") is None or entity_type in status["scope"]
     ]
 
 
