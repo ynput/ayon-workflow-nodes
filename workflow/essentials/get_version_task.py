@@ -1,3 +1,5 @@
+from typing import Optional
+
 import ayon_api
 
 from ayon_workflow.datatypes import (
@@ -22,6 +24,10 @@ class GetVersionTask(WorkflowTaskNode):
             name="version_item",
             description="An AYON version.",
         ),
+        InputAttribute(
+            name="ensure_exists",
+            description="Assert version published against a task.",
+        ),
     ]
     outputs = [
         OutputAttribute(
@@ -30,7 +36,11 @@ class GetVersionTask(WorkflowTaskNode):
         )
     ]
 
-    def execute(self, version_item: VersionItem) -> TaskItem:
+    def execute(
+        self,
+        version_item: VersionItem,
+        ensure_exists: bool = True,
+    ) -> Optional[TaskItem]:
         project_name = version_item.project_name
         version_data = ayon_api.get_version_by_id(
             project_name,
@@ -39,10 +49,13 @@ class GetVersionTask(WorkflowTaskNode):
         ) or {}
         task_id = version_data.get("taskId")
         if not task_id:
-            raise ValueError(
-                f"Version {version_item.version} ({version_item.id}) "
-                "was not published from a task."
-            )
+            if ensure_exists:
+                raise ValueError(
+                    f"Version {version_item.version} ({version_item.id}) "
+                    "was not published from a task."
+                )
+            else:
+                return None
 
         task_data = ayon_api.get_task_by_id(project_name, task_id)
         if not task_data:
