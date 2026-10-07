@@ -20,7 +20,7 @@ def _get_status_names(project_name: str, entity_type: str) -> list[str]:
         status["name"]
         for status in project.get("statuses") or []
         # no scope means every entity type
-        if not status.get("scope") or entity_type in status["scope"]
+        if status.get("scope") is None or entity_type in status["scope"]
     ]
 
 
@@ -74,6 +74,7 @@ class SetStatus(WorkflowTaskNode):
     ]
 
     def execute(self, input_entity: Entity, status: str) -> Entity:
+        self._previous_status = None
         entity_type = getattr(input_entity, "entity_type", None)
         if entity_type not in self.ENTITY_TYPES:
             raise ValueError(
@@ -92,7 +93,7 @@ class SetStatus(WorkflowTaskNode):
                 f"Expected one of: {', '.join(names)}."
             )
 
-        # kept to restore it if a later node fails
+        # Store previous value to restore it in revert if needed
         self._previous_status = _get_status(input_entity)
         _update_status(input_entity, matches[0])
         return input_entity

@@ -94,8 +94,6 @@ def get_plugins(
     ]
 
     if execution_scope == ExecutionScope.WORKSTATION:
-        # widget showcase for the desktop editor, not an automation step
-        nodes.append(UITest)
 
         from .applications.nuke import NukeRender
         from .applications.blender_render import BlenderRender
@@ -111,6 +109,9 @@ def get_plugins(
                 BlenderWorkfile,
                 Publish,
                 Representation,
+
+                # widget showcase for the desktop editor
+                UITest
             ]
         )
 
