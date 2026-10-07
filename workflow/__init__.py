@@ -62,6 +62,7 @@ def get_plugins(
         OnVersionCreated,
         OnTaskAssigneesChanged,
         OnStatusChanged,
+        OnEvent,
         OnActionFromFolder,
         OnActionFromVersion,
     )
@@ -88,6 +89,7 @@ def get_plugins(
         OnVersionCreated,
         OnTaskAssigneesChanged,
         OnStatusChanged,
+        OnEvent,
         OnActionFromFolder,
         OnActionFromVersion,
         OnSchedule,

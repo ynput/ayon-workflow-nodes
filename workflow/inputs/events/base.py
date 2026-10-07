@@ -1,6 +1,4 @@
-from typing import Optional, Any, Dict, List, Union
-
-import logging
+from typing import Any, Dict, List, Optional, Union
 
 import ayon_api
 
@@ -8,9 +6,6 @@ from ayon_workflow.plugin_system import (
     WorkflowInputTaskNode,
     InputAttribute,
 )
-
-
-log = logging.getLogger(__name__)
 
 
 class EventTrigger(WorkflowInputTaskNode):
@@ -25,39 +20,14 @@ class EventTrigger(WorkflowInputTaskNode):
         )
     ]
 
-    def __init__(
-        self,
-        name: Optional[str] = None,
-        provides: Optional[list[str]] = None,
-        inject: Optional[dict[str, Any]] = None,
-        rebind: Optional[dict[str, str]] = None,
-    ):
-        if not self.event_topic:
-            log.warning(
-                f"Event trigger class {self.__class__.__name__} does not "
-                "define event topic. It is required for the event processor."
-            )
-
-        super().__init__(
-            name=name,
-            provides=provides,
-            inject=inject,
-            rebind=rebind,
-        )
-
     @classmethod
-    def accepts_event(
-        cls,
-        event: Dict[str, Any],
-        values: Dict[str, Any],
-    ) -> bool:
-        """ Whether the workflow runs for this event, decided from the event
-        and the static values of the trigger node (its filters).
-
-        The event processor asks before it starts (and records) a run, so a
-        workflow can react to some events of a topic only.
+    def event_topics(cls, values: Dict[str, Any]) -> List[str]:
+        """ The topics the event processor registers the workflow on, from
+        the static values of the trigger node. `event_topic` by default.
         """
-        return True
+        if isinstance(cls.event_topic, str):
+            return [cls.event_topic]
+        return list(cls.event_topic or [])
 
     def execute(self, event_id: Optional[str] = None) -> Dict[str, Any]:
         """ Return the event data.

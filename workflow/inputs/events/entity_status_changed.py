@@ -1,4 +1,6 @@
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
+
+from taskflow.engines.action_engine import engine
 
 from ayon_workflow.datatypes import Entity
 from ayon_workflow.plugin_system import (
@@ -73,17 +75,11 @@ class OnStatusChanged(EventTrigger):
     ]
 
     @classmethod
-    def accepts_event(
-        cls,
-        event: Dict[str, Any],
-        values: Dict[str, Any],
-    ) -> bool:
-        payload = event.get("payload") or {}
-        return (
-            _matches(values.get("entity_type"), event["topic"].split(".")[1])
-            and _matches(values.get("to_status"), payload.get("newValue"))
-            and _matches(values.get("from_status"), payload.get("oldValue"))
-        )
+    def event_topics(cls, values: Dict[str, Any]) -> List[str]:
+        entity_type = (values.get("entity_type") or "").strip().lower()
+        if entity_type in ENTITY_TYPES:
+            return [f"entity.{entity_type}.status_changed"]
+        return super().event_topics(values)
 
     def execute(
         self,
@@ -91,17 +87,41 @@ class OnStatusChanged(EventTrigger):
         entity_type: str = ANY,
         to_status: str = "",
         from_status: str = "",
+        _engine: Optional[engine.ActionEngine] = None,
+        _backend_directory: Optional[str] = None,
+        _main_flow_id: Optional[str] = None,
     ) -> Tuple[Optional[Entity], Optional[str], Optional[str]]:
-        """ Return the entity and its new and old status.
+        """ Return the entity and its new and old status, or skip the rest
+        of the workflow when the change does not match the filters.
         """
         if event_id is None:
             return None, None, None
 
         event_data = super().execute(event_id)
+        changed_type = event_data["topic"].split(".")[1]
         payload = event_data.get("payload") or {}
+        new_status = payload.get("newValue")
+        old_status = payload.get("oldValue")
+
+        mismatch = None
+        if not _matches(entity_type, changed_type):
+            mismatch = f"a {changed_type} changed, not a {entity_type}"
+        elif not _matches(to_status, new_status):
+            mismatch = f"the new status is {new_status}, not {to_status}"
+        elif not _matches(from_status, old_status):
+            mismatch = f"the status was {old_status}, not {from_status}"
+        if mismatch:
+            self.skip_workflow(
+                mismatch,
+                _engine=_engine,
+                _backend_directory=_backend_directory,
+                _main_flow_id=_main_flow_id,
+            )
+            return None, new_status, old_status
+
         entity = _utils.get_entity_item(
             event_data["project"],
-            event_data["topic"].split(".")[1],
+            changed_type,
             event_data["summary"]["entityId"],
         )
-        return entity, payload.get("newValue"), payload.get("oldValue")
+        return entity, new_status, old_status
