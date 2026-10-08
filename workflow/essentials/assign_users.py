@@ -1,6 +1,7 @@
-from typing import Union
+from typing import Any, Dict, Optional, Union
 
 import ayon_api
+from taskflow.engines.action_engine import engine
 
 from ayon_workflow.datatypes import TaskItem
 from ayon_workflow.plugin_system import (
@@ -33,7 +34,6 @@ class AssignUsers(WorkflowTaskNode):
                 "Add them to the assignees, remove them, or make them the "
                 "only assignees."
             ),
-            default="add",
             widget={"name": "choice", "options": EDIT_MODES},
         ),
     ]
@@ -49,6 +49,7 @@ class AssignUsers(WorkflowTaskNode):
         task: TaskItem,
         users: Union[str, list[str]],
         edit_mode: str = "add",
+        _engine: Optional[engine.ActionEngine] = None,
     ) -> TaskItem:
         if edit_mode not in self.EDIT_MODES:
             raise ValueError(
@@ -81,7 +82,7 @@ class AssignUsers(WorkflowTaskNode):
             assignees = users
 
         # kept to restore them if a later node fails
-        self._previous = current
+        self.inject_custom_backend_data(_engine, previous_assignees=current)
         ayon_api.update_task(
             task.project_name, task.task_id, assignees=assignees
         )
@@ -92,9 +93,12 @@ class AssignUsers(WorkflowTaskNode):
         task: TaskItem,
         users: Union[str, list[str]],
         edit_mode: str = "add",
+        _custom_data: Optional[Dict[str, Any]] = None,
         **kwargs,
     ):
-        if hasattr(self, "_previous"):
+        if "previous_assignees" in (_custom_data or {}):
             ayon_api.update_task(
-                task.project_name, task.task_id, assignees=self._previous
+                task.project_name,
+                task.task_id,
+                assignees=_custom_data["previous_assignees"],
             )

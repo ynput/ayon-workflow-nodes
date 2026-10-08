@@ -193,9 +193,9 @@ using it, but return or forward the original rootless path, so the next node
 can resolve it on its own machine.
 
 **Reverting execution.** If a downstream node fails, the execution engine
-calls `revert_execute()` on nodes that already ran, with the same arguments as
-`execute()`. Implement it for any side effect that should be undone, such as
-creating files, calling external APIs, or submitting to the farm.
+calls `revert_execute()` on nodes that already ran. Implement it for any side
+effect that should be undone, such as creating files, calling external APIs, or
+submitting to the farm.
 
 This example shows both. Note that `revert_execute()` remaps the path too:
 
@@ -211,14 +211,71 @@ def execute(self, context: ContextItem, file_path: str, content: str = "") -> st
         f.write(content)
     return file_path  # the rootless path, not remapped_path
 
-def revert_execute(self, context: ContextItem, file_path: str, content: str = ""):
+def revert_execute(
+    self, context: ContextItem, file_path: str, content: str = "", **kwargs
+):
     remapped_path = remap_input(file_path, context.project_name)
     if os.path.exists(remapped_path):
         os.remove(remapped_path)
 ```
 
-No node in this repository overrides `revert_execute()` yet, so this snippet is
-illustrative. For a runnable demo of a failing workflow that triggers a
+**What `revert_execute()` receives.** The engine always gives it
+`flow_failures`, the failures that triggered the revert, so it must declare
+`flow_failures` or accept `**kwargs`. It also gives it `result` and
+`_custom_data` when it declares them or accepts `**kwargs`, so a
+`revert_execute()` that takes neither still works. Positional-only parameters
+(`def revert_execute(self, result, /)`) are refused when the node class is
+defined, the engine only gives keyword arguments.
+
+**Using the result of `execute()`.** What `execute()` returned is given to
+`revert_execute()` as `result`, so a node that creates something can delete it
+without keeping anything else:
+
+```python
+def execute(self, folder: FolderItem, task_name: str) -> str:
+    return create_task(folder, task_name)  # the id of the new task
+
+def revert_execute(self, folder: FolderItem, task_name: str, **kwargs):
+    task_id = kwargs.get("result")
+    if isinstance(task_id, str):
+        delete_task(folder, task_id)
+```
+
+- With several outputs, `result` is the tuple `execute()` returned.
+- If `execute()` itself failed, the node is reverted too and `result` is a
+  taskflow `Failure`, not a value: check its type before using it.
+
+**Keeping custom data for the revert.** `revert_execute()` often needs more than
+the result, like the previous status of what `execute()` changed. Store it with
+`inject_custom_backend_data()` and read it back from `_custom_data`:
+
+```python
+def execute(self, task: TaskItem, status: str, _engine=None) -> TaskItem:
+    self.inject_custom_backend_data(_engine, previous_status=get_status(task))
+    set_status(task, status)
+    return task
+
+def revert_execute(self, task: TaskItem, status: str, _custom_data=None, **kwargs):
+    previous = _custom_data.get("previous_status")
+    if previous:
+        set_status(task, previous)
+```
+
+- Declare `_engine=None` in `execute()`, the engine passes it. It is `None` when
+  a node is called outside an engine, for example in a unit test: the data is
+  then only kept in memory, nothing is saved in the backend.
+- The data must be serializable (strings, numbers, booleans, lists, dicts). It
+  is saved in the workflow backend, so the revert gets it even when it runs in
+  another process or machine.
+- It is not an output of the node: nothing connects to it and the editor does
+  not show it.
+- Every call adds to the previous ones, the same key is replaced, and the data
+  starts empty at each `execute()`.
+- `_custom_data` is `{}` when nothing was stored.
+- Do not keep this data on `self`: an attribute is lost when the revert runs in
+  another process.
+
+This snippet is illustrative. For a runnable demo of a failing workflow that triggers a
 revert, see [`demo/example_revert.py`](../demo/example_revert.py). For the full
 path-remapping pattern, including subprocesses and log streaming, see
 [`workflow/applications/_base.py`](../workflow/applications/_base.py) and
@@ -234,22 +291,29 @@ upstream input. They derive from `WorkflowInputTaskNode`, usually through one
 of the two base triggers in this repository:
 
 - [`EventTrigger`](../workflow/inputs/events/base.py) reacts to an AYON event.
-  Create one node per event topic you want to handle.
+  Create one node per kind of event you want to handle.
 - [`OnSchedule`](../workflow/inputs/cron.py) runs on a cron schedule. It only
   validates the cron expression; the Workflow addon handles the scheduling.
 
-A concrete event trigger sets `event_topic` (a string or a list of topics) and
-overrides `execute()`. It calls `super().execute()` to fetch the raw event,
-then shapes it into typed outputs:
+A concrete event trigger overrides the class method `get_event_topics()` and
+`execute()`. `get_event_topics()` returns the list of event topics that start
+the workflow. It gets the values set on the node, so the topics can depend on
+them. It must return a `list` of strings: the base class returns an empty list,
+and anything else is refused, so the workflow is not registered for events.
+`execute()` calls `super().execute()` to fetch the raw event, then shapes it
+into typed outputs:
 
 ```python
 class OnTaskAssigneesChanged(EventTrigger):
     version = "0.0.1"
-    event_topic = "entity.task.assignees_changed"
     outputs = [
         OutputAttribute(name="event_context", description="..."),
         OutputAttribute(name="event_assignees", description="..."),
     ]
+
+    @classmethod
+    def get_event_topics(cls, execute_values: Dict[str, Any]) -> List[str]:
+        return ["entity.task.assignees_changed"]
 
     def execute(
         self, event_id: Optional[str] = None
@@ -267,6 +331,47 @@ that case. For well-known event topics, see the
 [AYON Event Viewer article](https://help.ayon.app/en/help/articles/2566382-ayon-event-viewer#e4bo4xwd0ei).
 For an `OnSchedule` subclass example, see
 [Reference: creating your own EventTrigger or OnSchedule input node](https://docs.ayon.dev/docs/dev_addon_workflow_event#reference-creating-your-own-eventtrigger-or-onschedule-input-node).
+
+**Skipping the workflow.** A trigger can decide that an event is not for its
+workflow, for example because of a filter set on the node. Raise
+`SkipWorkflowInput` from `execute()` with the reason:
+
+```python
+from ayon_workflow.plugin_system import SkipWorkflowInput
+
+class OnVersionStatusChanged(EventTrigger):
+    version = "0.0.1"
+    inputs = [
+        InputAttribute(name="event_id", description="The id of the event."),
+        InputAttribute(name="to_status", description="Only for this status."),
+    ]
+    outputs = [OutputAttribute(name="event", description="The event.")]
+
+    @classmethod
+    def get_event_topics(cls, execute_values: Dict[str, Any]) -> List[str]:
+        return ["entity.version.status_changed"]
+
+    def execute(
+        self, event_id: Optional[str] = None, to_status: str = ""
+    ) -> Optional[Dict[str, Any]]:
+        if event_id is None:
+            return None
+        event_data = super().execute(event_id)
+        new_status = (event_data.get("payload") or {}).get("newValue")
+        if to_status and new_status != to_status:
+            raise SkipWorkflowInput(f"the new status is not {to_status}")
+        return event_data
+```
+
+- The event processor runs the trigger nodes in memory before the rest of the
+  workflow. If one raises `SkipWorkflowInput`, the workflow does not run.
+- It is not an error: the event is finished, and its description tells what was
+  skipped and why, for example `Skipped MyWorkflow: the new status is not
+  Approved.`
+- The trigger runs again in the workflow itself, so keep its `execute()` cheap
+  and without side effects.
+- Raised by any other node, it is an ordinary error. To choose a branch, use a
+  condition node and `skip_output()` instead.
 
 **Condition nodes** have several mutually exclusive outputs, where only one
 branch continues downstream. They derive from `WorkflowConditionTaskNode`,
@@ -357,7 +462,9 @@ Before considering a new or changed node done:
 - [ ] Structured data between nodes uses `ayon_workflow.datatypes` types, not ad-hoc dicts.
 - [ ] Path inputs go through `remap_input()`, and the original rootless path is returned.
 - [ ] Side effects (files, external APIs, farm submissions) have a matching `revert_execute()`.
+- [ ] Data needed by `revert_execute()` is stored with `inject_custom_backend_data()`, not on `self`.
 - [ ] Trigger nodes handle `event_id=None`.
+- [ ] Trigger nodes skip the workflow by raising `SkipWorkflowInput` with a reason.
 - [ ] Engine parameters (`_engine`, `_backend_directory`, `_main_flow_id`) are declared only when needed.
 - [ ] The node is in `get_plugins()`, gated behind `ExecutionScope.WORKSTATION` only if needed.
 - [ ] The node runs in the AYON Console and looks right in the Workflow editor.

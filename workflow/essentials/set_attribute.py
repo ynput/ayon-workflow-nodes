@@ -1,6 +1,7 @@
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 import ayon_api
+from taskflow.engines.action_engine import engine
 
 from ayon_workflow.datatypes import Entity
 from ayon_workflow.plugin_system import (
@@ -124,6 +125,7 @@ class SetAttribute(WorkflowTaskNode):
         input_entity: Entity,
         attribute: str,
         value: Optional[Any] = None,
+        _engine: Optional[engine.ActionEngine] = None,
     ) -> Entity:
         entity_type = getattr(input_entity, "entity_type", None)
         if not attribute:
@@ -140,7 +142,10 @@ class SetAttribute(WorkflowTaskNode):
         data = _utils.get_entity_data(
             input_entity, fields={f"attrib.{attribute}"}
         )
-        self._previous = (data.get("attrib") or {}).get(attribute)
+        self.inject_custom_backend_data(
+            _engine,
+            previous=(data.get("attrib") or {}).get(attribute)
+        )
         _utils.update_entity(input_entity, attrib={attribute: converted})
         return input_entity
 
@@ -149,9 +154,10 @@ class SetAttribute(WorkflowTaskNode):
         input_entity: Entity,
         attribute: str,
         value: Optional[Any] = None,
+        _custom_data: Optional[Dict[str, Any]] = None,
         **kwargs,
     ):
-        if hasattr(self, "_previous"):
+        if "previous" in (_custom_data or {}):
             _utils.update_entity(
-                input_entity, attrib={attribute: self._previous}
+                input_entity, attrib={attribute: _custom_data["previous"]}
             )

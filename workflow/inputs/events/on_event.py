@@ -1,11 +1,10 @@
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from taskflow.engines.action_engine import engine
-
 from ayon_workflow.datatypes import Entity
 from ayon_workflow.plugin_system import (
     InputAttribute,
     OutputAttribute,
+    SkipWorkflowInput,
     WorkflowConditionTaskNode,
 )
 
@@ -62,17 +61,14 @@ class OnEvent(EventTrigger):
     ]
 
     @classmethod
-    def event_topics(cls, values: Dict[str, Any]) -> List[str]:
-        return _topics(values.get("topic"))
+    def get_event_topics(cls, execute_values: Dict[str, Any]) -> List[str]:
+        return _topics(execute_values.get("topic"))
 
     def execute(
         self,
         event_id: Optional[str] = None,
         topic: Optional[str] = None,
         condition: Optional[str] = None,
-        _engine: Optional[engine.ActionEngine] = None,
-        _backend_directory: Optional[str] = None,
-        _main_flow_id: Optional[str] = None,
     ) -> Tuple[Optional[Entity], Optional[Dict[str, Any]]]:
         """ Return the entity of the event and the event, or skip the rest
         of the workflow when the condition does not hold.
@@ -84,13 +80,7 @@ class OnEvent(EventTrigger):
         if condition and not WorkflowConditionTaskNode.evaluate_condition(
             condition, input_data=event_data
         ):
-            self.skip_workflow(
-                f"{condition} is false for this event",
-                _engine=_engine,
-                _backend_directory=_backend_directory,
-                _main_flow_id=_main_flow_id,
-            )
-            return None, event_data
+            raise SkipWorkflowInput(f"{condition} is false for this event")
 
         entity = None
         parts = event_data["topic"].split(".")

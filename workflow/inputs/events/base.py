@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Optional, Any, Dict, List
+
 
 import ayon_api
 
@@ -12,7 +13,6 @@ class EventTrigger(WorkflowInputTaskNode):
     """A base class for event trigger node."""
 
     version = "0.0.1"
-    event_topic: Union[str, List[str], None] = None
     inputs = [
         InputAttribute(
             name="event_id",
@@ -21,13 +21,12 @@ class EventTrigger(WorkflowInputTaskNode):
     ]
 
     @classmethod
-    def event_topics(cls, values: Dict[str, Any]) -> List[str]:
-        """ The topics the event processor registers the workflow on, from
-        the static values of the trigger node. `event_topic` by default.
+    def get_event_topics(cls, execute_values: Dict[str, Any]) -> List[str]:
+        """ Return the event topic associated to the EventTrigger,
+            can use values provided to execute() as execute_values.
+            Must be overwritten per input node.
         """
-        if isinstance(cls.event_topic, str):
-            return [cls.event_topic]
-        return list(cls.event_topic or [])
+        return []
 
     def execute(self, event_id: Optional[str] = None) -> Dict[str, Any]:
         """ Return the event data.

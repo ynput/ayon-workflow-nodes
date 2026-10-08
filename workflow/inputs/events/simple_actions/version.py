@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Dict, Any, List
 
 import ayon_api
 
@@ -19,10 +19,6 @@ class OnActionFromVersion(EventTrigger):
     """Trigger node: on simple action from version."""
 
     version = "0.0.1"
-    event_topic = [
-        "workflow.from_simple_action.local",
-        "workflow.from_simple_action.remote",
-    ]
     inputs = [
         InputAttribute(
             name="project_name",
@@ -43,6 +39,13 @@ class OnActionFromVersion(EventTrigger):
             description="The output event version.",
         )
     ]
+
+    @classmethod
+    def get_event_topics(cls, execute_values: Dict[str, Any]) -> List[str]:
+        return [
+            "workflow.from_simple_action.local",
+            "workflow.from_simple_action.remote",
+        ]
 
     def execute(
         self,

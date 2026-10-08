@@ -1,4 +1,7 @@
+from typing import Any, Dict, Optional
+
 import ayon_api
+from taskflow.engines.action_engine import engine
 
 from ayon_workflow.datatypes import Entity
 from ayon_workflow.plugin_system import (
@@ -32,7 +35,12 @@ class AddComment(WorkflowTaskNode):
         )
     ]
 
-    def execute(self, input_entity: Entity, text: str) -> Entity:
+    def execute(
+        self,
+        input_entity: Entity,
+        text: str,
+        _engine: Optional[engine.ActionEngine] = None,
+    ) -> Entity:
         if getattr(input_entity, "entity_type", None) not in ENTITY_TYPES:
             raise ValueError(
                 f"Cannot comment on {input_entity}, expected a folder, task, "
@@ -40,17 +48,23 @@ class AddComment(WorkflowTaskNode):
             )
         if not text or not text.strip():
             raise ValueError("No comment text.")
-        self._activity_id = ayon_api.create_activity(
+        activity_id = ayon_api.create_activity(
             input_entity.project_name,
             input_entity.id,
             input_entity.entity_type,
             "comment",
             body=text,
         )
+        self.inject_custom_backend_data(_engine, activity_id=activity_id)
         return input_entity
 
-    def revert_execute(self, input_entity: Entity, text: str, **kwargs):
-        if getattr(self, "_activity_id", None):
-            ayon_api.delete_activity(
-                input_entity.project_name, self._activity_id
-            )
+    def revert_execute(
+        self,
+        input_entity: Entity,
+        text: str,
+        _custom_data: Optional[Dict[str, Any]] = None,
+        **kwargs,
+    ):
+        activity_id = (_custom_data or {}).get("activity_id")
+        if activity_id:
+            ayon_api.delete_activity(input_entity.project_name, activity_id)

@@ -1,6 +1,7 @@
-from typing import Optional, Union
+from typing import Any, Dict, Optional, Union
 
 import ayon_api
+from taskflow.engines.action_engine import engine
 
 from ayon_workflow.datatypes import FolderItem, TaskItem
 from ayon_workflow.plugin_system import (
@@ -34,7 +35,6 @@ class CreateTask(WorkflowTaskNode):
         InputAttribute(
             name="assignees",
             description="Users to assign when the task is created.",
-            default=[],
             widget={"name": "users"},
         ),
     ]
@@ -51,12 +51,12 @@ class CreateTask(WorkflowTaskNode):
         task_name: str,
         task_type: str,
         assignees: Optional[Union[str, list[str]]] = None,
+        _engine: Optional[engine.ActionEngine] = None,
     ) -> TaskItem:
         project_name = folder.project_name
         if not task_name:
             raise ValueError("No task name.")
 
-        self._created_id = None
         existing = ayon_api.get_task_by_name(
             project_name, folder.folder_id, task_name
         )
@@ -74,13 +74,14 @@ class CreateTask(WorkflowTaskNode):
                 )
             if isinstance(assignees, str):
                 assignees = [assignees]
-            self._created_id = ayon_api.create_task(
+            created_id = ayon_api.create_task(
                 project_name,
                 task_name,
                 matches[0],
                 folder.folder_id,
                 assignees=[name for name in assignees or [] if name] or None,
             )
+            self.inject_custom_backend_data(_engine, created_id=created_id)
 
         return _utils.get_task_item(project_name, folder, task_name)
 
@@ -90,8 +91,9 @@ class CreateTask(WorkflowTaskNode):
         task_name: str,
         task_type: str,
         assignees: Optional[Union[str, list[str]]] = None,
+        _custom_data: Optional[Dict[str, Any]] = None,
         **kwargs,
     ):
-        # only a task this node created
-        if getattr(self, "_created_id", None):
-            ayon_api.delete_task(folder.project_name, self._created_id)
+        created_id = (_custom_data or {}).get("created_id")
+        if created_id:
+            ayon_api.delete_task(folder.project_name, created_id)

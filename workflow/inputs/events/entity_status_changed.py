@@ -1,11 +1,10 @@
 from typing import Any, Dict, List, Optional, Tuple
 
-from taskflow.engines.action_engine import engine
-
 from ayon_workflow.datatypes import Entity
 from ayon_workflow.plugin_system import (
     InputAttribute,
     OutputAttribute,
+    SkipWorkflowInput,
 )
 
 from ayon_workflow.plugins.workflow.essentials import _utils
@@ -28,7 +27,6 @@ class OnStatusChanged(EventTrigger):
     changes, optionally only for one entity type or certain statuses."""
 
     version = "0.0.1"
-    event_topic = [f"entity.{name}.status_changed" for name in ENTITY_TYPES]
     inputs = [
         InputAttribute(
             name="event_id",
@@ -37,7 +35,6 @@ class OnStatusChanged(EventTrigger):
         InputAttribute(
             name="entity_type",
             description="Only for this entity type.",
-            default=ANY,
             widget={"name": "choice", "options": [ANY, *ENTITY_TYPES]},
         ),
         InputAttribute(
@@ -46,7 +43,6 @@ class OnStatusChanged(EventTrigger):
                 "Only when the new status is this one (not case sensitive), "
                 "any status when empty."
             ),
-            default="",
             widget={"name": "status"},
         ),
         InputAttribute(
@@ -55,7 +51,6 @@ class OnStatusChanged(EventTrigger):
                 "Only when the status was this one before, any status when "
                 "empty."
             ),
-            default="",
             widget={"name": "status"},
         ),
     ]
@@ -75,11 +70,11 @@ class OnStatusChanged(EventTrigger):
     ]
 
     @classmethod
-    def event_topics(cls, values: Dict[str, Any]) -> List[str]:
-        entity_type = (values.get("entity_type") or "").strip().lower()
+    def get_event_topics(cls, execute_values: Dict[str, Any]) -> List[str]:
+        entity_type = (execute_values.get("entity_type") or "").strip().lower()
         if entity_type in ENTITY_TYPES:
             return [f"entity.{entity_type}.status_changed"]
-        return super().event_topics(values)
+        return [f"entity.{name}.status_changed" for name in ENTITY_TYPES]
 
     def execute(
         self,
@@ -87,9 +82,6 @@ class OnStatusChanged(EventTrigger):
         entity_type: str = ANY,
         to_status: str = "",
         from_status: str = "",
-        _engine: Optional[engine.ActionEngine] = None,
-        _backend_directory: Optional[str] = None,
-        _main_flow_id: Optional[str] = None,
     ) -> Tuple[Optional[Entity], Optional[str], Optional[str]]:
         """ Return the entity and its new and old status, or skip the rest
         of the workflow when the change does not match the filters.
@@ -111,13 +103,7 @@ class OnStatusChanged(EventTrigger):
         elif not _matches(from_status, old_status):
             mismatch = f"the status was {old_status}, not {from_status}"
         if mismatch:
-            self.skip_workflow(
-                mismatch,
-                _engine=_engine,
-                _backend_directory=_backend_directory,
-                _main_flow_id=_main_flow_id,
-            )
-            return None, new_status, old_status
+            raise SkipWorkflowInput(mismatch)
 
         entity = _utils.get_entity_item(
             event_data["project"],
