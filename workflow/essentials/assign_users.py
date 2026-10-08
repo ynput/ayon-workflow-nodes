@@ -62,7 +62,11 @@ class AssignUsers(WorkflowTaskNode):
 
         known = {
             user["name"]
-            for user in ayon_api.get_users(usernames=users, fields={"name"})
+            for user in ayon_api.get_users(
+                project_name=task.project_name,
+                usernames=users,
+                fields={"name"},
+            )
         }
         unknown = [name for name in users if name not in known]
         if unknown:
