@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Dict, Any, List
 
 from ayon_workflow.datatypes import (
     ContextItem,
@@ -15,10 +15,6 @@ class OnActionFromFolder(EventTrigger):
     """Trigger node: on simple action from folder."""
 
     version = "0.0.1"
-    event_topic = [
-        "workflow.from_simple_action.local",
-        "workflow.from_simple_action.remote",
-    ]
     inputs = [
         InputAttribute(
             name="project_name",
@@ -35,6 +31,13 @@ class OnActionFromFolder(EventTrigger):
             description="The output event context.",
         )
     ]
+
+    @classmethod
+    def get_event_topics(cls, execute_values: Dict[str, Any]) -> List[str]:
+        return [
+            "workflow.from_simple_action.local",
+            "workflow.from_simple_action.remote",
+        ]
 
     def execute(
         self,

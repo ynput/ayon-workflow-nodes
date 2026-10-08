@@ -234,22 +234,29 @@ upstream input. They derive from `WorkflowInputTaskNode`, usually through one
 of the two base triggers in this repository:
 
 - [`EventTrigger`](../workflow/inputs/events/base.py) reacts to an AYON event.
-  Create one node per event topic you want to handle.
+  Create one node per kind of event you want to handle.
 - [`OnSchedule`](../workflow/inputs/cron.py) runs on a cron schedule. It only
   validates the cron expression; the Workflow addon handles the scheduling.
 
-A concrete event trigger sets `event_topic` (a string or a list of topics) and
-overrides `execute()`. It calls `super().execute()` to fetch the raw event,
-then shapes it into typed outputs:
+A concrete event trigger overrides the class method `get_event_topics()` and
+`execute()`. `get_event_topics()` returns the list of event topics that start
+the workflow. It gets the values set on the node, so the topics can depend on
+them. It must return a `list` of strings: the base class returns an empty list,
+and anything else is refused, so the workflow is not registered for events.
+`execute()` calls `super().execute()` to fetch the raw event, then shapes it
+into typed outputs:
 
 ```python
 class OnTaskAssigneesChanged(EventTrigger):
     version = "0.0.1"
-    event_topic = "entity.task.assignees_changed"
     outputs = [
         OutputAttribute(name="event_context", description="..."),
         OutputAttribute(name="event_assignees", description="..."),
     ]
+
+    @classmethod
+    def get_event_topics(cls, execute_values: Dict[str, Any]) -> List[str]:
+        return ["entity.task.assignees_changed"]
 
     def execute(
         self, event_id: Optional[str] = None
