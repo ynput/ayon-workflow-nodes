@@ -1,4 +1,4 @@
-from typing import Optional, Any, Dict, List, Union
+from typing import Optional, Any, Dict, List
 
 import logging
 
@@ -17,13 +17,20 @@ class EventTrigger(WorkflowInputTaskNode):
     """A base class for event trigger node."""
 
     version = "0.0.1"
-    event_topic: Union[str, List[str], None] = None
     inputs = [
         InputAttribute(
             name="event_id",
             description="The id of the event to inject.",
         )
     ]
+
+    @classmethod
+    def get_event_topics(cls, execute_values: Dict[str, Any]) -> List[str]:
+        """ Return the event topic associated to the EventTrigger,
+            can use values provided to execute() as execute_values.
+            Must be overwritten per input node.
+        """
+        return []
 
     def __init__(
         self,
@@ -32,12 +39,6 @@ class EventTrigger(WorkflowInputTaskNode):
         inject: Optional[dict[str, Any]] = None,
         rebind: Optional[dict[str, str]] = None,
     ):
-        if not self.event_topic:
-            log.warning(
-                f"Event trigger class {self.__class__.__name__} does not "
-                "define event topic. It is required for the event processor."
-            )
-
         super().__init__(
             name=name,
             provides=provides,

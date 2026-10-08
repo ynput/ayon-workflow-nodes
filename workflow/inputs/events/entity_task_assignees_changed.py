@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Any, Dict
 
 
 from ayon_workflow.datatypes import TaskItem
@@ -14,7 +14,6 @@ class OnTaskAssigneesChanged(EventTrigger):
     """Trigger node: on task assignees changed."""
 
     version = "0.0.1"
-    event_topic = "entity.task.assignees_changed"
     outputs = [
         OutputAttribute(
             name="event_context",
@@ -25,6 +24,10 @@ class OnTaskAssigneesChanged(EventTrigger):
             description="The output event task assignees.",
         )
     ]
+
+    @classmethod
+    def get_event_topics(cls, execute_values: Dict[str, Any]) -> List[str]:
+        return ["entity.task.assignees_changed"]
 
     def execute(
         self,
