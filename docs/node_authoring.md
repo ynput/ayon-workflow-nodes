@@ -217,6 +217,62 @@ def revert_execute(self, context: ContextItem, file_path: str, content: str = ""
         os.remove(remapped_path)
 ```
 
+**What `revert_execute()` receives.** The engine always gives it
+`flow_failures`, the failures that triggered the revert, so it must declare
+`flow_failures` or accept `**kwargs`. It also gives it `result` and
+`_custom_data` when it declares them or accepts `**kwargs`, so a
+`revert_execute()` that takes neither still works. Positional-only parameters
+(`def revert_execute(self, result, /)`) are refused when the node class is
+defined, the engine only gives keyword arguments.
+
+**Using the result of `execute()`.** What `execute()` returned is given to
+`revert_execute()` as `result`, so a node that creates something can delete it
+without keeping anything else:
+
+```python
+def execute(self, folder: FolderItem, task_name: str) -> str:
+    return create_task(folder, task_name)  # the id of the new task
+
+def revert_execute(self, folder: FolderItem, task_name: str, **kwargs):
+    task_id = kwargs.get("result")
+    if isinstance(task_id, str):
+        delete_task(folder, task_id)
+```
+
+- With several outputs, `result` is the tuple `execute()` returned.
+- If `execute()` itself failed, the node is reverted too and `result` is a
+  taskflow `Failure`, not a value: check its type before using it.
+
+**Keeping custom data for the revert.** `revert_execute()` often needs more than
+the result, like the previous status of what `execute()` changed. Store it with
+`inject_custom_backend_data()` and read it back from `_custom_data`:
+
+```python
+def execute(self, task: TaskItem, status: str, _engine=None) -> TaskItem:
+    self.inject_custom_backend_data(_engine, previous_status=get_status(task))
+    set_status(task, status)
+    return task
+
+def revert_execute(self, task: TaskItem, status: str, _custom_data=None, **kwargs):
+    previous = _custom_data.get("previous_status")
+    if previous:
+        set_status(task, previous)
+```
+
+- Declare `_engine=None` in `execute()`, the engine passes it. It is `None` when
+  a node is called outside an engine, which `inject_custom_backend_data()` does
+  not accept.
+- The data must be serializable (strings, numbers, booleans, lists, dicts). It
+  is saved in the workflow backend, so the revert gets it even when it runs in
+  another process or machine.
+- It is not an output of the node: nothing connects to it and the editor does
+  not show it.
+- Every call adds to the previous ones, the same key is replaced, and the data
+  starts empty at each `execute()`.
+- `_custom_data` is `{}` when nothing was stored.
+- Do not keep this data on `self`: an attribute is lost when the revert runs in
+  another process.
+
 No node in this repository overrides `revert_execute()` yet, so this snippet is
 illustrative. For a runnable demo of a failing workflow that triggers a
 revert, see [`demo/example_revert.py`](../demo/example_revert.py). For the full
@@ -364,6 +420,7 @@ Before considering a new or changed node done:
 - [ ] Structured data between nodes uses `ayon_workflow.datatypes` types, not ad-hoc dicts.
 - [ ] Path inputs go through `remap_input()`, and the original rootless path is returned.
 - [ ] Side effects (files, external APIs, farm submissions) have a matching `revert_execute()`.
+- [ ] Data needed by `revert_execute()` is stored with `inject_custom_backend_data()`, not on `self`.
 - [ ] Trigger nodes handle `event_id=None`.
 - [ ] Engine parameters (`_engine`, `_backend_directory`, `_main_flow_id`) are declared only when needed.
 - [ ] The node is in `get_plugins()`, gated behind `ExecutionScope.WORKSTATION` only if needed.
