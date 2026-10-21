@@ -57,8 +57,17 @@ class CreateTask(WorkflowTaskNode):
         if not task_name:
             raise ValueError("No task name.")
 
-        existing = ayon_api.get_task_by_name(
-            project_name, folder.folder_id, task_name
+        existing = next(
+            (
+                task
+                for task in ayon_api.get_tasks(
+                    project_name,
+                    folder_ids=[folder.folder_id],
+                    active=None,
+                )
+                if task["name"].lower() == task_name.lower()
+            ),
+            None,
         )
         if not existing:
             project = ayon_api.get_project(project_name) or {}
@@ -83,7 +92,11 @@ class CreateTask(WorkflowTaskNode):
             )
             self.inject_custom_backend_data(_engine, created_id=created_id)
 
-        return _utils.get_task_item(project_name, folder, task_name)
+        return _utils.get_task_item(
+            project_name,
+            folder,
+            existing["name"] if existing else task_name,
+        )
 
     def revert_execute(
         self,
