@@ -162,12 +162,14 @@ def _entity_functions(entity: Entity) -> Tuple[str, str]:
 def get_entity_data(
     entity: Entity,
     fields: Optional[set] = None,
+    own_attributes: bool = False,
 ) -> dict:
     """ The server data of a folder, task, product or version item.
     """
     getter, _ = _entity_functions(entity)
     return getattr(ayon_api, getter)(
-        entity.project_name, entity.id, fields=fields
+        entity.project_name, entity.id,
+        fields=fields, own_attributes=own_attributes,
     ) or {}
 
 

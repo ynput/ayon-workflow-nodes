@@ -148,7 +148,8 @@ class SetAttribute(WorkflowTaskNode):
 
         # kept to restore it if a later node fails
         data = _utils.get_entity_data(
-            input_entity, fields={f"attrib.{attribute}"}
+            input_entity, fields={f"attrib.{attribute}"},
+            own_attributes=True
         )
         self.inject_custom_backend_data(
             _engine,
