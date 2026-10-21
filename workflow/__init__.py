@@ -41,13 +41,17 @@ def get_plugins(
     """
     from .conditions import If
 
+    from .essentials.add_comment import AddComment
     from .essentials.append import Append
+    from .essentials.assign_users import AssignUsers
     from .essentials.context import Context
+    from .essentials.create_task import CreateTask
     from .essentials.get_parent_context import GetParentContext
     from .essentials.get_version_task import GetVersionTask
     from .essentials.image_sequence import ImageSequenceNode
     from .essentials.merge_sequence import MergeSequence
     from .essentials.no_op import NoOp
+    from .essentials.set_attribute import SetAttribute
     from .essentials.set_entity_watchers import SetEntityWatchers
     from .essentials.set_status import SetStatus
     from .essentials.task_context import TaskContext
@@ -57,6 +61,8 @@ def get_plugins(
     from .inputs.events import (
         OnVersionCreated,
         OnTaskAssigneesChanged,
+        OnStatusChanged,
+        OnEvent,
         OnActionFromFolder,
         OnActionFromVersion,
     )
@@ -76,8 +82,14 @@ def get_plugins(
         MergeSequence,
         SetEntityWatchers,
         SetStatus,
+        SetAttribute,
+        AssignUsers,
+        CreateTask,
+        AddComment,
         OnVersionCreated,
         OnTaskAssigneesChanged,
+        OnStatusChanged,
+        OnEvent,
         OnActionFromFolder,
         OnActionFromVersion,
         OnSchedule,

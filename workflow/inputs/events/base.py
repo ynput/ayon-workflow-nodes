@@ -1,6 +1,5 @@
 from typing import Optional, Any, Dict, List
 
-import logging
 
 import ayon_api
 
@@ -8,9 +7,6 @@ from ayon_workflow.plugin_system import (
     WorkflowInputTaskNode,
     InputAttribute,
 )
-
-
-log = logging.getLogger(__name__)
 
 
 class EventTrigger(WorkflowInputTaskNode):
@@ -31,20 +27,6 @@ class EventTrigger(WorkflowInputTaskNode):
             Must be overwritten per input node.
         """
         return []
-
-    def __init__(
-        self,
-        name: Optional[str] = None,
-        provides: Optional[list[str]] = None,
-        inject: Optional[dict[str, Any]] = None,
-        rebind: Optional[dict[str, str]] = None,
-    ):
-        super().__init__(
-            name=name,
-            provides=provides,
-            inject=inject,
-            rebind=rebind,
-        )
 
     def execute(self, event_id: Optional[str] = None) -> Dict[str, Any]:
         """ Return the event data.
