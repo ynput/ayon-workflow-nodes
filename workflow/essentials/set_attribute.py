@@ -46,6 +46,14 @@ def convert_value(attribute: str, value: Any, schema: dict) -> Any:
     """
     attr_type = schema.get("type") or "string"
     enum = schema.get("enum") or []
+    if enum:
+        if attr_type.startswith("list_of_"):
+            value = [
+                _enum_value(attribute, item, enum)
+                for item in _as_list(value)
+            ]
+        else:
+            value = _enum_value(attribute, value, enum)
     try:
         if attr_type == "integer":
             if isinstance(value, float) and not value.is_integer():
