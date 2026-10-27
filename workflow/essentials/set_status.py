@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import Any, Dict, Optional
 
 import ayon_api
+from taskflow.engines.action_engine import engine
 
 from ayon_workflow.datatypes import (
     Entity,
@@ -62,6 +63,8 @@ class SetStatus(WorkflowTaskNode):
                 "The status to set, one of the project statuses for this "
                 "entity type (not case sensitive)."
             ),
+            # editors can offer the project statuses
+            widget={"name": "status"},
         ),
     ]
     outputs = [
@@ -71,8 +74,12 @@ class SetStatus(WorkflowTaskNode):
         )
     ]
 
-    def execute(self, input_entity: Entity, status: str) -> Entity:
-        self._previous_status = None
+    def execute(
+        self,
+        input_entity: Entity,
+        status: str,
+        _engine: Optional[engine.ActionEngine] = None,
+    ) -> Entity:
         entity_type = getattr(input_entity, "entity_type", None)
         if entity_type not in self.ENTITY_TYPES:
             raise ValueError(
@@ -92,7 +99,10 @@ class SetStatus(WorkflowTaskNode):
             )
 
         # Store previous value to restore it in revert if needed
-        self._previous_status = _get_status(input_entity)
+        self.inject_custom_backend_data(
+            _engine,
+            previous_status=_get_status(input_entity)
+        )
         _update_status(input_entity, matches[0])
         return input_entity
 
@@ -100,8 +110,9 @@ class SetStatus(WorkflowTaskNode):
         self,
         input_entity: Entity,
         status: str,
+        _custom_data: Optional[Dict[str, Any]] = None,
         **kwargs,
     ):
-        previous = getattr(self, "_previous_status", None)
+        previous = (_custom_data or {}).get("previous_status")
         if previous:
             _update_status(input_entity, previous)
