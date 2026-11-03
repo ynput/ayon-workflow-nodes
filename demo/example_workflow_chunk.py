@@ -1,4 +1,7 @@
 """ Workflow with chunked dispatch graph.
+
+Usage:
+    ayon run example_workflow_chunk.py
 """
 from dataclasses import asdict
 import logging

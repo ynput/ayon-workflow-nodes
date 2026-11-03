@@ -1,4 +1,7 @@
 """ Workflow revert execution example
+
+Usage:
+    ayon run example_revert.py
 """
 import logging
 
@@ -40,6 +43,9 @@ image_sequence_node = my_graph.create_node(
     "ImageSequence",
     label="custom image sequence"
 )
+image_sequence_node["head"] = "img_sequence"
+image_sequence_node["tail"] = ".exr"
+
 nuke_process_node = my_graph.create_node("NukeRender")
 image_sequence_node.connect(
     "image_sequence",

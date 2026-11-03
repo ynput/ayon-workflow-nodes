@@ -4,6 +4,9 @@
 * Blender render an image sequence from a script
 * Nuke encore the resulting image sequence from Blender as a video
 * Workflow is prepared to be dispatched a 3 dependent jobs on Deadline Thinkbox
+
+Usage:
+    ayon run example_workflow_deadlinethinkbox.py
 """
 import os
 import subprocess
