@@ -1,4 +1,7 @@
 """ Workflow execution from backend
+
+Usage:
+    ayon run example_workflow.py
 """
 import logging
 import tempfile

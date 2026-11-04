@@ -4,6 +4,9 @@ Requirement:
 * A valid AYON folder path within a project
 * A task within this folder (task name="Generic", task type="Generic")
 * Nuke and Blender applications correctly setup
+
+Usage:
+    ayon run demo_publish_render.py
 """
 import os
 import pprint
@@ -25,6 +28,8 @@ logging.basicConfig(level=logging.INFO)
 def _build_workflow(
         project_name: str,
         folder_path: str,
+        task_name: str,
+        task_type: str,
     ) -> workflow_editor.Workflow:
     # Discover all available node definitions
     register_all_plugins()
@@ -39,8 +44,8 @@ def _build_workflow(
     )
     context_node["project_name"] = project_name
     context_node["folder_path"] = folder_path
-    context_node["task_name"] = "Generic"
-    context_node["task_type"] = "Generic"
+    context_node["task_name"] = task_name
+    context_node["task_type"] = task_type
 
     # Render path
     render_node = graph.create_node(
@@ -169,16 +174,22 @@ def _run_workflow(workflow: workflow_editor.Workflow):
 def run_demo(
         project_name: str,
         folder_path: str,
+        task_name: str,
+        task_type: str,
     ):
     workflow = _build_workflow(
         project_name,
         folder_path,
+        task_name,
+        task_type,
     )
     _run_workflow(workflow)
 
 
 if __name__ == "__main__":
     run_demo(
-        "TODO",  # project name
-        "TODO",  # folderPath to a folder with a Generic/Generic task
+        "Dummy",  # project name
+        "/workflowtest",  # folderPath
+        "generic",  # task name
+        "Generic",  # task type
     )

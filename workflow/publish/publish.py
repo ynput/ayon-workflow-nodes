@@ -186,7 +186,10 @@ class Publish(WorkflowTaskNode):
 
         pyblish.api.register_host("workflow")
 
-        install_ayon_plugins()
+        install_ayon_plugins(
+            project_name=project_name,
+            host_name="workflow",
+        )
         discover_result = publish_plugins_discover()
         publish_plugins = discover_result.plugins
 
@@ -196,6 +199,11 @@ class Publish(WorkflowTaskNode):
         ):
             if result["error"]:
                 raise RuntimeError(repr(result))
+
+        if not len(pyblish_context):
+            raise RuntimeError(
+                "Publish did not collect any instance."
+            )
 
         instance = tuple(pyblish_context)[0]
         data = instance.data.get("versionEntity")

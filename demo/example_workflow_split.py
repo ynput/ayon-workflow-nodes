@@ -1,4 +1,7 @@
 """ Workflow with multiple dispatch graphs.
+
+Usage:
+    ayon run example_workflow_split.py
 """
 import logging
 import tempfile

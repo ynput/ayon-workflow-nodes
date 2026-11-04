@@ -1,4 +1,7 @@
 """ Workflow editing example
+
+Usage:
+    ayon run example.py
 """
 import os
 import logging
