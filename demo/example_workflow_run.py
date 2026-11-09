@@ -2,7 +2,6 @@
 Needs an AYON connection through a user that can create events.
 """
 import logging
-import os
 
 import ayon_api
 
