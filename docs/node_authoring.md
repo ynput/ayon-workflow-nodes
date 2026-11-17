@@ -111,7 +111,8 @@ node["inputs"] = ["hello", ["world", "!"]]
 print(execute_workflow(workflow))
 ```
 
-Then check it in the Workflow editor too: launch the editor from the AYON tray,
+Then check it in the Workflow editor too: start a runner from the AYON tray
+(**Services > Workflow runner > Start**), open a project's **Workflow** tab,
 add your node to a graph, and confirm its description, ports, and widgets look
 right. For longer walkthroughs, see [`demo/example.py`](../demo/example.py),
 which covers connecting nodes, JSON serialization, and CLI execution.
