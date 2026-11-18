@@ -10,7 +10,7 @@ The same examples ship with the Workflow addon under
 ## Requirements
 
 - **Workflow addon service:** The Workflow addon service must be running on
-  your AYON server, since it picks up registered workflows and runs them when
+  your AYON server: it is the runner that runs the published workflows when
   their trigger fires. See
   [Configure Workflow Addon](https://help.ayon.app/en/help/articles/0480584-configure-workflow-addon).
 - **Deadline:** All examples except
@@ -32,11 +32,11 @@ The same examples ship with the Workflow addon under
 
 Every example follows the same two steps:
 
-1. **Load it.** In the Workflow editor, go to `File > Load...` and select the
-   example's `.json` file.
-2. **Register it.** Go to `File > Registered Workflows > Register Current Workflow...`
-   and give the workflow a name. From then on, the Workflow addon service runs
-   it whenever its trigger fires.
+1. **Import it.** In a project's **Workflow** tab, pick the Workflow addon
+   service runner at the top right, then **⋯ > Import a JSON file** and select
+   the example's `.json` file.
+2. **Publish it.** Click **Publish**. From then on, the Workflow addon service
+   runs it whenever its trigger fires.
 
 The two simple action examples need one more step so the action appears in
 the web UI:
@@ -44,7 +44,7 @@ the web UI:
 3. **Add the action in settings.** Open the Workflow addon settings,
    `ayon+settings://workflow/simple_actions/from_folder` or
    `ayon+settings://workflow/simple_actions/from_version`. Add an entry with an
-   action label and your registered workflow's name, then enable the entry,
+   action label and pick your published workflow, then enable the entry,
    since new entries are disabled by default. The **Execute Locally** option
    controls where the workflow runs: enabled, it runs through the AYON launcher
    on the user's machine; disabled, it's handed to the Workflow addon service.
