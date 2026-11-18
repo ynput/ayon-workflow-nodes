@@ -23,7 +23,9 @@ def _check_compatibility():
     spec.loader.exec_module(package)
 
     ayon_workflow_compatible = package.ayon_compatible_addons["workflow"]
-    if Version(core_version) not in SpecifierSet(ayon_workflow_compatible):
+    if not SpecifierSet(ayon_workflow_compatible).contains(
+        Version(core_version), prereleases=True
+    ):
         raise RuntimeError(
             f"ayon-workflow-nodes-{package.version} requires ayon_workflow-"
             f"{ayon_workflow_compatible}, but found {core_version}."
