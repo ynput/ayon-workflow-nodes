@@ -1,0 +1,101 @@
+{
+  "name": "Frame end from the clip",
+  "description": "When the attributes of a folder change, set its frame end from its frame start and clip length.",
+  "execution_graph": {
+    "name": "Frame end from the clip",
+    "description": "When the attributes of a folder change, set its frame end from its frame start and clip length.",
+    "all_nodes": [
+      {
+        "plugin_ref": {
+          "name": "OnEvent",
+          "version": "0.0.1"
+        },
+        "name": "OnEvent1",
+        "label": "OnEvent",
+        "static_values": {
+          "event_id": null,
+          "topic": "entity.folder.attrib_changed",
+          "condition": null
+        },
+        "input_connections": {
+          "event_id": null,
+          "topic": null,
+          "condition": null
+        },
+        "ui": {
+          "position": [
+            0,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "Expression",
+          "version": "0.0.1"
+        },
+        "name": "Expression1",
+        "label": "Expression",
+        "static_values": {
+          "input_data": null,
+          "expression": "attrib[\"frameStart\"] + attrib[\"clipOut\"] - attrib[\"clipIn\"]"
+        },
+        "input_connections": {
+          "input_data": [
+            {
+              "origin_node_name": "OnEvent1",
+              "origin_node_output": "entity"
+            }
+          ],
+          "expression": null
+        },
+        "ui": {
+          "position": [
+            320,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "SetAttribute",
+          "version": "0.0.1"
+        },
+        "name": "SetAttribute1",
+        "label": "SetAttribute",
+        "static_values": {
+          "input_entity": null,
+          "attribute": "frameEnd",
+          "value": null
+        },
+        "input_connections": {
+          "input_entity": {
+            "origin_node_name": "OnEvent1",
+            "origin_node_output": "entity"
+          },
+          "attribute": null,
+          "value": {
+            "origin_node_name": "Expression1",
+            "origin_node_output": "result"
+          }
+        },
+        "ui": {
+          "position": [
+            640,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      }
+    ],
+    "ui": {
+      "viewport_framing": null
+    }
+  },
+  "dispatch_graphs": []
+}

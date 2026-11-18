@@ -151,10 +151,11 @@ class SetAttribute(WorkflowTaskNode):
             input_entity, fields={f"attrib.{attribute}"},
             own_attributes=True
         )
-        self.inject_custom_backend_data(
-            _engine,
-            previous=(data.get("attrib") or {}).get(attribute)
-        )
+        previous = (data.get("attrib") or {}).get(attribute)
+        # unchanged: no event, so workflows reacting to it do not loop
+        if previous == converted:
+            return input_entity
+        self.inject_custom_backend_data(_engine, previous=previous)
         _utils.update_entity(input_entity, attrib={attribute: converted})
         return input_entity
 

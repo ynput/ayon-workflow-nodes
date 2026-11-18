@@ -1,0 +1,185 @@
+{
+  "name": "Folder approved when all its tasks are",
+  "description": "When a task is approved, approve its folder if all its tasks are approved or omitted.",
+  "execution_graph": {
+    "name": "Folder approved when all its tasks are",
+    "description": "When a task is approved, approve its folder if all its tasks are approved or omitted.",
+    "all_nodes": [
+      {
+        "plugin_ref": {
+          "name": "OnStatusChanged",
+          "version": "0.0.1"
+        },
+        "name": "OnStatusChanged1",
+        "label": "OnStatusChanged",
+        "static_values": {
+          "event_id": null,
+          "entity_type": "task",
+          "to_status": "Approved",
+          "from_status": ""
+        },
+        "input_connections": {
+          "event_id": null,
+          "entity_type": null,
+          "to_status": null,
+          "from_status": null
+        },
+        "ui": {
+          "position": [
+            0,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "GetParentContext",
+          "version": "0.0.1"
+        },
+        "name": "GetParentContext1",
+        "label": "GetParentContext",
+        "static_values": {
+          "context": null
+        },
+        "input_connections": {
+          "context": {
+            "origin_node_name": "OnStatusChanged1",
+            "origin_node_output": "entity"
+          }
+        },
+        "ui": {
+          "position": [
+            320,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "GetChildren",
+          "version": "0.0.1"
+        },
+        "name": "GetChildren1",
+        "label": "GetChildren",
+        "static_values": {
+          "input_entity": null,
+          "child_type": "task",
+          "recursive": false,
+          "latest_only": false
+        },
+        "input_connections": {
+          "input_entity": {
+            "origin_node_name": "GetParentContext1",
+            "origin_node_output": "parent_context"
+          },
+          "child_type": null,
+          "recursive": null,
+          "latest_only": null
+        },
+        "ui": {
+          "position": [
+            640,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "Expression",
+          "version": "0.0.1"
+        },
+        "name": "Expression1",
+        "label": "Expression",
+        "static_values": {
+          "input_data": null,
+          "expression": "input_data[0] if all(s in (\"Approved\", \"Omitted\") for s in input_data[1:]) else None"
+        },
+        "input_connections": {
+          "input_data": [
+            {
+              "origin_node_name": "GetParentContext1",
+              "origin_node_output": "parent_context"
+            },
+            {
+              "origin_node_name": "GetChildren1",
+              "origin_node_output": "statuses"
+            }
+          ],
+          "expression": null
+        },
+        "ui": {
+          "position": [
+            960,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "If",
+          "version": "0.0.1"
+        },
+        "name": "If1",
+        "label": "If",
+        "static_values": {
+          "input_data": null,
+          "condition": null
+        },
+        "input_connections": {
+          "input_data": {
+            "origin_node_name": "Expression1",
+            "origin_node_output": "result"
+          },
+          "condition": null
+        },
+        "ui": {
+          "position": [
+            1280,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "SetStatus",
+          "version": "0.0.1"
+        },
+        "name": "SetStatus1",
+        "label": "SetStatus",
+        "static_values": {
+          "input_entity": null,
+          "status": "Approved"
+        },
+        "input_connections": {
+          "input_entity": {
+            "origin_node_name": "If1",
+            "origin_node_output": "on_True"
+          },
+          "status": null
+        },
+        "ui": {
+          "position": [
+            1600,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      }
+    ],
+    "ui": {
+      "viewport_framing": null
+    }
+  },
+  "dispatch_graphs": []
+}
