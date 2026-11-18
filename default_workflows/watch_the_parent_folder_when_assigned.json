@@ -1,0 +1,93 @@
+{
+  "name": "Watch the parent folder when assigned",
+  "description": "When users are assigned to a task, they also watch its folder.",
+  "execution_graph": {
+    "name": "Watch the parent folder when assigned",
+    "description": "When users are assigned to a task, they also watch its folder.",
+    "all_nodes": [
+      {
+        "plugin_ref": {
+          "name": "OnTaskAssigneesChanged",
+          "version": "0.0.1"
+        },
+        "name": "OnTaskAssigneesChanged1",
+        "label": "OnTaskAssigneesChanged",
+        "static_values": {
+          "event_id": null
+        },
+        "input_connections": {
+          "event_id": null
+        },
+        "ui": {
+          "position": [
+            0,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "GetParentContext",
+          "version": "0.0.1"
+        },
+        "name": "GetParentContext1",
+        "label": "GetParentContext",
+        "static_values": {
+          "context": null
+        },
+        "input_connections": {
+          "context": {
+            "origin_node_name": "OnTaskAssigneesChanged1",
+            "origin_node_output": "event_context"
+          }
+        },
+        "ui": {
+          "position": [
+            320,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "SetEntityWatchers",
+          "version": "0.0.1"
+        },
+        "name": "SetEntityWatchers1",
+        "label": "SetEntityWatchers",
+        "static_values": {
+          "input_entity": null,
+          "watchers": null,
+          "edit_mode": "add"
+        },
+        "input_connections": {
+          "input_entity": {
+            "origin_node_name": "GetParentContext1",
+            "origin_node_output": "parent_context"
+          },
+          "watchers": {
+            "origin_node_name": "OnTaskAssigneesChanged1",
+            "origin_node_output": "event_assignees"
+          },
+          "edit_mode": null
+        },
+        "ui": {
+          "position": [
+            640,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      }
+    ],
+    "ui": {
+      "viewport_framing": null
+    }
+  },
+  "dispatch_graphs": []
+}

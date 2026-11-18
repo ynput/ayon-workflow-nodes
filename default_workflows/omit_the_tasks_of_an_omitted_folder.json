@@ -1,0 +1,100 @@
+{
+  "name": "Omit the tasks of an omitted folder",
+  "description": "When a folder is omitted, omit all the tasks under it.",
+  "execution_graph": {
+    "name": "Omit the tasks of an omitted folder",
+    "description": "When a folder is omitted, omit all the tasks under it.",
+    "all_nodes": [
+      {
+        "plugin_ref": {
+          "name": "OnStatusChanged",
+          "version": "0.0.1"
+        },
+        "name": "OnStatusChanged1",
+        "label": "OnStatusChanged",
+        "static_values": {
+          "event_id": null,
+          "entity_type": "folder",
+          "to_status": "Omitted",
+          "from_status": ""
+        },
+        "input_connections": {
+          "event_id": null,
+          "entity_type": null,
+          "to_status": null,
+          "from_status": null
+        },
+        "ui": {
+          "position": [
+            0,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "GetChildren",
+          "version": "0.0.1"
+        },
+        "name": "GetChildren1",
+        "label": "GetChildren",
+        "static_values": {
+          "input_entity": null,
+          "child_type": "task",
+          "recursive": true,
+          "latest_only": false
+        },
+        "input_connections": {
+          "input_entity": {
+            "origin_node_name": "OnStatusChanged1",
+            "origin_node_output": "entity"
+          },
+          "child_type": null,
+          "recursive": null,
+          "latest_only": null
+        },
+        "ui": {
+          "position": [
+            320,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "SetStatus",
+          "version": "0.0.1"
+        },
+        "name": "SetStatus1",
+        "label": "SetStatus",
+        "static_values": {
+          "input_entity": null,
+          "status": "Omitted"
+        },
+        "input_connections": {
+          "input_entity": {
+            "origin_node_name": "GetChildren1",
+            "origin_node_output": "children"
+          },
+          "status": null
+        },
+        "ui": {
+          "position": [
+            640,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      }
+    ],
+    "ui": {
+      "viewport_framing": null
+    }
+  },
+  "dispatch_graphs": []
+}

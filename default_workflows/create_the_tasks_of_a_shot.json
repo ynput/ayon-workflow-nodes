@@ -1,0 +1,65 @@
+{
+  "name": "Create the tasks of a shot",
+  "description": "From an action on a folder, create its Layout, Animation, Lighting and Compositing tasks, if missing.",
+  "execution_graph": {
+    "name": "Create the tasks of a shot",
+    "description": "From an action on a folder, create its Layout, Animation, Lighting and Compositing tasks, if missing.",
+    "all_nodes": [
+      {
+        "plugin_ref": {
+          "name": "OnActionFromFolder",
+          "version": "0.0.1"
+        },
+        "name": "OnActionFromFolder1",
+        "label": "OnActionFromFolder",
+        "static_values": {
+          "project_name": null,
+          "entity_id": null
+        },
+        "input_connections": {
+          "project_name": null,
+          "entity_id": null
+        },
+        "ui": {
+          "position": [
+            0,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "ApplyHierarchyTemplate",
+          "version": "0.0.1"
+        },
+        "name": "ApplyHierarchyTemplate1",
+        "label": "ApplyHierarchyTemplate",
+        "static_values": {
+          "folder": null,
+          "template": "{\n  \"entities\": [\n    {\n      \"entity_type\": \"task\",\n      \"entity_subtype\": \"Layout\",\n      \"name\": \"layout\"\n    },\n    {\n      \"entity_type\": \"task\",\n      \"entity_subtype\": \"Animation\",\n      \"name\": \"animation\"\n    },\n    {\n      \"entity_type\": \"task\",\n      \"entity_subtype\": \"Lighting\",\n      \"name\": \"lighting\"\n    },\n    {\n      \"entity_type\": \"task\",\n      \"entity_subtype\": \"Compositing\",\n      \"name\": \"compositing\"\n    }\n  ]\n}"
+        },
+        "input_connections": {
+          "folder": {
+            "origin_node_name": "OnActionFromFolder1",
+            "origin_node_output": "event_context"
+          },
+          "template": null
+        },
+        "ui": {
+          "position": [
+            320,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      }
+    ],
+    "ui": {
+      "viewport_framing": null
+    }
+  },
+  "dispatch_graphs": []
+}
