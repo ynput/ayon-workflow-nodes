@@ -24,7 +24,8 @@ generic utilities and branching logic to event triggers, DCC integrations
 ## Repository Layout
  
 ```
-demo/                        # example workflows, ready to open or run
+demo/                        # sample workflows, ready to open or run
+default_workflows/           # workflows offered by the editor to start from
 workflow/
   ├── __init__.py            # get_plugins() entrypoint, discovered by the Workflow addon
   ├── essentials/            # generic utility nodes
@@ -64,6 +65,12 @@ cron schedule, an AYON event, or a simple action, see
 [`demo/workflow_from_events/`](demo/workflow_from_events/). For detailed steps
 on setting them up, see
 [Workflows & Automations](https://help.ayon.app/en/help/articles/1804107-workflows-and-automations).
+ 
+## Default Workflows
+
+The [`default_workflows/`](default_workflows/) folder holds the workflows the editor offers to
+start from on an empty canvas. To add one, build it in the editor, export it
+with **⋯ > Export as a JSON file**, and save it in `default_workflows/`.
  
 ## Contributing
  

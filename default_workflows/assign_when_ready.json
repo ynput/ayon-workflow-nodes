@@ -1,0 +1,71 @@
+{
+  "name": "Assign when ready",
+  "description": "When a task is ready to start, assign users to it.",
+  "execution_graph": {
+    "name": "Assign when ready",
+    "description": "When a task is ready to start, assign users to it.",
+    "all_nodes": [
+      {
+        "plugin_ref": {
+          "name": "OnStatusChanged",
+          "version": "0.0.1"
+        },
+        "name": "OnStatusChanged1",
+        "label": "OnStatusChanged",
+        "static_values": {
+          "event_id": null,
+          "entity_type": "task",
+          "to_status": "Ready to start",
+          "from_status": ""
+        },
+        "input_connections": {
+          "event_id": null,
+          "entity_type": null,
+          "to_status": null,
+          "from_status": null
+        },
+        "ui": {
+          "position": [
+            0,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "AssignUsers",
+          "version": "0.0.1"
+        },
+        "name": "AssignUsers1",
+        "label": "AssignUsers",
+        "static_values": {
+          "task": null,
+          "users": null,
+          "edit_mode": "add"
+        },
+        "input_connections": {
+          "task": {
+            "origin_node_name": "OnStatusChanged1",
+            "origin_node_output": "entity"
+          },
+          "users": null,
+          "edit_mode": null
+        },
+        "ui": {
+          "position": [
+            320,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      }
+    ],
+    "ui": {
+      "viewport_framing": null
+    }
+  },
+  "dispatch_graphs": []
+}
