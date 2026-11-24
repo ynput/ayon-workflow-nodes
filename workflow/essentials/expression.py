@@ -29,11 +29,9 @@ class Expression(WorkflowTaskNode):
         InputAttribute(
             name="input_data",
             description=(
-                "The data, a list when several outputs are connected. For a "
-                "folder, task, product or version, its attributes are in "
-                "`attrib`."
+                "The data. For a folder, task, product or version, its "
+                "attributes are in `attrib`."
             ),
-            allow_multi_connection=True,
         ),
         InputAttribute(
             name="expression",

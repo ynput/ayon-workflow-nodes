@@ -69,7 +69,11 @@
           "input_entity": null,
           "child_type": "task",
           "recursive": false,
-          "latest_only": false
+          "latest_only": false,
+          "statuses": [
+            "Approved",
+            "Omitted"
+          ]
         },
         "input_connections": {
           "input_entity": {
@@ -78,44 +82,12 @@
           },
           "child_type": null,
           "recursive": null,
-          "latest_only": null
+          "latest_only": null,
+          "statuses": null
         },
         "ui": {
           "position": [
             640,
-            0
-          ],
-          "color": null,
-          "size": null
-        }
-      },
-      {
-        "plugin_ref": {
-          "name": "Expression",
-          "version": "0.0.1"
-        },
-        "name": "Expression1",
-        "label": "Expression",
-        "static_values": {
-          "input_data": null,
-          "expression": "input_data[0] if all(s in (\"Approved\", \"Omitted\") for s in input_data[1:]) else None"
-        },
-        "input_connections": {
-          "input_data": [
-            {
-              "origin_node_name": "GetParentContext1",
-              "origin_node_output": "parent_context"
-            },
-            {
-              "origin_node_name": "GetChildren1",
-              "origin_node_output": "statuses"
-            }
-          ],
-          "expression": null
-        },
-        "ui": {
-          "position": [
-            960,
             0
           ],
           "color": null,
@@ -135,10 +107,43 @@
         },
         "input_connections": {
           "input_data": {
-            "origin_node_name": "Expression1",
-            "origin_node_output": "result"
+            "origin_node_name": "GetParentContext1",
+            "origin_node_output": "parent_context"
           },
+          "condition": {
+            "origin_node_name": "GetChildren1",
+            "origin_node_output": "excluded_children"
+          }
+        },
+        "ui": {
+          "position": [
+            960,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "If",
+          "version": "0.0.1"
+        },
+        "name": "If2",
+        "label": "If",
+        "static_values": {
+          "input_data": null,
           "condition": null
+        },
+        "input_connections": {
+          "input_data": {
+            "origin_node_name": "If1",
+            "origin_node_output": "on_False"
+          },
+          "condition": {
+            "origin_node_name": "GetChildren1",
+            "origin_node_output": "children"
+          }
         },
         "ui": {
           "position": [
@@ -162,7 +167,7 @@
         },
         "input_connections": {
           "input_entity": {
-            "origin_node_name": "If1",
+            "origin_node_name": "If2",
             "origin_node_output": "on_True"
           },
           "status": null
