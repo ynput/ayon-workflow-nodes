@@ -234,6 +234,7 @@ class NukeRender(WorkflowTaskNode):
             log_file=log_file,
             temporary_directory=temp_dir,
             restrict_to_task=restrict_to_task,
+            log=self.log,
         )
 
         # Ensure expected output_media exists.

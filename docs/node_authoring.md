@@ -220,7 +220,8 @@ def revert_execute(self, context: ContextItem, file_path: str, content: str = ""
 No node in this repository overrides `revert_execute()` yet, so this snippet is
 illustrative. For a runnable demo of a failing workflow that triggers a
 revert, see [`demo/example_revert.py`](../demo/example_revert.py). For the full
-path-remapping pattern, including subprocesses and log streaming, see
+path-remapping pattern, including subprocesses and streaming their output
+to `self.log`, see
 [`workflow/applications/_base.py`](../workflow/applications/_base.py) and
 [`workflow/applications/nuke.py`](../workflow/applications/nuke.py).
 
@@ -358,6 +359,7 @@ Before considering a new or changed node done:
 - [ ] Path inputs go through `remap_input()`, and the original rootless path is returned.
 - [ ] Side effects (files, external APIs, farm submissions) have a matching `revert_execute()`.
 - [ ] Trigger nodes handle `event_id=None`.
+- [ ] Messages for the run's log go through `self.log`, not `print()`.
 - [ ] Engine parameters (`_engine`, `_backend_directory`, `_main_flow_id`) are declared only when needed.
 - [ ] The node is in `get_plugins()`, gated behind `ExecutionScope.WORKSTATION` only if needed.
 - [ ] The node runs in the AYON Console and looks right in the Workflow editor.
