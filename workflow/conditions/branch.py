@@ -24,9 +24,10 @@ class If(WorkflowConditionTaskNode):
                 "The condition to evaluate. "
                 "Defaults to bool(input_data). "
                 "If a string is provided, it is evaluated as a Python "
-                "expression against `input_data` (trusted workflows only). "
-                "Any other value is used as its truth, an empty list is "
-                "False."
+                "expression against `input_data`. It runs as Python code on "
+                "the runner: anyone who can publish this workflow can run "
+                "code there. Any other value is used as its truth, an empty "
+                "list is False."
             ),
         ),
     ]

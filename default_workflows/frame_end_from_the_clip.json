@@ -33,6 +33,31 @@
       },
       {
         "plugin_ref": {
+          "name": "GetAttributes",
+          "version": "0.0.1"
+        },
+        "name": "GetAttributes1",
+        "label": "GetAttributes",
+        "static_values": {
+          "input_entity": null
+        },
+        "input_connections": {
+          "input_entity": {
+            "origin_node_name": "OnEvent1",
+            "origin_node_output": "entity"
+          }
+        },
+        "ui": {
+          "position": [
+            320,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
           "name": "Expression",
           "version": "0.0.1"
         },
@@ -40,20 +65,18 @@
         "label": "Expression",
         "static_values": {
           "input_data": null,
-          "expression": "attrib[\"frameStart\"] + attrib[\"clipOut\"] - attrib[\"clipIn\"]"
+          "expression": "input_data[\"frameStart\"] + input_data[\"clipOut\"] - input_data[\"clipIn\"]"
         },
         "input_connections": {
-          "input_data": [
-            {
-              "origin_node_name": "OnEvent1",
-              "origin_node_output": "entity"
-            }
-          ],
+          "input_data": {
+            "origin_node_name": "GetAttributes1",
+            "origin_node_output": "attributes"
+          },
           "expression": null
         },
         "ui": {
           "position": [
-            320,
+            640,
             0
           ],
           "color": null,
@@ -85,7 +108,7 @@
         },
         "ui": {
           "position": [
-            640,
+            960,
             0
           ],
           "color": null,
