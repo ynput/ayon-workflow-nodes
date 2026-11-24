@@ -56,9 +56,10 @@ class SetStatus(WorkflowTaskNode):
         InputAttribute(
             name="input_entity",
             description=(
-                "The folder, task, product or version to change, or a list "
-                "of them."
+                "The folder, task, product or version to change, "
+                "or a list of them."
             ),
+            allow_multi_connection=True,
         ),
         InputAttribute(
             name="status",
@@ -66,7 +67,6 @@ class SetStatus(WorkflowTaskNode):
                 "The status to set, one of the project statuses for this "
                 "entity type (not case sensitive)."
             ),
-            # editors can offer the project statuses
             widget={"name": "status"},
         ),
     ]
@@ -84,26 +84,35 @@ class SetStatus(WorkflowTaskNode):
         _engine: Optional[engine.ActionEngine] = None,
     ) -> Union[Entity, List[Entity]]:
         if not status:
-            raise ValueError("No status to set.")
+            raise ValueError("No provided status to set.")
 
-        entities = (
-            input_entity if isinstance(input_entity, list) else [input_entity]
-        )
+        if isinstance(input_entity, list):
+            entities = input_entity
+        else:
+            entities = [input_entity]
+
         new_statuses = []
-        names_by_type = {}
+        status_names_by_type = {}
         for entity in entities:
+
+            # Check supported entity.
             entity_type = getattr(entity, "entity_type", None)
             if entity_type not in self.ENTITY_TYPES:
                 raise ValueError(
-                    f"Cannot set the status of {entity}, expected one of "
+                    f"Unsupported entity: {entity}, expected one of "
                     f"{', '.join(self.ENTITY_TYPES)}."
                 )
+
+            # Find and validate new status.
             key = (entity.project_name, entity_type)
-            if key not in names_by_type:
-                names_by_type[key] = _get_status_names(*key)
-            names = names_by_type[key]
+            if key not in status_names_by_type:
+                status_names_by_type[key] = _get_status_names(*key)
+
+            names = status_names_by_type[key]
             matches = [
-                name for name in names if name.lower() == status.lower()
+                name
+                for name in names
+                if name.lower() == status.lower()
             ]
             if not matches:
                 raise ValueError(
@@ -119,11 +128,15 @@ class SetStatus(WorkflowTaskNode):
             _engine, previous_statuses=previous_statuses
         )
         for entity, previous, new in zip(
-            entities, previous_statuses, new_statuses
+            entities,
+            previous_statuses,
+            new_statuses
         ):
-            # unchanged: no event, so workflows reacting to it do not loop
+            # skip update if no change, optimization but
+            # also do not emit events (prevent workflow loop)
             if previous != new:
                 _update_status(entity, new)
+
         return input_entity
 
     def revert_execute(
@@ -133,9 +146,11 @@ class SetStatus(WorkflowTaskNode):
         _custom_data: Optional[Dict[str, Any]] = None,
         **kwargs,
     ):
-        entities = (
-            input_entity if isinstance(input_entity, list) else [input_entity]
-        )
+        if isinstance(input_entity, list):
+            entities = input_entity
+        else:
+            entities = [input_entity]
+
         previous_statuses = (_custom_data or {}).get("previous_statuses", [])
         for entity, previous in zip(entities, previous_statuses):
             if previous:
