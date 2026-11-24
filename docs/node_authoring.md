@@ -207,6 +207,7 @@ from ayon_workflow.utils import remap_input
 
 def execute(self, context: ContextItem, file_path: str, content: str = "") -> str:
     remapped_path = remap_input(file_path, context.project_name)
+    self.log.info("Writing %s", remapped_path)
     with open(remapped_path, "w") as f:
         f.write(content)
     return file_path  # the rootless path, not remapped_path
@@ -214,6 +215,7 @@ def execute(self, context: ContextItem, file_path: str, content: str = "") -> st
 def revert_execute(self, context: ContextItem, file_path: str, content: str = ""):
     remapped_path = remap_input(file_path, context.project_name)
     if os.path.exists(remapped_path):
+        self.log.info("Removing %s", remapped_path)
         os.remove(remapped_path)
 ```
 
@@ -256,6 +258,7 @@ class OnTaskAssigneesChanged(EventTrigger):
         self, event_id: Optional[str] = None
     ) -> Tuple[Optional[TaskItem], Optional[List[str]]]:
         if event_id is None:
+            self.log.debug("No event, skipping.")
             return None, None
         event_data = super().execute(event_id)
         # ... resolve typed objects from event_data ...
