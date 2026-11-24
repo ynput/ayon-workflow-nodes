@@ -1,0 +1,96 @@
+{
+  "name": "Approve the task with its version",
+  "description": "When a version is approved, approve the task it was published from.",
+  "execution_graph": {
+    "name": "Approve the task with its version",
+    "description": "When a version is approved, approve the task it was published from.",
+    "all_nodes": [
+      {
+        "plugin_ref": {
+          "name": "OnStatusChanged",
+          "version": "0.0.1"
+        },
+        "name": "OnStatusChanged1",
+        "label": "OnStatusChanged",
+        "static_values": {
+          "event_id": null,
+          "entity_type": "version",
+          "to_status": "Approved",
+          "from_status": ""
+        },
+        "input_connections": {
+          "event_id": null,
+          "entity_type": null,
+          "to_status": null,
+          "from_status": null
+        },
+        "ui": {
+          "position": [
+            0,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "GetVersionTask",
+          "version": "0.0.1"
+        },
+        "name": "GetVersionTask1",
+        "label": "GetVersionTask",
+        "static_values": {
+          "version_item": null,
+          "ensure_exists": true
+        },
+        "input_connections": {
+          "version_item": {
+            "origin_node_name": "OnStatusChanged1",
+            "origin_node_output": "entity"
+          },
+          "ensure_exists": null
+        },
+        "ui": {
+          "position": [
+            320,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "SetStatus",
+          "version": "0.0.1"
+        },
+        "name": "SetStatus1",
+        "label": "SetStatus",
+        "static_values": {
+          "input_entity": null,
+          "status": "Approved"
+        },
+        "input_connections": {
+          "input_entity": {
+            "origin_node_name": "GetVersionTask1",
+            "origin_node_output": "task_context"
+          },
+          "status": null
+        },
+        "ui": {
+          "position": [
+            640,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      }
+    ],
+    "ui": {
+      "viewport_framing": null
+    }
+  },
+  "dispatch_graphs": []
+}
