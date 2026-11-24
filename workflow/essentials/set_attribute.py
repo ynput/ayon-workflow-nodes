@@ -152,9 +152,12 @@ class SetAttribute(WorkflowTaskNode):
             own_attributes=True
         )
         previous = (data.get("attrib") or {}).get(attribute)
-        # unchanged: no event, so workflows reacting to it do not loop
+
+        # skip update if no change, optimization but
+        # also do not emit events (prevent workflow loop)
         if previous == converted:
             return input_entity
+
         self.inject_custom_backend_data(_engine, previous=previous)
         _utils.update_entity(input_entity, attrib={attribute: converted})
         return input_entity
