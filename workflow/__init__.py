@@ -45,6 +45,7 @@ def get_plugins(
 
     from .essentials.append import Append
     from .essentials.context import Context
+    from .essentials.display import Display
     from .essentials.get_parent_context import GetParentContext
     from .essentials.get_version_task import GetVersionTask
     from .essentials.image_sequence import ImageSequenceNode
@@ -67,6 +68,7 @@ def get_plugins(
 
     nodes = [
         NoOp,
+        Display,
         Append,
         If,
         Context,
