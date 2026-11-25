@@ -1,9 +1,9 @@
 {
-  "name": "Comment on approval",
-  "description": "When a version is approved, say so in its activity feed.",
+  "name": "Approve task when its version is approved",
+  "description": "When a version is approved, approve the task it was published from.",
   "execution_graph": {
-    "name": "Comment on approval",
-    "description": "When a version is approved, say so in its activity feed.",
+    "name": "Approve task when its version is approved",
+    "description": "When a version is approved, approve the task it was published from.",
     "all_nodes": [
       {
         "plugin_ref": {
@@ -35,25 +35,52 @@
       },
       {
         "plugin_ref": {
-          "name": "AddComment",
+          "name": "GetVersionTask",
           "version": "0.0.1"
         },
-        "name": "AddComment1",
-        "label": "AddComment",
+        "name": "GetVersionTask1",
+        "label": "GetVersionTask",
         "static_values": {
-          "input_entity": null,
-          "text": "Approved."
+          "version_item": null,
+          "ensure_exists": true
         },
         "input_connections": {
-          "input_entity": {
+          "version_item": {
             "origin_node_name": "OnStatusChanged1",
             "origin_node_output": "entity"
           },
-          "text": null
+          "ensure_exists": null
         },
         "ui": {
           "position": [
             320,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "SetStatus",
+          "version": "0.0.1"
+        },
+        "name": "SetStatus1",
+        "label": "SetStatus",
+        "static_values": {
+          "input_entity": null,
+          "status": "Approved"
+        },
+        "input_connections": {
+          "input_entity": {
+            "origin_node_name": "GetVersionTask1",
+            "origin_node_output": "task_context"
+          },
+          "status": null
+        },
+        "ui": {
+          "position": [
+            640,
             0
           ],
           "color": null,

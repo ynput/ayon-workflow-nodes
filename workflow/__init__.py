@@ -48,6 +48,9 @@ def get_plugins(
     from .essentials.assign_users import AssignUsers
     from .essentials.context import Context
     from .essentials.create_task import CreateTask
+    from .essentials.expression import Expression
+    from .essentials.get_attributes import GetAttributes
+    from .essentials.get_children import GetChildren
     from .essentials.get_parent_context import GetParentContext
     from .essentials.get_version_task import GetVersionTask
     from .essentials.image_sequence import ImageSequenceNode
@@ -78,7 +81,10 @@ def get_plugins(
         Context,
         TaskContext,
         GetParentContext,
+        GetChildren,
         GetVersionTask,
+        GetAttributes,
+        Expression,
         VideoNode,
         ImageSequenceNode,
         MergeSequence,

@@ -1,9 +1,9 @@
 {
-  "name": "Approve the task with its version",
-  "description": "When a version is approved, approve the task it was published from.",
+  "name": "Omit tasks when their folder is omitted",
+  "description": "When a folder is omitted, omit all the tasks under it.",
   "execution_graph": {
-    "name": "Approve the task with its version",
-    "description": "When a version is approved, approve the task it was published from.",
+    "name": "Omit tasks when their folder is omitted",
+    "description": "When a folder is omitted, omit all the tasks under it.",
     "all_nodes": [
       {
         "plugin_ref": {
@@ -14,8 +14,8 @@
         "label": "OnStatusChanged",
         "static_values": {
           "event_id": null,
-          "entity_type": "version",
-          "to_status": "Approved",
+          "entity_type": "folder",
+          "to_status": "Omitted",
           "from_status": ""
         },
         "input_connections": {
@@ -35,21 +35,27 @@
       },
       {
         "plugin_ref": {
-          "name": "GetVersionTask",
+          "name": "GetChildren",
           "version": "0.0.1"
         },
-        "name": "GetVersionTask1",
-        "label": "GetVersionTask",
+        "name": "GetChildren1",
+        "label": "GetChildren",
         "static_values": {
-          "version_item": null,
-          "ensure_exists": true
+          "input_entity": null,
+          "child_type": "task",
+          "recursive": true,
+          "latest_only": false,
+          "statuses": []
         },
         "input_connections": {
-          "version_item": {
+          "input_entity": {
             "origin_node_name": "OnStatusChanged1",
             "origin_node_output": "entity"
           },
-          "ensure_exists": null
+          "child_type": null,
+          "recursive": null,
+          "latest_only": null,
+          "statuses": null
         },
         "ui": {
           "position": [
@@ -69,12 +75,12 @@
         "label": "SetStatus",
         "static_values": {
           "input_entity": null,
-          "status": "Approved"
+          "status": "Omitted"
         },
         "input_connections": {
           "input_entity": {
-            "origin_node_name": "GetVersionTask1",
-            "origin_node_output": "task_context"
+            "origin_node_name": "GetChildren1",
+            "origin_node_output": "children"
           },
           "status": null
         },

@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import ayon_api
 from taskflow.engines.action_engine import engine
@@ -47,7 +47,7 @@ def _update_status(entity: Entity, status: str):
 
 
 class SetStatus(WorkflowTaskNode):
-    """Set the status of an AYON folder, task, product or version."""
+    """Set the status of AYON folders, tasks, products or versions."""
 
     ENTITY_TYPES = ("folder", "task", "product", "version")
 
@@ -55,7 +55,11 @@ class SetStatus(WorkflowTaskNode):
     inputs = [
         InputAttribute(
             name="input_entity",
-            description="The folder, task, product or version to change.",
+            description=(
+                "The folder, task, product or version to change, "
+                "or a list of them."
+            ),
+            allow_multi_connection=True,
         ),
         InputAttribute(
             name="status",
@@ -63,56 +67,92 @@ class SetStatus(WorkflowTaskNode):
                 "The status to set, one of the project statuses for this "
                 "entity type (not case sensitive)."
             ),
-            # editors can offer the project statuses
             widget={"name": "status"},
         ),
     ]
     outputs = [
         OutputAttribute(
             name="edited_entity",
-            description="The entity with its status set.",
+            description="The entity, or the list, with the status set.",
         )
     ]
 
     def execute(
         self,
-        input_entity: Entity,
+        input_entity: Union[Entity, List[Entity]],
         status: str,
         _engine: Optional[engine.ActionEngine] = None,
-    ) -> Entity:
-        entity_type = getattr(input_entity, "entity_type", None)
-        if entity_type not in self.ENTITY_TYPES:
-            raise ValueError(
-                f"Cannot set the status of {input_entity}, expected one of "
-                f"{', '.join(self.ENTITY_TYPES)}."
-            )
+    ) -> Union[Entity, List[Entity]]:
         if not status:
-            raise ValueError("No status to set.")
+            raise ValueError("No provided status to set.")
 
-        names = _get_status_names(input_entity.project_name, entity_type)
-        matches = [name for name in names if name.lower() == status.lower()]
-        if not matches:
-            raise ValueError(
-                f"{status!r} is not a {entity_type} status in project "
-                f"{input_entity.project_name}. "
-                f"Expected one of: {', '.join(names)}."
+        if isinstance(input_entity, list):
+            entities = input_entity
+        else:
+            entities = [input_entity]
+
+        new_statuses = []
+        status_names_by_type = {}
+        for entity in entities:
+
+            # Check supported entity.
+            entity_type = getattr(entity, "entity_type", None)
+            if entity_type not in self.ENTITY_TYPES:
+                raise ValueError(
+                    f"Unsupported entity: {entity}, expected one of "
+                    f"{', '.join(self.ENTITY_TYPES)}."
+                )
+
+            # Find and validate new status.
+            key = (entity.project_name, entity_type)
+            if key not in status_names_by_type:
+                status_names_by_type[key] = _get_status_names(*key)
+
+            names = status_names_by_type[key]
+            matches = [
+                name
+                for name in names
+                if name.lower() == status.lower()
+            ]
+            if not matches:
+                raise ValueError(
+                    f"{status!r} is not a {entity_type} status in project "
+                    f"{entity.project_name}. "
+                    f"Expected one of: {', '.join(names)}."
+                )
+            new_statuses.append(matches[0])
+
+        previous_statuses = []
+        try:
+            for entity, new in zip(entities, new_statuses):
+                previous = _get_status(entity)
+                # skip update if no change, optimization but
+                # also do not emit events (prevent workflow loop)
+                if previous == new:
+                    previous = None  # no need to revert
+                else:
+                    _update_status(entity, new)
+                previous_statuses.append(previous)
+        finally:
+            self.inject_custom_backend_data(
+                _engine, previous_statuses=previous_statuses
             )
 
-        # Store previous value to restore it in revert if needed
-        self.inject_custom_backend_data(
-            _engine,
-            previous_status=_get_status(input_entity)
-        )
-        _update_status(input_entity, matches[0])
         return input_entity
 
     def revert_execute(
         self,
-        input_entity: Entity,
+        input_entity: Union[Entity, List[Entity]],
         status: str,
         _custom_data: Optional[Dict[str, Any]] = None,
         **kwargs,
     ):
-        previous = (_custom_data or {}).get("previous_status")
-        if previous:
-            _update_status(input_entity, previous)
+        if isinstance(input_entity, list):
+            entities = input_entity
+        else:
+            entities = [input_entity]
+
+        previous_statuses = (_custom_data or {}).get("previous_statuses", [])
+        for entity, previous in zip(entities, previous_statuses):
+            if previous:
+                _update_status(entity, previous)

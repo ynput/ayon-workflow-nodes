@@ -1,4 +1,4 @@
-from typing import Any, Union, Optional, Tuple
+from typing import Any, Optional, Tuple
 
 from taskflow.engines.action_engine import engine
 
@@ -24,7 +24,10 @@ class If(WorkflowConditionTaskNode):
                 "The condition to evaluate. "
                 "Defaults to bool(input_data). "
                 "If a string is provided, it is evaluated as a Python "
-                "expression against `input_data` (trusted workflows only)."
+                "expression against `input_data`. It runs as Python code on "
+                "the runner: anyone who can publish this workflow can run "
+                "code there. Any other value is used as its truth, an empty "
+                "list is False."
             ),
         ),
     ]
@@ -42,7 +45,7 @@ class If(WorkflowConditionTaskNode):
     def execute(
             self,
             input_data: Any,
-            condition: Union[bool, str, None] = None,
+            condition: Any = None,
             _engine: Optional[engine.ActionEngine] = None,
             _backend_directory: Optional[str] = None,
             _main_flow_id: Optional[str] = None,

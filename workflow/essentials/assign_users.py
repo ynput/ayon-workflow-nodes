@@ -85,11 +85,16 @@ class AssignUsers(WorkflowTaskNode):
         else:
             assignees = users
 
-        # kept to restore them if a later node fails
-        self.inject_custom_backend_data(_engine, previous_assignees=current)
+        # skip update if no change, optimization but
+        # also do not emit events (prevent workflow loop)
+        if assignees == current:
+            return task
+
         ayon_api.update_task(
             task.project_name, task.task_id, assignees=assignees
         )
+        # kept to restore them if a later node fails
+        self.inject_custom_backend_data(_engine, previous_assignees=current)
         return task
 
     def revert_execute(
