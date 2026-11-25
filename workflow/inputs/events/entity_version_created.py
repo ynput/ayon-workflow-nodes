@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Dict, Any, List
 
 import ayon_api
 
@@ -19,7 +19,6 @@ class OnVersionCreated(EventTrigger):
     """Trigger node: on new version created."""
 
     version = "0.0.1"
-    event_topic = "entity.version.created"
     outputs = [
         OutputAttribute(
             name="event_context",
@@ -30,6 +29,10 @@ class OnVersionCreated(EventTrigger):
             description="The output version item.",
         )
     ]
+
+    @classmethod
+    def get_event_topics(cls, execute_values: Dict[str, Any]) -> List[str]:
+        return ["entity.version.created"]
 
     def execute(
         self,

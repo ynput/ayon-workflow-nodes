@@ -1,0 +1,90 @@
+{
+  "name": "Task to review on publish",
+  "description": "When a version is created, set the status of its task to Pending review.",
+  "execution_graph": {
+    "name": "Task to review on publish",
+    "description": "When a version is created, set the status of its task to Pending review.",
+    "all_nodes": [
+      {
+        "plugin_ref": {
+          "name": "OnVersionCreated",
+          "version": "0.0.1"
+        },
+        "name": "OnVersionCreated1",
+        "label": "OnVersionCreated",
+        "static_values": {
+          "event_id": null
+        },
+        "input_connections": {
+          "event_id": null
+        },
+        "ui": {
+          "position": [
+            0,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "GetVersionTask",
+          "version": "0.0.1"
+        },
+        "name": "GetVersionTask1",
+        "label": "GetVersionTask",
+        "static_values": {
+          "version_item": null,
+          "ensure_exists": true
+        },
+        "input_connections": {
+          "version_item": {
+            "origin_node_name": "OnVersionCreated1",
+            "origin_node_output": "event_version_item"
+          },
+          "ensure_exists": null
+        },
+        "ui": {
+          "position": [
+            320,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "SetStatus",
+          "version": "0.0.1"
+        },
+        "name": "SetStatus1",
+        "label": "SetStatus",
+        "static_values": {
+          "input_entity": null,
+          "status": "Pending review"
+        },
+        "input_connections": {
+          "input_entity": {
+            "origin_node_name": "GetVersionTask1",
+            "origin_node_output": "task_context"
+          },
+          "status": null
+        },
+        "ui": {
+          "position": [
+            640,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      }
+    ],
+    "ui": {
+      "viewport_framing": null
+    }
+  },
+  "dispatch_graphs": []
+}
