@@ -122,20 +122,21 @@ class SetStatus(WorkflowTaskNode):
                 )
             new_statuses.append(matches[0])
 
-        # Store previous values to restore them in revert if needed
-        previous_statuses = [_get_status(entity) for entity in entities]
-        self.inject_custom_backend_data(
-            _engine, previous_statuses=previous_statuses
-        )
-        for entity, previous, new in zip(
-            entities,
-            previous_statuses,
-            new_statuses
-        ):
-            # skip update if no change, optimization but
-            # also do not emit events (prevent workflow loop)
-            if previous != new:
-                _update_status(entity, new)
+        previous_statuses = []
+        try:
+            for entity, new in zip(entities, new_statuses):
+                previous = _get_status(entity)
+                # skip update if no change, optimization but
+                # also do not emit events (prevent workflow loop)
+                if previous == new:
+                    previous = None  # no need to revert
+                else:
+                    _update_status(entity, new)
+                previous_statuses.append(previous)
+        finally:
+            self.inject_custom_backend_data(
+                _engine, previous_statuses=previous_statuses
+            )
 
         return input_entity
 
