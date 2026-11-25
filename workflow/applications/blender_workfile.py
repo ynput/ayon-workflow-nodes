@@ -133,6 +133,7 @@ class BlenderWorkfile(WorkflowTaskNode):
             app_application_variant=blender_application_variant,
             log_file=log_file,
             restrict_to_task=restrict_to_task,
+            log=self.log,
         )
 
         return output_workfile
