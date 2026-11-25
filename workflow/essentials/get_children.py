@@ -174,6 +174,13 @@ class GetChildren(WorkflowTaskNode):
 
         entity_type = getattr(input_entity, "entity_type", None)
         if child_type == "version" and entity_type == "task":
+            folders[input_entity.folder_id] = FolderItem(
+                project_name=project_name,
+                folder_type=input_entity.folder_type,
+                folder_name=input_entity.folder_name,
+                folder_id=input_entity.folder_id,
+                _parent=input_entity.parent,
+            )
             children, child_statuses = _get_versions(
                 project_name,
                 input_entity,
@@ -187,6 +194,21 @@ class GetChildren(WorkflowTaskNode):
                 input_entity,
                 recursive
             )
+            # parents first, so each one is built from the cache,
+            # without fetching its ancestors again
+            folders[input_entity.folder_id] = input_entity
+            for folder in sorted(
+                sub_folders,
+                key=lambda f: f["path"].count("/")
+            ):
+                folders[folder["id"]] = FolderItem(
+                    project_name=project_name,
+                    folder_type=folder["folderType"],
+                    folder_name=folder["name"],
+                    folder_id=folder["id"],
+                    _parent=folders[folder["parentId"]],
+                )
+
             if child_type == "folder":
                 children = [
                     folder_item(folder["id"]) for folder in sub_folders
