@@ -208,6 +208,7 @@ from ayon_workflow.utils import remap_input
 
 def execute(self, context: ContextItem, file_path: str, content: str = "") -> str:
     remapped_path = remap_input(file_path, context.project_name)
+    self.log.info("Writing %s", remapped_path)
     with open(remapped_path, "w") as f:
         f.write(content)
     return file_path  # the rootless path, not remapped_path
@@ -217,6 +218,7 @@ def revert_execute(
 ):
     remapped_path = remap_input(file_path, context.project_name)
     if os.path.exists(remapped_path):
+        self.log.info("Removing %s", remapped_path)
         os.remove(remapped_path)
 ```
 
@@ -278,7 +280,8 @@ def revert_execute(self, task: TaskItem, status: str, _custom_data=None, **kwarg
 
 This snippet is illustrative. For a runnable demo of a failing workflow that triggers a
 revert, see [`demo/example_revert.py`](../demo/example_revert.py). For the full
-path-remapping pattern, including subprocesses and log streaming, see
+path-remapping pattern, including subprocesses and streaming their output
+to `self.log`, see
 [`workflow/applications/_base.py`](../workflow/applications/_base.py) and
 [`workflow/applications/nuke.py`](../workflow/applications/nuke.py).
 
@@ -320,6 +323,7 @@ class OnTaskAssigneesChanged(EventTrigger):
         self, event_id: Optional[str] = None
     ) -> Tuple[Optional[TaskItem], Optional[List[str]]]:
         if event_id is None:
+            self.log.debug("No event, skipping.")
             return None, None
         event_data = super().execute(event_id)
         # ... resolve typed objects from event_data ...
@@ -466,6 +470,7 @@ Before considering a new or changed node done:
 - [ ] Data needed by `revert_execute()` is stored with `inject_custom_backend_data()`, not on `self`.
 - [ ] Trigger nodes handle `event_id=None`.
 - [ ] Trigger nodes skip the workflow by raising `SkipWorkflowInput` with a reason.
+- [ ] Messages for the run's log go through `self.log`, not `print()`.
 - [ ] Engine parameters (`_engine`, `_backend_directory`, `_main_flow_id`) are declared only when needed.
 - [ ] The node is in `get_plugins()`, gated behind `ExecutionScope.WORKSTATION` only if needed.
 - [ ] The node runs in the AYON Console and looks right in the Workflow editor.
