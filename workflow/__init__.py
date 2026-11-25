@@ -45,7 +45,6 @@ def get_plugins(
 
     from .essentials.add_comment import AddComment
     from .essentials.append import Append
-    from .essentials.apply_hierarchy_template import ApplyHierarchyTemplate
     from .essentials.assign_users import AssignUsers
     from .essentials.context import Context
     from .essentials.create_task import CreateTask
@@ -94,7 +93,6 @@ def get_plugins(
         SetAttribute,
         AssignUsers,
         CreateTask,
-        ApplyHierarchyTemplate,
         AddComment,
         OnVersionCreated,
         OnTaskAssigneesChanged,
