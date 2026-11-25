@@ -158,8 +158,8 @@ class SetAttribute(WorkflowTaskNode):
         if previous == converted:
             return input_entity
 
-        self.inject_custom_backend_data(_engine, previous=previous)
         _utils.update_entity(input_entity, attrib={attribute: converted})
+        self.inject_custom_backend_data(_engine, previous=previous)
         return input_entity
 
     def revert_execute(
