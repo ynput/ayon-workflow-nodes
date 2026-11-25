@@ -107,7 +107,7 @@ def _get_tasks(
 
 class GetChildren(WorkflowTaskNode):
     """
-    Get the chidren of an entity:
+    Get the children of an entity:
         - folders or tasks of an AYON folder,
         - versions published from a task.
     """
