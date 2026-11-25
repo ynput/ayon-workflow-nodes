@@ -1,9 +1,9 @@
 {
-  "name": "Assign when ready",
-  "description": "When a task is ready to start, assign users to it.",
+  "name": "Set folder in progress when a task starts",
+  "description": "When a task is in progress, set its folder in progress too.",
   "execution_graph": {
-    "name": "Assign when ready",
-    "description": "When a task is ready to start, assign users to it.",
+    "name": "Set folder in progress when a task starts",
+    "description": "When a task is in progress, set its folder in progress too.",
     "all_nodes": [
       {
         "plugin_ref": {
@@ -15,7 +15,7 @@
         "static_values": {
           "event_id": null,
           "entity_type": "task",
-          "to_status": "Ready to start",
+          "to_status": "In progress",
           "from_status": ""
         },
         "input_connections": {
@@ -35,27 +35,50 @@
       },
       {
         "plugin_ref": {
-          "name": "AssignUsers",
+          "name": "GetParentContext",
           "version": "0.0.1"
         },
-        "name": "AssignUsers1",
-        "label": "AssignUsers",
+        "name": "GetParentContext1",
+        "label": "GetParentContext",
         "static_values": {
-          "task": null,
-          "users": null,
-          "edit_mode": "add"
+          "context": null
         },
         "input_connections": {
-          "task": {
+          "context": {
             "origin_node_name": "OnStatusChanged1",
             "origin_node_output": "entity"
-          },
-          "users": null,
-          "edit_mode": null
+          }
         },
         "ui": {
           "position": [
             320,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "SetStatus",
+          "version": "0.0.1"
+        },
+        "name": "SetStatus1",
+        "label": "SetStatus",
+        "static_values": {
+          "input_entity": null,
+          "status": "In progress"
+        },
+        "input_connections": {
+          "input_entity": {
+            "origin_node_name": "GetParentContext1",
+            "origin_node_output": "parent_context"
+          },
+          "status": null
+        },
+        "ui": {
+          "position": [
+            640,
             0
           ],
           "color": null,

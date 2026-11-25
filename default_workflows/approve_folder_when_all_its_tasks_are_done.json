@@ -1,8 +1,8 @@
 {
-  "name": "Folder approved when all its tasks are",
+  "name": "Approve folder when all its tasks are done",
   "description": "When a task is approved, approve its folder if all its tasks are approved or omitted.",
   "execution_graph": {
-    "name": "Folder approved when all its tasks are",
+    "name": "Approve folder when all its tasks are done",
     "description": "When a task is approved, approve its folder if all its tasks are approved or omitted.",
     "all_nodes": [
       {

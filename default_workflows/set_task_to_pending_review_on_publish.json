@@ -1,8 +1,8 @@
 {
-  "name": "Task to review on publish",
+  "name": "Set task to pending review on publish",
   "description": "When a version is created, set the status of its task to Pending review.",
   "execution_graph": {
-    "name": "Task to review on publish",
+    "name": "Set task to pending review on publish",
     "description": "When a version is created, set the status of its task to Pending review.",
     "all_nodes": [
       {

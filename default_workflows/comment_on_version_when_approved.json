@@ -1,0 +1,69 @@
+{
+  "name": "Comment on version when approved",
+  "description": "When a version is approved, say so in its activity feed.",
+  "execution_graph": {
+    "name": "Comment on version when approved",
+    "description": "When a version is approved, say so in its activity feed.",
+    "all_nodes": [
+      {
+        "plugin_ref": {
+          "name": "OnStatusChanged",
+          "version": "0.0.1"
+        },
+        "name": "OnStatusChanged1",
+        "label": "OnStatusChanged",
+        "static_values": {
+          "event_id": null,
+          "entity_type": "version",
+          "to_status": "Approved",
+          "from_status": ""
+        },
+        "input_connections": {
+          "event_id": null,
+          "entity_type": null,
+          "to_status": null,
+          "from_status": null
+        },
+        "ui": {
+          "position": [
+            0,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      },
+      {
+        "plugin_ref": {
+          "name": "AddComment",
+          "version": "0.0.1"
+        },
+        "name": "AddComment1",
+        "label": "AddComment",
+        "static_values": {
+          "input_entity": null,
+          "text": "Approved."
+        },
+        "input_connections": {
+          "input_entity": {
+            "origin_node_name": "OnStatusChanged1",
+            "origin_node_output": "entity"
+          },
+          "text": null
+        },
+        "ui": {
+          "position": [
+            320,
+            0
+          ],
+          "color": null,
+          "size": null
+        }
+      }
+    ],
+    "ui": {
+      "viewport_framing": null
+    }
+  },
+  "dispatch_graphs": []
+}

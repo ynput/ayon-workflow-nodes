@@ -1,9 +1,9 @@
 {
-  "name": "Folder in progress when a task starts",
-  "description": "When a task is in progress, set its folder in progress too.",
+  "name": "Approve latest versions when their task is approved",
+  "description": "When a task is approved, approve the latest version of each product published from it.",
   "execution_graph": {
-    "name": "Folder in progress when a task starts",
-    "description": "When a task is in progress, set its folder in progress too.",
+    "name": "Approve latest versions when their task is approved",
+    "description": "When a task is approved, approve the latest version of each product published from it.",
     "all_nodes": [
       {
         "plugin_ref": {
@@ -15,7 +15,7 @@
         "static_values": {
           "event_id": null,
           "entity_type": "task",
-          "to_status": "In progress",
+          "to_status": "Approved",
           "from_status": ""
         },
         "input_connections": {
@@ -35,19 +35,27 @@
       },
       {
         "plugin_ref": {
-          "name": "GetParentContext",
+          "name": "GetChildren",
           "version": "0.0.1"
         },
-        "name": "GetParentContext1",
-        "label": "GetParentContext",
+        "name": "GetChildren1",
+        "label": "GetChildren",
         "static_values": {
-          "context": null
+          "input_entity": null,
+          "child_type": "version",
+          "recursive": false,
+          "latest_only": true,
+          "statuses": []
         },
         "input_connections": {
-          "context": {
+          "input_entity": {
             "origin_node_name": "OnStatusChanged1",
             "origin_node_output": "entity"
-          }
+          },
+          "child_type": null,
+          "recursive": null,
+          "latest_only": null,
+          "statuses": null
         },
         "ui": {
           "position": [
@@ -67,12 +75,12 @@
         "label": "SetStatus",
         "static_values": {
           "input_entity": null,
-          "status": "In progress"
+          "status": "Approved"
         },
         "input_connections": {
           "input_entity": {
-            "origin_node_name": "GetParentContext1",
-            "origin_node_output": "parent_context"
+            "origin_node_name": "GetChildren1",
+            "origin_node_output": "children"
           },
           "status": null
         },

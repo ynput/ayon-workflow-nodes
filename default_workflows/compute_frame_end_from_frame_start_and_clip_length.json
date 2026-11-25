@@ -1,8 +1,8 @@
 {
-  "name": "Frame end from the clip",
+  "name": "Compute frame end from frame start and clip length",
   "description": "When the attributes of a folder change, set its frame end from its frame start and clip length.",
   "execution_graph": {
-    "name": "Frame end from the clip",
+    "name": "Compute frame end from frame start and clip length",
     "description": "When the attributes of a folder change, set its frame end from its frame start and clip length.",
     "all_nodes": [
       {

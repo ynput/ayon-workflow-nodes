@@ -1,8 +1,8 @@
 {
-  "name": "Watch the parent folder when assigned",
+  "name": "Watch folder when assigned to one of its tasks",
   "description": "When users are assigned to a task, they also watch its folder.",
   "execution_graph": {
-    "name": "Watch the parent folder when assigned",
+    "name": "Watch folder when assigned to one of its tasks",
     "description": "When users are assigned to a task, they also watch its folder.",
     "all_nodes": [
       {
