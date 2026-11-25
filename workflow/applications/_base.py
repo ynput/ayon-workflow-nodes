@@ -4,11 +4,9 @@ import json
 import os
 import logging
 import shutil
-import sys
 import subprocess
 import tempfile
 
-from contextlib import contextmanager
 from typing import Optional, Tuple, List, Dict
 
 from ayon_applications import ApplicationManager, Application, LaunchTypes
@@ -19,22 +17,6 @@ from ayon_workflow.utils import remap_input
 
 
 log = logging.getLogger(__name__)
-
-
-@contextmanager
-def force_stdout_utf8():
-    original_encoding = sys.stdout.encoding
-    original_errors = sys.stdout.errors
-
-    try:
-        sys.stdout.reconfigure(encoding='utf-8')
-        yield
-
-    finally:
-        sys.stdout.reconfigure(
-            encoding=original_encoding,
-            errors=original_errors
-        )
 
 
 def get_application(
@@ -124,6 +106,7 @@ def run_application(
         env: Optional[Dict[str, str]] = None,
         temporary_directory: Optional[str] = None,
         restrict_to_task: Optional[bool] = False,
+        log: logging.Logger = log,
     ) -> subprocess.Popen:
     # Start application.
     app_manager, app = get_application(
@@ -197,13 +180,12 @@ def run_application(
             f.write(f"environment: {env_log}\n")
             process = subprocess.Popen(launch_args, **kwargs)
 
-            with force_stdout_utf8():
-                for line in iter(lambda: process.stdout.readline(), b""):
-                    sys.stdout.write(line)
-                    f.write(line)
+            for line in iter(lambda: process.stdout.readline(), b""):
+                log.info(line.rstrip())
+                f.write(line)
 
-                    if process.poll() is not None and line == '':
-                        break
+                if process.poll() is not None and line == '':
+                    break
 
             process.wait()
 

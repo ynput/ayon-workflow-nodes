@@ -197,6 +197,8 @@ class Publish(WorkflowTaskNode):
             context=pyblish_context,
             plugins=publish_plugins
         ):
+            for record in result["records"]:
+                self.log.log(record.levelno, record.getMessage())
             if result["error"]:
                 raise RuntimeError(repr(result))
 
