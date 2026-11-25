@@ -48,6 +48,5 @@ class Expression(WorkflowTaskNode):
             raise ValueError("No expression to compute.")
         return eval(
             expression,
-            {"__builtins__": SAFE_BUILTINS},
-            {"input_data": input_data},
+            {"__builtins__": SAFE_BUILTINS, "input_data": input_data},
         )
